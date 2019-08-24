@@ -3,7 +3,6 @@ import torch
 import os
 import numpy as np
 import pytest
-
 from kymatio import HarmonicScattering3D
 from kymatio.scattering3d import backend
 from kymatio.scattering3d.utils import generate_weighted_sum_of_gaussians
