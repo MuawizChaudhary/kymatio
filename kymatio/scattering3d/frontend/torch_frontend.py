@@ -107,7 +107,8 @@ class HarmonicScattering3DTorch(ScatteringTorch):
                         self.guassian_filters[j+1], self.points)
         elif self.method == 'standard':
             self.average = lambda x, j:\
-                self.backend._compute_standard_scattering_coefs(x, self.gaussian_filters[j], j, self.backend.subsample)
+                self.backend._compute_standard_scattering_coefs(x,
+                        self.gaussian_filters[j], self.J, self.backend.subsample)
 
     
     def _apply(self, fn):
