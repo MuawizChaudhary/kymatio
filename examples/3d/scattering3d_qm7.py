@@ -201,7 +201,7 @@ def compute_qm7_solid_harmonic_scattering_coefficients(
         val_batch = valence_charges[start:end]
 
         full_density_batch = torch.from_numpy(generate_weighted_sum_of_gaussians(
-                grid, pos_batch, full_batch, sigma)).float()
+                grid, pos_batch, full_batch, sigma)).float().cuda()
         full_order_0 = compute_integrals(full_density_batch, integral_powers)
         scattering.max_order = 2
         scattering.method = 'integral'
@@ -209,7 +209,7 @@ def compute_qm7_solid_harmonic_scattering_coefficients(
         full_scattering = scattering(full_density_batch)
 
         val_density_batch = torch.from_numpy(generate_weighted_sum_of_gaussians(
-                grid, pos_batch, val_batch, sigma)).float()
+                grid, pos_batch, val_batch, sigma)).float().cuda()
         val_order_0 = compute_integrals(val_density_batch, integral_powers)
         val_scattering= scattering(val_density_batch)
 

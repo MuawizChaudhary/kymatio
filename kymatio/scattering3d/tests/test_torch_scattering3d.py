@@ -200,8 +200,7 @@ def test_against_standard_computations(device, backend):
     # Permute the axes since reference has (batch index, integral power, j,
     # ell) while the computed transform has (batch index, j, ell, integral
     # power).
-    order_1 = order_1.permute(0, 3, 1, 2)
-    order_2 = order_2.permute(0, 3, 1, 2)
+    print(order_1.size())
 
     order_1 = order_1.reshape((batch_size, -1))
     order_2 = order_2.reshape((batch_size, -1))
@@ -236,8 +235,9 @@ def test_solid_harmonic_scattering(device, backend):
     M, N, O, J, L = 128, 128, 128, 1, 3
     grid = np.fft.ifftshift(np.mgrid[-M//2:-M//2+M, -N//2:-N//2+N, -O//2:-O//2+O].astype('float32'), axes=(1,2,3))
     x = torch.from_numpy(generate_weighted_sum_of_gaussians(grid, centers,
-        weights, sigma_gaussian)).to(device)
-    scattering = HarmonicScattering3D(J=J, shape=(M, N, O), L=L, sigma_0=sigma_0_wavelet).to(device)
+        weights, sigma_gaussian)).to(device).float()
+    scattering = HarmonicScattering3D(J=J, shape=(M, N, O), L=L,
+            sigma_0=sigma_0_wavelet,frontend='torch',backend=backend).to(device)
 
     scattering.max_order = 1
     scattering.method = 'integral'
@@ -276,7 +276,8 @@ def test_scattering_methods(device, backend):
     sigma_0 = 1
     x = torch.randn((1,) + shape).to(device)
 
-    scattering = HarmonicScattering3D(J=J, shape=shape, L=L, sigma_0=sigma_0).to(device)
+    scattering = HarmonicScattering3D(J=J, shape=shape, L=L, sigma_0=sigma_0,
+            frontend='torch',backend=backend).to(device)
 
     scattering.method = 'standard'
     Sx = scattering(x)
