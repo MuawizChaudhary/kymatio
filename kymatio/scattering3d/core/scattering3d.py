@@ -1,6 +1,5 @@
 # Authors: Louis Thiry, Georgios Exarchakis
 # Scientific Ancestry: Louis Thiry, Georgios Exarchakis, Matthew Hirn, Michael Eickenberg
-import torch
 
 def scattering3d(_input, filters, gaussian_filters, rotation_covariant, points, integral_powers, L, J, method,\
                  max_order, backend, averaging):
