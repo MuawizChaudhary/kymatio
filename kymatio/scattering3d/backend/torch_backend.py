@@ -140,46 +140,6 @@ def modulus_rotation(x, module):
     return torch.sqrt(module)
 
 
-def _fft_convolve(input_array, filter_array):
-        """
-        Computes the fourier space convolution of the input_array, 
-        given in signal space, with a filter, given in fourier space.
-
-        Parameters
-        ----------
-
-        input_array: torch tensor
-            size (batchsize, M, N, O, 2)
-        filter_array: torch tensor
-            size (M, N, O, 2)
-
-        Returns
-        -------
-
-        output: the result of the convolution of input_array with filter
-
-        """
-        return fft(cdgmm3d(fft(input_array, inverse=False), filter_array), inverse=True)
-
-
-def _low_pass_filter(input_array, low_pass):
-    """
-    Computes the convolution of input_array with a lowpass filter phi_j
-
-    Parameters
-    ----------
-    input_array : tensor
-        size (batchsize, M, N, O, 2)
-
-    j: int
-
-    Returns
-    -------
-    output: the result of input_array :math:`\\star phi_J`
-
-    """
-    return _fft_convolve(input_array, low_pass)
-
 
 def _compute_standard_scattering_coefs(input_array, low_pass, J, subsample):
     """
@@ -231,46 +191,6 @@ def _compute_local_scattering_coefs(input_array, low_pass, points):
 
 
 
-
-def averaging(input_array, method, args, filter, compute_integrals):
-    """
-    Computes the scattering coefficients out with any of the three methods
-    'standard', 'local', 'integral'
-
-    Parameters
-    ----------
-    input_array : torch tensor
-        size (batchsize, M, N, O, 2)
-    method : string
-        method name with three possible values ("standard", "local", "integral")
-    args : dict
-        method specific arguments. It methods is equal to "standard", then one
-        expects the array args['integral_powers'] to be a list that holds
-        the exponents the moduli. It should be raised to before calculating
-        the integrals. If method is equal to "local", args['points'] must contain
-        a torch tensor of size (batchsize, number of points, 3) the points in
-        coordinate space at which you want the moduli sampled
-    j : int
-        lowpass scale j of :math:`\\phi_j`
-
-    Returns
-    -------
-    output: torch tensor
-        The scattering coefficients as given by different methods.
-
-    """
-    methods = ['standard', 'local', 'integral']
-    if (not method in methods):
-        raise (ValueError('method must be in {}'.format(methods)))
-    if method == 'integral':
-        return compute_integrals(input_array[..., 0],
-                                 args['integral_powers'])
-    elif method == 'local':
-        return _compute_local_scattering_coefs(input_array, args['points'], filter)
-    elif method == 'standard':
-        return _compute_standard_scattering_coefs(input_array)
-
-
 def subsample(input_array, j):
     return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j, :].contiguous()
 
@@ -310,9 +230,10 @@ backend.name = 'torch'
 backend.cdgmm3d = cdgmm3d
 backend.fft = fft
 backend.finalize = finalize
-backend.to_complex = to_complex
 backend.modulus = complex_modulus
 backend.modulus_rotation = modulus_rotation
 backend.subsample = subsample
 backend.compute_integrals = compute_integrals
 backend._compute_standard_scattering_coefs = _compute_standard_scattering_coefs
+backend._compute_local_scattering_coefs = _compute_local_scattering_coefs
+
