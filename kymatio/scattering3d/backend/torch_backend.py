@@ -4,7 +4,6 @@ import warnings
 BACKEND_NAME = 'torch'
 from collections import namedtuple
 
-
 def iscomplex(input):
     return input.size(-1) == 2
 
@@ -97,15 +96,12 @@ def cdgmm3d(A, B, inplace=False):
     return C if not inplace else A.copy_(C)
 
 def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 = [torch.stack([arr[...,0] for arr in scattering_coef], 1) for scattering_coef in s_order_1]
+    s_order_1 = torch.stack(s_order_1, 1)[...,0]
     if max_order == 2:
-        s_order_2 = [torch.stack([arr[...,0] for arr in scattering_coef], 1) for scattering_coef in s_order_2]
-
-
-        return torch.cat([torch.stack(s_order_1, dim=2), torch.stack(s_order_2,
-            dim=2)], 1)
+        s_order_2 = torch.stack(s_order_2, 1)[..., 0]
+        return torch.cat([s_order_1, s_order_2], dim=1)
     else:
-        return torch.stack(s_order_1, dim=2)
+        return s_order_1
 
 
 

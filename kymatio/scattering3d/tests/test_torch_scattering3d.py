@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pytest
 from kymatio import HarmonicScattering3D
-from kymatio.scattering3d import backend
 from kymatio.scattering3d.utils import generate_weighted_sum_of_gaussians
 
 
@@ -28,7 +27,6 @@ if torch.cuda.is_available():
     devices = ['cuda', 'cpu']
 else:
     devices = ['cpu']
-
 
 
 def relative_difference(a, b):
@@ -135,11 +133,6 @@ def test_cdgmm3d(device, backend, inplace):
             backend.cdgmm3d(x, y)
         assert "for cpu tensors" in record.value.args[0]
 
-@pytest.mark.parametrize("device", devices)
-@pytest.mark.parametrize("backend", backends)
-def test_iscomplex(backend, device):
-    assert backend.iscomplex(torch.zeros(4, 2).to(device))
-    assert not backend.iscomplex(torch.zeros(4, 1).to(device))
 
 @pytest.mark.parametrize("device", devices)
 @pytest.mark.parametrize("backend", backends)
@@ -154,7 +147,7 @@ def test_to_complex(backend, device):
 def test_complex_modulus(backend, device):
     x = torch.randn(4, 3, 2).to(device)
     xm = torch.sqrt(x[...,0] ** 2 + x[...,1] ** 2)
-    y = backend.complex_modulus(x)
+    y = backend.modulus(x)
     assert (y[...,0] - xm).norm() < 1e-7
     assert (y[...,1]).norm() < 1e-7
 

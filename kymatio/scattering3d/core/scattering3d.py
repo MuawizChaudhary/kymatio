@@ -25,7 +25,6 @@ def scattering3d(_input, filters, gaussian_filters, rotation_covariant, points, 
 
     s_order_1, s_order_2 = [], []
     for l in range(L+1):
-        s_order_1_l, s_order_2_l = [], []
         for j_1 in range(J+1):
             U_1_c = fft(_input)
             U_1_m = None
@@ -41,7 +40,7 @@ def scattering3d(_input, filters, gaussian_filters, rotation_covariant, points, 
                 U_1_m = modulus(U_1_c)
 
             S_1_l = averaging(U_1_m, j_1)
-            s_order_1_l.append(S_1_l)
+            s_order_1.append(S_1_l)
 
             if max_order >1:
                 for j_2 in range(j_1+1, J+1):
@@ -58,11 +57,7 @@ def scattering3d(_input, filters, gaussian_filters, rotation_covariant, points, 
                         U_2_c = fft(U_2_c, inverse=True)
                         U_2_m = modulus(U_2_c)
                     S_2_l = averaging(U_2_m, j_2)
-                    s_order_2_l.append(S_2_l)
-        s_order_1.append(s_order_1_l)
-        s_order_2.append(s_order_2_l)
-
-
+                    s_order_2.append(S_2_l)
 
     return finalize(s_order_1, s_order_2, max_order)
 
