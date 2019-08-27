@@ -156,6 +156,14 @@ class HarmonicScattering3DTorch(ScatteringTorch):
                 integral_powers=self.integral_powers, L=self.L, J=self.J, method=self.method, max_order=self.max_order, 
                 backend=self.backend, averaging=self.average)
 
+    def scattering(self, input):
+        # TODO: Fill in needed code
+        #
+        return scattering3d(input_array, filters=self.filters,
+                gaussian_filters=self.gaussian_filters, rotation_covariant=self.rotation_covariant, points=self.points, 
+                integral_powers=self.integral_powers, L=self.L, J=self.J, method=self.method, max_order=self.max_order, 
+                backend=self.backend, averaging=self.averaging)
+
 
     def forward(self, input_array):
         """
