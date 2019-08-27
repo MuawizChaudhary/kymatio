@@ -100,65 +100,19 @@ class HarmonicScattering3DTorch(ScatteringTorch):
         if (not self.method in methods):
             raise (ValueError('method must be in {}'.format(methods)))
         if self.method == 'integral':\
-            self.average =lambda x,j : self.backend.compute_integrals(x[...,0],self.integral_powers)
+            self.averaging =lambda x,j : self.backend.compute_integrals(x[...,0],self.integral_powers)
         elif self.method == 'local':
-            self.average = lambda x,j:\
+            self.averaging = lambda x,j:\
                 self.backend._compute_local_scattering_coefs(x,
                         self.guassian_filters[j+1], self.points)
         elif self.method == 'standard':
-            self.average = lambda x, j:\
+            self.averaging = lambda x, j:\
                 self.backend._compute_standard_scattering_coefs(x,
                         self.gaussian_filters[j], self.J, self.backend.subsample)
 
-    
-    def _apply(self, fn):
-        """
-            Mimics the behavior of the function _apply() of a nn.Module()
-        """
-        self.filters = _apply_filters(self.filters, fn)
-        self.gaussian_filters = fn(self.gaussian_filters)
-        return self
-
-    def cuda(self, device=None):
-        """
-            Mimics the behavior of the function cuda() of a nn.Module()
-        """
-        return self._apply(lambda t: t.cuda(device))
-
-    def to(self, *args, **kwargs):
-        """
-            Mimics the behavior of the function to() of a nn.Module()
-        """
-        device, dtype, non_blocking = torch._C._nn._parse_to(*args, **kwargs)
-
-        if dtype is not None:
-            if not dtype.is_floating_point:
-                raise TypeError('nn.Module.to only accepts floating point '
-                                'dtypes, but got desired dtype={}'.format(dtype))
-
-        def convert(t):
-            return t.to(device, dtype if t.is_floating_point() else None, non_blocking)
-
-        return self._apply(convert)
-
-    def cpu(self):
-        """
-            Mimics the behavior of the function cpu() of a nn.Module()
-        """
-        return self._apply(lambda t: t.cpu())
 
 
-    def scattering(self, input):
-        # TODO: Fill in needed code
-        #
-        return scattering3d(input, filters=self.filters,
-                gaussian_filters=self.gaussian_filters, rotation_covariant=self.rotation_covariant, points=self.points, 
-                integral_powers=self.integral_powers, L=self.L, J=self.J, method=self.method, max_order=self.max_order, 
-                backend=self.backend, averaging=self.average)
-
-    def scattering(self, input):
-        # TODO: Fill in needed code
-        #
+    def scattering(self, input_array):
         return scattering3d(input_array, filters=self.filters,
                 gaussian_filters=self.gaussian_filters, rotation_covariant=self.rotation_covariant, points=self.points, 
                 integral_powers=self.integral_powers, L=self.L, J=self.J, method=self.method, max_order=self.max_order, 
