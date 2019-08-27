@@ -200,7 +200,9 @@ def test_against_standard_computations(device, backend):
     # Permute the axes since reference has (batch index, integral power, j,
     # ell) while the computed transform has (batch index, j, ell, integral
     # power).
-    print(order_1.size())
+    order_1 = order_1.permute(0, 3, 1, 2)
+    order_2 = order_2.permute(0, 3, 1, 2)
+
 
     order_1 = order_1.reshape((batch_size, -1))
     order_2 = order_2.reshape((batch_size, -1))
@@ -210,12 +212,12 @@ def test_against_standard_computations(device, backend):
     order_0 = order_0.cpu().numpy().reshape((batch_size, -1))
     start = 0
     end = order_0.shape[1]
-    order_0_ref = scattering_ref[:,start:end].numpy()
+    order_0_ref = scattering_ref[:,start:end].cpu().numpy()
 
     orders_1_and_2 = orders_1_and_2.cpu().numpy().reshape((batch_size, -1))
     start = end
     end += orders_1_and_2.shape[1]
-    orders_1_and_2_ref = scattering_ref[:, start:end].numpy()
+    orders_1_and_2_ref = scattering_ref[:, start:end].cpu().numpy()
 
     order_0_diff_cpu = relative_difference(order_0_ref, order_0)
     orders_1_and_2_diff_cpu = relative_difference(
