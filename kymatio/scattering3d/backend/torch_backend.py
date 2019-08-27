@@ -45,18 +45,19 @@ def fft(input, inverse=False):
     return torch.fft(input, 3)
 
 
-def cdgmm3d(A, B):
+def cdgmm3d(A, B, inplace=False):
     """
     Pointwise multiplication of complex tensors.
 
     ----------
     A: complex torch tensor
     B: complex torch tensor of the same size as A
-
+    inplace : boolean, optional
+        if set True, all the operations are performed inplace
     Returns
     -------
     output : torch tensor of the same size as A containing the result of the 
-             elementwise complex multiplication of  A with B 
+             elementwise complex multiplication of A with B 
     """
     if not A.is_contiguous():
         warnings.warn("cdgmm3d: tensor A is converted to a contiguous array")
@@ -77,17 +78,32 @@ def cdgmm3d(A, B):
 
     if type(A) is not type(B):
         raise RuntimeError('A and B should be same type!')
+    
+    if A.device.type != B.device.type:
+        raise TypeError('A and B must be both on GPU or both on CPU.')
 
-    C = torch.empty_like(A)
+    if A.device.type == 'cuda':
+        if A.device.index != B.device.index:
+            raise TypeError('A and B must be on the same GPU!')
+
+
+
+
+    C = A.new(A.size())
 
     C[..., 0] = A[..., 0] * B[..., 0] - A[..., 1] * B[..., 1]
     C[..., 1] = A[..., 0] * B[..., 1] + A[..., 1] * B[..., 0]
 
-    return C
+    return C if not inplace else A.copy_(C)
 
 def finalize(s_order_1, s_order_2, max_order):
+    s_order_1 = [torch.stack([arr[...,0] for arr in scattering_coef], 1) for scattering_coef in s_order_1]
     if max_order == 2:
-        return torch.cat([torch.stack(s_order_1, dim=2), torch.stack(s_order_2, dim=2)], 1)
+        s_order_2 = [torch.stack([arr[...,0] for arr in scattering_coef], 1) for scattering_coef in s_order_2]
+
+
+        return torch.cat([torch.stack(s_order_1, dim=2), torch.stack(s_order_2,
+            dim=2)], 1)
     else:
         return torch.stack(s_order_1, dim=2)
 
@@ -120,7 +136,7 @@ def modulus_rotation(x, module):
         which is covariant to 3D translations and rotations
 
     """
-    if module == None:
+    if module is None:
         module = torch.zeros_like(x)
     else:
         module = module **2
@@ -128,6 +144,26 @@ def modulus_rotation(x, module):
     return torch.sqrt(module)
 
 
+def _fft_convolve(input_array, filter_array):
+        """
+        Computes the fourier space convolution of the input_array, 
+        given in signal space, with a filter, given in fourier space.
+
+        Parameters
+        ----------
+
+        input_array: torch tensor
+            size (batchsize, M, N, O, 2)
+        filter_array: torch tensor
+            size (M, N, O, 2)
+
+        Returns
+        -------
+
+        output: the result of the convolution of input_array with filter
+
+        """
+        return fft(cdgmm3d(fft(input_array, inverse=False), filter_array), inverse=True)
 
 
 def _low_pass_filter(input_array, low_pass):
@@ -146,6 +182,7 @@ def _low_pass_filter(input_array, low_pass):
     output: the result of input_array :math:`\\star phi_J`
 
     """
+
     return _fft_convolve(input_array, low_pass)
 
 
@@ -189,7 +226,7 @@ def _compute_local_scattering_coefs(input_array, low_pass, points):
 
     """
     local_coefs = torch.zeros(input_array.size(0), points.size(1), 1)
-    convolved_input = _low_pass_filter(input_array, low_pass)#j + 1)
+    convolved_input = _low_pass_filter(input_array, low_pass)
     for i in range(input_array.size(0)):
         for j in range(points[i].size(0)):
             x, y, z = points[i, j, 0], points[i, j, 1], points[i, j, 2]
@@ -286,3 +323,4 @@ backend.modulus_rotation = modulus_rotation
 backend.averaging = averaging
 backend.subsample = subsample
 backend.compute_integrals = compute_integrals
+backend._compute_standard_scattering_coefs = _compute_standard_scattering_coefs
