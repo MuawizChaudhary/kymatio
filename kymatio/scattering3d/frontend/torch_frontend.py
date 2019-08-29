@@ -94,8 +94,9 @@ class HarmonicScattering3DTorch(ScatteringTorch):
         # transfer the filters from numpy to torch
         for k in range(len(self.filters)):
             self.filters[k] = torch.from_numpy(self.filters[k]).type(torch.Tensor)
+            self.register_buffer('tensor' + str(k), self.filters[k])
         self.gaussian_filters = torch.from_numpy(self.gaussian_filters).type(torch.Tensor)
-
+        self.register_buffer('tensor_gaussian_filter', self.gaussian_filters)
         methods = ['standard', 'local', 'integral']
         if (not self.method in methods):
             raise (ValueError('method must be in {}'.format(methods)))
@@ -113,6 +114,11 @@ class HarmonicScattering3DTorch(ScatteringTorch):
 
 
     def scattering(self, input_array):
+        buffer_dict = dict(self.named_buffers())
+        for k in range(len(self.filters)):
+            self.filters[k] = buffer_dict['tensor' + str(k)]
+        self.gaussian_filters = buffer_dict['tensor_gaussian_filter']
+
         return scattering3d(input_array, filters=self.filters,
                 gaussian_filters=self.gaussian_filters, rotation_covariant=self.rotation_covariant, points=self.points, 
                 integral_powers=self.integral_powers, L=self.L, J=self.J, method=self.method, max_order=self.max_order, 

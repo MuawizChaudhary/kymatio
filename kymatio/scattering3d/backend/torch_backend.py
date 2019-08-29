@@ -155,7 +155,8 @@ def _compute_standard_scattering_coefs(input_array, low_pass, J, subsample):
     output: the result of input_array \\star phi_J downsampled by a factor J
 
     """
-    convolved_input = _low_pass_filter(input_array, low_pass)
+    convolved_input = cdgmm3d(input_array, low_pass)
+    convolved_input = fft(convolved_input, inverse=True)
     return subsample(convolved_input, J)
 
 
@@ -181,7 +182,8 @@ def _compute_local_scattering_coefs(input_array, low_pass, points):
 
     """
     local_coefs = torch.zeros(input_array.size(0), points.size(1), 1)
-    convolved_input = _low_pass_filter(input_array, low_pass)
+    convolved_input = cdgmm3d(input_array, low_pass)
+    convolved_input = fft(convolved_input, inverse=True)
     for i in range(input_array.size(0)):
         for j in range(points[i].size(0)):
             x, y, z = points[i, j, 0], points[i, j, 1], points[i, j, 2]
