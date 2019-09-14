@@ -169,7 +169,9 @@ def test_against_standard_computations(device, backend):
     N, O = M, M
     sigma = 1
 
-    scattering = HarmonicScattering3D(J=J, shape=(M, N, O), L=L, sigma_0=sigma, backend=backend, frontend='torch').to(device)
+    scattering = HarmonicScattering3D(J=J, shape=(M, N, O), L=L,
+            sigma_0=sigma, method='integral',
+            integral_powers=integral_powers, max_order=2, backend=backend, frontend='torch').to(device)
 
 
 
@@ -230,7 +232,8 @@ def test_solid_harmonic_scattering(device, backend):
     x = torch.from_numpy(generate_weighted_sum_of_gaussians(grid, centers,
         weights, sigma_gaussian)).to(device).float()
     scattering = HarmonicScattering3D(J=J, shape=(M, N, O), L=L,
-            sigma_0=sigma_0_wavelet,frontend='torch',backend=backend).to(device)
+            sigma_0=sigma_0_wavelet,max_order=1, method='integral',
+            integral_powers=[1], frontend='torch',backend=backend).to(device)
 
     scattering.max_order = 1
     scattering.method = 'integral'
