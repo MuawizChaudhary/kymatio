@@ -94,11 +94,11 @@ class HarmonicScattering3DNumpy(ScatteringNumpy):
         elif self.method == 'local':
             self.averaging = lambda x,j:\
                 self.backend._compute_local_scattering_coefs(x,
-                        self.gaussian_filters[j+1], self.points)
+                        self.gaussian_filters, j, self.points)
         elif self.method == 'standard':
             self.averaging = lambda x, j:\
                 self.backend._compute_standard_scattering_coefs(x,
-                        self.gaussian_filters[j], self.J, self.backend.subsample)
+                        self.gaussian_filters, self.J, self.backend.subsample)
 
 
     def scattering(self, input_array):
