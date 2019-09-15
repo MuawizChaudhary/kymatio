@@ -67,10 +67,10 @@ def cdgmm3d(A, B, inplace=False):
         return A * B
 
 def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 =   np.concatenate(s_order_1, axis=1)
+    s_order_1 =   np.concatenate(np.expand_dims(s_order_1, 1), axis=1)
     if max_order == 2:
-        s_order_2 = np.concatenate(s_order_2, axis=1)
-        return np.concatenate([s_order_1, s_order_2], axis=1)
+        s_order_2 = np.concatenate(np.expand_dims(s_order_2, 1), axis=1)
+        return np.concatenate([s_order_1, s_order_2], axis=0)
     else:
         return s_order_1
 
@@ -204,7 +204,7 @@ def compute_integrals(input_array, integral_powers):
 
 
 def aggregate(x):
-    return np.concatenate([arr for arr in x], axis=1)
+    return np.concatenate([np.expand_dims(arr, 1) for arr in x], axis=1)
 
 backend = namedtuple('backend', ['name', 'cdgmm3d', 'fft', 'finalize', 'modulus', 'modulus_rotation', 'subsample',
                                  'compute_integrals', 'aggregate'])
