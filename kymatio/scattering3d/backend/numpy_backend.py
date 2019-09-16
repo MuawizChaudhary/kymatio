@@ -69,7 +69,7 @@ def cdgmm3d(A, B, inplace=False):
 def finalize(s_order_1, s_order_2, max_order):
     s_order_1 = aggregate(s_order_1)
     if max_order == 2:
-        s_order_2 = aggregate(s_order_1)
+        s_order_2 = aggregate(s_order_2)
         return np.concatenate([s_order_1, s_order_2], axis=1)
     else:
         return s_order_1
