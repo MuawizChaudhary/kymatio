@@ -135,7 +135,7 @@ def modulus_rotation(x, module):
 
 
 
-def _compute_standard_scattering_coefs(input_array, low_pass, J, subsample):
+def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
     """
     Computes the convolution of input_array with a lowpass filter phi_J
     and downsamples by a factor J.
@@ -151,6 +151,7 @@ def _compute_standard_scattering_coefs(input_array, low_pass, J, subsample):
     output: the result of input_array \\star phi_J downsampled by a factor J
 
     """
+    low_pass = filter[J]
     convolved_input = cdgmm3d(input_array, low_pass)
     convolved_input = fft(convolved_input, inverse=True)
     return subsample(convolved_input, J)
