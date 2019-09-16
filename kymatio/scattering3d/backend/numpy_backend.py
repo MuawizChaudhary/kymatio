@@ -31,10 +31,10 @@ def fft(x, direction='C2C', inverse=False):
             raise RuntimeError('C2R mode can only be done with an inverse FFT.')
 
     if direction == 'C2R':
-        output = np.real(np.fft.ifftn(x, axes=(-3,-2,-1)))
+        output = np.real(np.fft.ifftn(x, axes=(-3,-2,-1)))*x.shape[-1]*x.shape[-2]
     elif direction == 'C2C':
         if inverse:
-            output = np.fft.ifftn(x, axes=(-3,-2,-1))
+            output = np.fft.ifftn(x, axes=(-3,-2,-1))*x.shape[-1]*x.shape[-2]
         else:
             output = np.fft.fftn(x, axes=(-3,-2,-1))
     return output
@@ -67,10 +67,10 @@ def cdgmm3d(A, B, inplace=False):
         return A * B
 
 def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 = aggregate(s_order_1)
+    s_order_1 =   np.concatenate(np.expand_dims(s_order_1, 1), axis=1)
     if max_order == 2:
-        s_order_2 = aggregate(s_order_2)
-        return np.concatenate([s_order_1, s_order_2], axis=1)
+        s_order_2 = np.concatenate(np.expand_dims(s_order_2, 1), axis=1)
+        return np.concatenate([s_order_1, s_order_2], axis=0)
     else:
         return s_order_1
 
