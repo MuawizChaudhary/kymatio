@@ -67,9 +67,11 @@ def cdgmm3d(A, B, inplace=False):
         return A * B
 
 def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 = aggregate(s_order_1)
+    s_order_1 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_1], axis=2)
+
+
     if max_order == 2:
-        s_order_2 = aggregate(s_order_2)
+        s_order_2 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_2], axis=2)
         return np.concatenate([s_order_1, s_order_2], axis=1)
     else:
         return s_order_1
