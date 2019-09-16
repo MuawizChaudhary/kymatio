@@ -35,6 +35,7 @@ def test_against_standard_computations():
     scattering.method = 'integral'
     scattering.integral_powers = integral_powers
     orders_1_and_2 = scattering(x)
+    
     # Extract orders and make order axis the slowest in accordance with
     # the stored reference scattering transform.
 
