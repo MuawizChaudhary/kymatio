@@ -47,7 +47,8 @@ def fft(x, direction='C2C', inverse=False):
         else:
             output = tf.signal.fft3d(x, name='fft3d')
     return output
-    
+   
+
 def cdgmm3d(A, B, inplace=False):
     """
     Pointwise multiplication of complex tensors.
@@ -62,43 +63,10 @@ def cdgmm3d(A, B, inplace=False):
     output : torch tensor of the same size as A containing the result of the 
              elementwise complex multiplication of A with B 
     """
-    if not A.is_contiguous():
-        warnings.warn("cdgmm3d: tensor A is converted to a contiguous array")
-        A = A.contiguous()
-    if not B.is_contiguous():
-        warnings.warn("cdgmm3d: tensor B is converted to a contiguous array")
-        B = B.contiguous()
-
-    print(A.size(), B.size(), A.size()[-4:])
-    if A.size()[-4:] != B.size():
-        raise RuntimeError(
-            'The tensors are not compatible for multiplication!')
-
-    if not iscomplex(A) or not iscomplex(B):
-        raise TypeError('The input, filter and output should be complex')
-
-    if B.ndimension() != 4:
-        raise RuntimeError('The second tensor must be simply a complex array!')
-
-    if type(A) is not type(B):
-        raise RuntimeError('A and B should be same type!')
-    
-    if A.device.type != B.device.type:
-        raise TypeError('A and B must be both on GPU or both on CPU.')
-
-    if A.device.type == 'cuda':
-        if A.device.index != B.device.index:
-            raise TypeError('A and B must be on the same GPU!')
-
-
-
-
-    C = A.new(A.size())
-
-    C[..., 0] = A[..., 0] * B[..., 0] - A[..., 1] * B[..., 1]
-    C[..., 1] = A[..., 0] * B[..., 1] + A[..., 1] * B[..., 0]
-
-    return C if not inplace else A.copy_(C)
+    if B.ndim != 3:
+        raise RuntimeError('The dimension of the second input must be 3.')
+    return A * B 
+   
 
 def finalize(s_order_1, s_order_2, max_order):
     s_order_1 = torch.stack(s_order_1, 2)

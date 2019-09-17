@@ -21,7 +21,6 @@ def test_against_standard_computations():
     M = x.shape[1]
 
     batch_size = x.shape[0]
-    print(x)
     x_tf = tf.compat.v1.placeholder(tf.complex64, shape=x.shape)
 
 
@@ -36,7 +35,7 @@ def test_against_standard_computations():
     config = tf.ConfigProto()
     sess = tf.Session(config=config)
     orders_1_and_2  = sess.run(S_tf, feed_dict={x_tf: x})
-
+    print(orders_1_and_2)
     sess.close()
     
     #order_0 = numpy_backend.compute_integrals(x, integral_powers)   
