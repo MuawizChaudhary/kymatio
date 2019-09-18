@@ -82,17 +82,17 @@ class HarmonicScattering3DTensorflow(ScatteringTensorflow):
         elif self.backend.name[0:10] != 'tensorflow':
             raise RuntimeError('This backend is not supported.')
 
-        self.filters = solid_harmonic_filter_bank(
-                            self.M, self.N, self.O, self.J, self.L, self.sigma_0)
+        self.filters = solid_harmonic_filter_bank(self.M, self.N, self.O, self.J, self.L, self.sigma_0)
         self.gaussian_filters = gaussian_filter_bank(
                                 self.M, self.N, self.O, self.J + 1, self.sigma_0)
 
         methods = ['standard', 'local', 'integral']
         if (not self.method in methods):
             raise (ValueError('method must be in {}'.format(methods)))
-        if self.method == 'integral':\
-            self.averaging =lambda x,j: self.backend.compute_integrals(self.backend.fft(x, inverse=True),
-                                                                       self.integral_powers)
+        if self.method == 'integral':
+            self.averaging =lambda x,j:\
+                self.backend.compute_integrals(self.backend.fft(x,
+                    inverse=True), self.integral_powers)
         elif self.method == 'local':
             self.averaging = lambda x,j:\
                 self.backend._compute_local_scattering_coefs(x,

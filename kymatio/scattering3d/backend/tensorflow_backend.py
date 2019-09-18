@@ -5,15 +5,10 @@ import warnings
 BACKEND_NAME = 'torch'
 from collections import namedtuple
 
-def iscomplex(input):
-    return input.size(-1) == 2
-
-def complex_modulus(input_array):
-    modulus = torch.zeros_like(input_array)
-    modulus[..., 0] += torch.sqrt((input_array ** 2).sum(-1))
+def complex_modulus(x):
+    modulus = tf.zeros_like(x)
+    modulus += tf.sqrt(x * tf.math.conj(x))
     return modulus
-
-
 
 def fft(x, direction='C2C', inverse=False):
     """
@@ -69,12 +64,12 @@ def cdgmm3d(A, B, inplace=False):
    
 
 def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 = torch.stack(s_order_1, 2)
+    s_order_1 = tf.stack([arr for arr in s_order_1], axis=2)
     if max_order == 2:
-        s_order_2 = torch.stack(s_order_2, 2)
-        return torch.cat([s_order_1, s_order_2], dim=1)
+        s_order_2 = tf.stack([arr for arr in s_order_2], axis=2)
+        return tf.squeeze(tf.concat([s_order_1, s_order_2], axis=1), axis=-1)
     else:
-        return s_order_1
+        return tf.squeeze(s_order_1, axis=-1)
 
 
 
@@ -108,7 +103,7 @@ def modulus_rotation(x, module):
     if module is None:
         module = tf.zeros_like(x)
     else:
-        module = module ** 2
+        module = module**2
     module += x * tf.math.conj(x)
     return tf.sqrt(module)
 
@@ -159,15 +154,14 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
             the values of the lowpass filtered moduli at the points given.
 
     """
-    local_coefs = torch.zeros(input_array.size(0), points.size(1), 1)
+    local_coefs = tf.zeros(input_array.shape[0], points.shape[1])
     low_pass = filter[j+1]
     convolved_input = cdgmm3d(input_array, low_pass)
     convolved_input = fft(convolved_input, inverse=True)
-    for i in range(input_array.size(0)):
-        for j in range(points[i].size(0)):
+    for i in range(input_array.shape[0]):
+        for j in range(points.shape[1]):
             x, y, z = points[i, j, 0], points[i, j, 1], points[i, j, 2]
-            local_coefs[i, j, 0] = convolved_input[
-                i, int(x), int(y), int(z), 0]
+            tf.assign(local_coefs[i, j], convolved_input[i, int(x), int(y), int(z)])
     return local_coefs
 
 
@@ -197,18 +191,17 @@ def compute_integrals(input_array, integral_powers):
             to the powers p (l_p norms)
 
     """
-    #integrals = tf.zeros((input_array.shape[0], len(integral_powers)),dtype=tf.complex64)
     integrals = []
 
     for i_q, q in enumerate(integral_powers):
-        integrals.append(tf.reduce_sum(tf.reshape((input_array ** \
-                q), shape=(input_array.shape[0], -1)), axis=1))
+        integrals.append(tf.reduce_sum(tf.reshape(tf.pow(tf.math.real(input_array)\
+            +tf.math.imag(input_array), q), shape=(input_array.shape[0], -1)), axis=1))
 
     return tf.expand_dims(tf.stack(integrals, axis=-1), axis=-1)
 
 
 def aggregate(x):
-    return torch.stack([arr[..., 0] for arr in x], 1)
+    return tf.stack([arr for arr in x], axis=1)
 
 backend = namedtuple('backend', ['name', 'cdgmm3d', 'fft', 'finalize', 'modulus', 'modulus_rotation', 'subsample',\
                                  'compute_integrals', 'aggregate'])
