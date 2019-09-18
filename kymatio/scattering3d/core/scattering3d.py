@@ -20,7 +20,6 @@ def scattering3d(_input, filters, rotation_covariant, L, J, max_order, backend, 
     """
     aggregate, finalize, fft, cdgmm3d, modulus, modulus_rotation = backend.aggregate, backend.finalize, backend.fft, backend.cdgmm3d, backend.modulus\
     , backend.modulus_rotation
-
     U_0_c = fft(_input)
 
     s_order_1, s_order_2 = [], []
@@ -40,6 +39,7 @@ def scattering3d(_input, filters, rotation_covariant, L, J, max_order, backend, 
 
             U_1_c = fft(U_1_m)
             S_1_l = averaging(U_1_c, j_1)
+            return S_1_l
             s_order_1_l.append(S_1_l)
 
             if max_order >1:
