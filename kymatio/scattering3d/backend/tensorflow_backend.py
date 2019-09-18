@@ -197,11 +197,13 @@ def compute_integrals(input_array, integral_powers):
             to the powers p (l_p norms)
 
     """
-    integrals = torch.zeros(input_array.size(0), len(integral_powers), 1)
+    #integrals = tf.zeros((input_array.shape[0], len(integral_powers)),dtype=tf.complex64)
+    integrals = []
+
     for i_q, q in enumerate(integral_powers):
-        integrals[:, i_q, 0] = (input_array ** q).view(
-                                        input_array.size(0), -1).sum(1).cpu()
-    return integrals
+        integrals.append(tf.reduce_sum(tf.reshape((input_array ** \
+                q), shape=(input_array.shape[0], -1)), axis=1))
+    return tf.stack(integrals, axis=-1)
 
 
 def aggregate(x):
