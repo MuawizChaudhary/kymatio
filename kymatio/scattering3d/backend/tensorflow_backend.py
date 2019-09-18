@@ -1,8 +1,7 @@
 import tensorflow as tf
-import torch 
 import warnings
 
-BACKEND_NAME = 'torch'
+BACKEND_NAME = 'tensorflow'
 from collections import namedtuple
 
 def complex_modulus(x):
