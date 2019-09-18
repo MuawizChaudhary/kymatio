@@ -203,7 +203,8 @@ def compute_integrals(input_array, integral_powers):
     for i_q, q in enumerate(integral_powers):
         integrals.append(tf.reduce_sum(tf.reshape((input_array ** \
                 q), shape=(input_array.shape[0], -1)), axis=1))
-    return tf.stack(integrals, axis=-1)
+
+    return tf.expand_dims(tf.stack(integrals, axis=-1), axis=-1)
 
 
 def aggregate(x):
