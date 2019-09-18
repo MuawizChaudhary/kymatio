@@ -106,11 +106,11 @@ def modulus_rotation(x, module):
 
     """
     if module is None:
-        module = torch.zeros_like(x)
+        module = tf.zeros_like(x)
     else:
-        module = module **2
-    module[..., 0] += (x**2).sum(-1)
-    return torch.sqrt(module)
+        module = module ** 2
+    module += x * tf.math.conj(x)
+    return tf.sqrt(module)
 
 
 
