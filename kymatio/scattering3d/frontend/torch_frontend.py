@@ -93,7 +93,7 @@ class HarmonicScattering3DTorch(ScatteringTorch):
             self.register_buffer('tensor' + str(k), self.filters[k])
 
         g = torch.zeros(self.gaussian_filters.shape + (2,))
-        g[..., 0] = torch.from_numpy(self.gaussian_filters)
+        g[..., 0] = torch.from_numpy(self.gaussian_filters.real)
         self.gaussian_filters = g
         self.register_buffer('tensor_gaussian_filter', self.gaussian_filters)
 

@@ -1,12 +1,10 @@
 import tensorflow as tf
-import warnings
 
 BACKEND_NAME = 'tensorflow'
 from collections import namedtuple
 
 def complex_modulus(x):
-    modulus = tf.zeros_like(x)
-    modulus += tf.sqrt(x * tf.math.conj(x))
+    modulus = tf.abs(x)
     return modulus
 
 def fft(x, direction='C2C', inverse=False):
@@ -29,18 +27,19 @@ def fft(x, direction='C2C', inverse=False):
             NB : if direction is equal to 'C2R', then an error is raised.
 .
     """
+    x = tf.cast(x, tf.complex64)
     if direction == 'C2R':
         if not inverse:
             raise RuntimeError('C2R mode can only be done with an inverse FFT')
 
     if direction == 'C2R':
-        output = tf.real(tf.signal.ifft3d(x, name='irfft3d'))
+        output = tf.real(tf.signal.ifft3d(x, name='irfft3d'))#*tf.cast(x.shape[-1]*x.shape[-2]*x.shape[-3],tf.float32)
     elif direction == 'C2C':
         if inverse:
-            output = tf.signal.ifft3d(x, name='ifft3d')
+            output = tf.signal.ifft3d(x, name='ifft3d')#*tf.cast(x.shape[-1]*x.shape[-2]*x.shape[-3], tf.complex64)
         else:
             output = tf.signal.fft3d(x, name='fft3d')
-    return output
+    return tf.cast(output, tf.complex64)
    
 
 def cdgmm3d(A, B, inplace=False):
@@ -59,7 +58,13 @@ def cdgmm3d(A, B, inplace=False):
     """
     if B.ndim != 3:
         raise RuntimeError('The dimension of the second input must be 3.')
-    return A * B 
+
+    #C = A * B
+    import numpy as np
+    Cr = tf.cast(tf.real(A)*np.real(B)-tf.imag(A)*np.imag(B),tf.complex64)
+    Ci = tf.cast(tf.real(A)*np.imag(B)+tf.imag(A)*np.real(B),tf.complex64)
+
+    return Cr+1.0j*Ci
    
 
 def finalize(s_order_1, s_order_2, max_order):
@@ -100,10 +105,10 @@ def modulus_rotation(x, module):
 
     """
     if module is None:
-        module = tf.zeros_like(x)
+        module = tf.zeros_like(x, tf.float32)
     else:
         module = module**2
-    module += x * tf.math.conj(x)
+    module += tf.abs(x)**2
     return tf.sqrt(module)
 
 
@@ -166,7 +171,7 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
 
 
 def subsample(input_array, j):
-    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j, :].contiguous()
+    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j].contiguous()
 
 
 
@@ -193,8 +198,7 @@ def compute_integrals(input_array, integral_powers):
     integrals = []
 
     for i_q, q in enumerate(integral_powers):
-        integrals.append(tf.reduce_sum(tf.reshape(tf.pow(tf.math.real(input_array)\
-            +tf.math.imag(input_array), q), shape=(input_array.shape[0], -1)), axis=1))
+        integrals.append(tf.reduce_sum(tf.reshape(tf.pow(input_array, q), shape=(input_array.shape[0], -1)), axis=1))
 
     return tf.expand_dims(tf.stack(integrals, axis=-1), axis=-1)
 

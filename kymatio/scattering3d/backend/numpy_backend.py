@@ -174,7 +174,7 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
 
 
 def subsample(input_array, j):
-    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j, :].contiguous()
+    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j].contiguous()
 
 
 

@@ -91,16 +91,16 @@ class HarmonicScattering3DTensorflow(ScatteringTensorflow):
             raise (ValueError('method must be in {}'.format(methods)))
         if self.method == 'integral':
             self.averaging =lambda x,j:\
-                self.backend.compute_integrals(self.backend.fft(x,
-                    inverse=True), self.integral_powers)
+                self.backend.compute_integrals(tf.real(self.backend.fft(x,
+                    inverse=True)), self.integral_powers)
         elif self.method == 'local':
             self.averaging = lambda x,j:\
                 self.backend._compute_local_scattering_coefs(x,
-                        self.tensor_gaussian_filter, j, self.points)
+                        self.gaussian_filters, j, self.points)
         elif self.method == 'standard':
             self.averaging = lambda x, j:\
                 self.backend._compute_standard_scattering_coefs(x,
-                        self.tensor_gaussian_filter, self.J, self.backend.subsample)
+                        self.gaussian_filters, self.J, self.backend.subsample)
 
 
     def scattering(self, input_array):
