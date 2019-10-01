@@ -16,8 +16,7 @@ def isreal(x):
 
 class Pad(object):
     def __init__(self, pad_size, input_size, pre_pad=False):
-        """
-            Padding which allows to simultaneously pad in a reflection fashion
+        """Padding which allows to simultaneously pad in a reflection fashion
             and map to complex.
 
             Parameters
@@ -26,8 +25,18 @@ class Pad(object):
                 size of padding to apply [top, bottom, left, right].
             input_size : list of 2 integers
                 size of the original signal [height, width].
+            pre_pad : boolean, optional
+                if set to true, then there is no padding, one simply adds the imaginary part.
+
+            Attributes
+            ----------
+            pad_size : list of 4 integers 
+                size of padding to apply [top, bottom, left, right].
+            input_size : list of 2 integers
+                size of the original signal [height, width].
             pre_pad : boolean
                 if set to true, then there is no padding, one simply adds the imaginary part.
+                
         """
         self.pre_pad = pre_pad
         self.pad_size = pad_size
@@ -36,6 +45,14 @@ class Pad(object):
         self.build()
 
     def build(self):
+        """Builds the padding module
+
+            Attributes
+            ----------
+            padding_module: ReflectionPad2d
+                Pads the input tensor using the reflection of the input
+                boundary. 
+        """
         pad_size_tmp = list(self.pad_size)
 
         # This allow to handle the case where the padding is equal to the image size
@@ -50,6 +67,18 @@ class Pad(object):
                                                pad_size_tmp[0], pad_size_tmp[1]])
 
     def __call__(self, x):
+        """Applies padding and maps to complex
+            
+            Parameters
+            ----------
+            x : tensor
+                real tensor input to be padded and sent to complex domain.
+
+            Returns
+            -------
+            output : tensor
+                complex torch tensor that has been padded.
+        """
         batch_shape = x.shape[:-2]
         signal_shape = x.shape[-2:]
         x = x.reshape((-1, 1) + signal_shape)

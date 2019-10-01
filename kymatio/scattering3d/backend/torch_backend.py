@@ -127,7 +127,6 @@ def modulus_rotation(x, module):
 
     Returns
     -------
-
     output : torch tensor
         tensor of the same size as input_array. It holds the output of
         the operation::
@@ -153,7 +152,8 @@ def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
 
     Parameters
     ----------
-    input_array: torch tensor of size (batchsize, M, N, O, 2)
+    input_array: torch tensor 
+        size (batchsize, M, N, O, 2)
     filter: torch tensor
         size (M, N, O, 2)
 
