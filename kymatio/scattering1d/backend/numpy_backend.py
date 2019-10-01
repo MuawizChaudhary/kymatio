@@ -191,11 +191,11 @@ def finalize(s0, s1, s2):
     Parameters
     ----------
     s0 : numpy array
-        numpy array which contain the zeroth order scattering coefficents.
+        numpy array which contains the zeroth order scattering coefficents.
     s1 : numpy array
-        numpy array which contain the first order scattering coefficents.
+        numpy array which contains the first order scattering coefficents.
     s2 : numpy array
-        numpy array which contain the second order scattering coefficents.
+        numpy array which contains the second order scattering coefficents.
     
     Returns
     -------

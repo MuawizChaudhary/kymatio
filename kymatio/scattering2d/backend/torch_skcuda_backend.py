@@ -116,8 +116,7 @@ class SubsampleFourier(object):
 
 
 class Modulus(object):
-    """
-        This class implements a modulus transform for complex numbers.
+    """This class implements a modulus transform for complex numbers.
 
         Usage
         -----
@@ -126,13 +125,15 @@ class Modulus(object):
 
         Parameters
         ---------
-        x: input tensor, with last dimension = 2 for complex numbers
+        x : input tensor
+           complex torch tensor.
 
         Returns
         -------
-        output: a tensor with imaginary part set to 0, real part set equal to
-        the modulus of x.
-    """
+        output : output tensor 
+            A tensor with the same dimensions as x, such that output[..., 0]
+            contains the complex modulus of x, while output[..., 1] = 0.
+    """    
     def __init__(self):
         self.CUDA_NUM_THREADS = 1024
 

@@ -313,11 +313,11 @@ def finalize(s0, s1, s2):
     Parameters
     ----------
     s0 : tensor
-        Tensor which contain the zeroth order scattering coefficents.
+        Tensor which contains the zeroth order scattering coefficents.
     s1 : tensor
-        Tensor which contain the first order scattering coefficents.
+        Tensor which contains the first order scattering coefficents.
     s2 : tensor
-        Tensor which contain the second order scattering coefficents.
+        Tensor which contains the second order scattering coefficents.
     
     Returns
     -------

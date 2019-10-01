@@ -171,7 +171,7 @@ def fft1d_c2c(x):
     -------
     x_f : tensor
         A tensor of the same size as x containing its Fourier transform in the
-        standard tensorflow FFT ordering.
+        standard Tensorflow FFT ordering.
     """
     return tf.signal.fft(x)
 
@@ -193,8 +193,23 @@ def ifft1d_c2c(x):
     return tf.signal.ifft(x)
 
 def finalize(s0, s1, s2):
-    """ Concatenate scattering of different orders"""
-    return tf.concat([tf.concat(s0, axis=-2), tf.concat(s1, axis=-2), tf.concat(s2, axis=-2)], axis=-2)
+    """Concatenate scattering of different orders
+
+    Parameters
+    ----------
+    s0 : tensor
+        Tensor which contains the zeroth order scattering coefficents.
+    s1 : tensor
+        Tensor which contains the first order scattering coefficents.
+    s2 : tensor
+        Tensor which contains the second order scattering coefficents.
+    
+    Returns
+    -------
+    s : tensor
+        Final output. Scattering transform.
+    """
+     return tf.concat([tf.concat(s0, axis=-2), tf.concat(s1, axis=-2), tf.concat(s2, axis=-2)], axis=-2)
 
 
 backend = namedtuple('backend', ['name', 'modulus_complex', 'subsample_fourier', 'real', 'unpad', 'fft1d_c2c', 'ifft1d_c2c'])

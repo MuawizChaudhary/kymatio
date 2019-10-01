@@ -7,22 +7,43 @@ BACKEND_NAME = 'numpy'
 
 class Pad(object):
     def __init__(self, pad_size, input_size, pre_pad=False):
-        """
-            Padding which allows to simultaneously pad in a reflection fashion
+        """Padding which allows to simultaneously pad in a reflection fashion
             and map to complex.
+
             Parameters
             ----------
             pad_size : list of 4 integers
-                size of padding to apply.
+                size of padding to apply [top, bottom, left, right].
             input_size : list of 2 integers
-                size of the original signal
+                size of the original signal [height, width].
+            pre_pad : boolean, optional
+                if set to true, then there is no padding, one simply adds the imaginary part.
+
+            Attributes
+            ----------
+            pad_size : list of 4 integers 
+                size of padding to apply [top, bottom, left, right].
+            input_size : list of 2 integers
+                size of the original signal [height, width].
             pre_pad : boolean
-                if set to true, then there is no padding, one simply adds the imaginarty part.
+                if set to true, then there is no padding, one simply adds the imaginary part.
         """
         self.pre_pad = pre_pad
         self.pad_size = pad_size
 
     def __call__(self, x):
+        """Applies padding 
+            
+            Parameters
+            ----------
+            x : numpy array
+                input to be padded.
+
+            Returns
+            -------
+            output : numpy array
+                numpy array that has been padded.
+        """
         if self.pre_pad:
             return x
         else:
@@ -31,11 +52,13 @@ class Pad(object):
 
 def unpad(in_):
     """
-        Slices the input tensor at indices between 1::-1
+        Slices the input numpy array at indices between 1::-1
+        
         Parameters
         ----------
-        in_ : tensor_like
-            input tensor
+        in_ : numpy array_like
+            input numpy array
+        
         Returns
         -------
         in_[..., 1:-1, 1:-1]
@@ -43,22 +66,23 @@ def unpad(in_):
     return np.expand_dims(in_[..., 1:-1, 1:-1],-3)
 
 class SubsampleFourier(object):
-    """
-        Subsampling of a 2D image performed in the Fourier domain
+    """Subsampling of a 2D image performed in the Fourier domain
         Subsampling in the spatial domain amounts to periodization
         in the Fourier domain, hence the formula.
+        
         Parameters
         ----------
-        x : tensor_like
-            input tensor with at least 5 dimensions, the last being the real
+        x : numpy array_like
+            input array with at least 5 dimensions, the last being the real
              and imaginary parts.
             Ideally, the last dimension should be a power of 2 to avoid errors.
         k : int
             integer such that x is subsampled by 2**k along the spatial variables.
+        
         Returns
         -------
-        res : tensor_like
-            tensor such that its fourier transform is the Fourier
+        out : numpy array_like
+            numpy array such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
     """
@@ -74,18 +98,20 @@ class SubsampleFourier(object):
 
 
 class Modulus(object):
-    """
-        This class implements a modulus transform for complex numbers.
+    """This class implements a modulus transform for complex numbers.
+        
         Usage
         -----
         modulus = Modulus()
         x_mod = modulus(x)
+        
         Parameters
         ---------
-        x: input complex tensor.
+        x: input complex numpy array.
+        
         Returns
         -------
-        output: a real tensor equal to the modulus of x.
+        output: a real numpy array equal to the modulus of x.
     """
     def __call__(self, x):
         norm = np.abs(x)
@@ -96,14 +122,17 @@ class Modulus(object):
 
 def fft(x, direction='C2C', inverse=False):
     """
-        Interface with torch FFT routines for 2D signals.
+        Interface with numpy FFT routines for 2D signals.
+        
         Example
         -------
-        x = torch.randn(128, 32, 32, 2)
-        x_fft = fft(x, inverse=True)
+        x = numpy.random.randn(128, 32, 32, 2).view(numpy.complex64)
+        x_fft = fft(x)
+        x_ifft = fft(x, inverse=True)
+        
         Parameters
         ----------
-        input : tensor
+        input : numpy array
             complex input for the FFT
         direction : string
             'C2R' for complex to real, 'C2C' for complex to complex
@@ -130,19 +159,21 @@ def fft(x, direction='C2C', inverse=False):
 
 def cdgmm(A, B, inplace=False):
     """
-        Complex pointwise multiplication between (batched) tensor A and tensor B.
+        Complex pointwise multiplication between (batched) numpy array A and numpy array B.
+
         Parameters
         ----------
-        A : tensor
-            A is a complex tensor of size (B, C, M, N, 2)
-        B : tensor
-            B is a complex tensor of size (M, N) or real tensor of (M, N)
+        A : numpy array
+            A is a complex numpy array of size (B, C, M, N, 2)
+        B : numpy array
+            B is a complex numpy array of size (M, N) or real numpy array of (M, N)
         inplace : boolean, optional
             if set to True, all the operations are performed inplace
+        
         Returns
         -------
-        C : tensor
-            output tensor of size (B, C, M, N, 2) such that:
+        C : numpy array
+            output numpy array of size (B, C, M, N, 2) such that:
             C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
     """
 
@@ -156,7 +187,22 @@ def cdgmm(A, B, inplace=False):
 
 
 def finalize(s0, s1, s2):
-    """ Concatenate scattering of different orders"""
+    """Concatenate scattering of different orders
+
+    Parameters
+    ----------
+    s0 : numpy array
+        numpy array which contains the zeroth order scattering coefficents.
+    s1 : numpy array
+        numpy array which contains the first order scattering coefficents.
+    s2 : numpy array
+        numpy array which contains the second order scattering coefficents.
+    
+    Returns
+    -------
+    s : numpy array
+        Final output. Scattering transform.
+    """
     return np.concatenate([np.concatenate(s0, axis=-3), np.concatenate(s1, axis=-3), np.concatenate(s2, axis=-3)], axis=-3)
 
 
