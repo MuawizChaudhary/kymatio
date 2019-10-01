@@ -5,6 +5,15 @@ BACKEND_NAME = 'torch'
 from collections import namedtuple
 
 def iscomplex(input):
+    """
+        if input is complex
+      
+        Parameters
+        -------
+        input : tensor
+            input to check if complex
+        
+    """
     return input.size(-1) == 2
 
 def complex_modulus(input_array):
@@ -21,7 +30,8 @@ def fft(input, inverse=False):
         Example
         -------
         x = torch.randn(128, 32, 32, 32, 2)
-        x_fft = fft(x, inverse=True)
+        x_fft = fft(x)
+        x_ifft = fft(x, inverse=True)
 
         Parameters
         ----------
@@ -29,7 +39,7 @@ def fft(input, inverse=False):
             complex input for the FFT
         inverse : bool
             True for computing the inverse FFT.
-.
+
     """
     if not iscomplex(input):
         raise(TypeError('The input should be complex (e.g. last dimension is 2)'))
@@ -42,9 +52,10 @@ def cdgmm3d(A, B, inplace=False):
     """
     Pointwise multiplication of complex tensors.
 
+    Parameters
     ----------
-    A: complex torch tensor
-    B: complex torch tensor of the same size as A
+    A : complex torch tensor
+    B : complex torch tensor of the same size as A
     inplace : boolean, optional
         if set True, all the operations are performed inplace
     Returns

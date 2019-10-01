@@ -215,7 +215,7 @@ def pad(x, pad_left=0, pad_right=0, to_complex=True):
         Amount to add on the left of the tensor (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the tensor (at the end of the temporal
+        Amount to add on the right of the tensor (at the end of the temporal
         axis).
     to_complex : boolean, optional
         Whether to map the resulting padded tensor to a complex type (seen
@@ -296,7 +296,7 @@ def ifft1d_c2c(x):
     -----
     x_f : tensor
         A tensor of size (..., T, 2), where x_f[..., 0] is the real part and
-        x[..., 1] is the imaginary part. The frequencies are assumed to be in
+        x_f[..., 1] is the imaginary part. The frequencies are assumed to be in
         the standard PyTorch FFT ordering.
 
     Returns
@@ -308,7 +308,22 @@ def ifft1d_c2c(x):
     return torch.ifft(x, signal_ndim=1)
 
 def finalize(s0, s1, s2):
-    """ Concatenate scattering of different orders"""
+    """Concatenate scattering of different orders
+
+    Parameters
+    ----------
+    s0 : tensor
+        Tensor which contain the zeroth order scattering coefficents.
+    s1 : tensor
+        Tensor which contain the first order scattering coefficents.
+    s2 : tensor
+        Tensor which contain the second order scattering coefficents.
+    
+    Returns
+    -------
+    s : tensor
+        Final output. Scattering transform.
+    """
     if len(s2)>0:
         return torch.cat([torch.cat(s0, -2), torch.cat(s1, -2), torch.cat(s2, -2)], -2)
     else:

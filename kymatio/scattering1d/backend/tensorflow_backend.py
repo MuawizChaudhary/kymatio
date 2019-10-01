@@ -16,13 +16,13 @@ def modulus_complex(x):
     Parameters
     ----------
     x : tensor
-        A complex tensor (that is, whose last dimension is equal to 2).
+        A complex tensor.
 
     Returns
     -------
-    res : tensor
-        A tensor with the same dimensions as x, such that res[..., 0] contains
-        the complex modulus of x, while res[..., 1] = 0.
+    norm : tensor
+        A complex tensor with the same dimensions as x and the complex modulus
+        of x.
     """
 
     norm = tf.abs(x)
@@ -60,7 +60,7 @@ def subsample_fourier(x, k):
 def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
     """Pad real 1D tensors
 
-    1D implementation of the padding function for real PyTorch tensors.
+    1D implementation of the padding function for real Tensorflow tensors.
 
     Parameters
     ----------
@@ -74,11 +74,10 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
         amount to add on the right of the tensor (at the end of the temporal
         axis).
     mode : string, optional
-        Padding mode. Options include 'constant' and 'reflect'. See the
-        PyTorch API for other options.  Defaults to 'constant'.
+        Padding mode. Only option on Tensorflow backend is reflect. 
     value : float, optional
-        If mode == 'constant', value to input within the padding. Defaults to
-        0.
+        If mode == 'constant', value to input within the padding. Does nothing
+        on Tensorflow backend.
 
     Returns
     -------
@@ -117,9 +116,7 @@ def pad(x, pad_left=0, pad_right=0, to_complex=True):
     Returns
     -------
     output : tensor
-        A padded signal, possibly transformed into a four-dimensional tensor
-        with the last axis of size 2 if to_complex is True (this axis
-        corresponds to the real and imaginary parts).
+        A padded signal, possibly transformed into a four-dimensional tensor. 
     """
     output = pad_1d(x, pad_left, pad_right, mode='reflect')
     return output
@@ -148,18 +145,17 @@ def unpad(x, i0, i1):
 def real(x):
     """Real part of complex tensor
 
-    Takes the real part of a complex tensor, where the last axis corresponds
-    to the real and imaginary parts.
+    Takes the real part of a complex tensor.
 
     Parameters
     ----------
     x : tensor
-        A complex tensor (that is, whose last dimension is equal to 2).
+        A complex tensor.
 
     Returns
     -------
     x_real : tensor
-        The tensor x[..., 0] which is interpreted as the real part of x.
+        The tensor tf.real(x) which is interpreted as the real part of x.
     """
     return tf.real(x)
 
@@ -169,14 +165,13 @@ def fft1d_c2c(x):
     Input
     -----
     x : tensor
-        A tensor of size (..., T, 2), where x[..., 0] is the real part and
-        x[..., 1] is the imaginary part.
+        A tensor of size (..., T).
 
     Returns
     -------
     x_f : tensor
         A tensor of the same size as x containing its Fourier transform in the
-        standard PyTorch FFT ordering.
+        standard tensorflow FFT ordering.
     """
     return tf.signal.fft(x)
 
@@ -186,9 +181,8 @@ def ifft1d_c2c(x):
     Input
     -----
     x_f : tensor
-        A tensor of size (..., T, 2), where x_f[..., 0] is the real part and
-        x[..., 1] is the imaginary part. The frequencies are assumed to be in
-        the standard PyTorch FFT ordering.
+        A tensor of size (..., T). The frequencies are assumed to be in
+        the standard Tensorflow FFT ordering.
 
     Returns
     -------
@@ -204,7 +198,7 @@ def finalize(s0, s1, s2):
 
 
 backend = namedtuple('backend', ['name', 'modulus_complex', 'subsample_fourier', 'real', 'unpad', 'fft1d_c2c', 'ifft1d_c2c'])
-backend.name = 'torch'
+backend.name = 'tensorflow'
 backend.modulus_complex = modulus_complex
 backend.subsample_fourier = subsample_fourier
 backend.real = real
