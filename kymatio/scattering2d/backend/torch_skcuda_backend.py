@@ -41,16 +41,16 @@ class SubsampleFourier(object):
         Parameters
         ----------
         x : tensor_like
-            input tensor with at least 5 dimensions, the last being the real
+            Input tensor with at least 5 dimensions, the last being the real
              and imaginary parts.
             Ideally, the last dimension should be a power of 2 to avoid errors.
         k : int
-            integer such that x is subsampled by 2**k along the spatial variables.
+            Integer such that x is subsampled by 2**k along the spatial variables.
 
         Returns
         -------
         res : tensor_like
-            tensor such that its fourier transform is the Fourier
+            Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
     """
@@ -126,7 +126,7 @@ class Modulus(object):
         Parameters
         ---------
         x : input tensor
-           complex torch tensor.
+           Complex torch tensor.
 
         Returns
         -------
@@ -182,12 +182,12 @@ def cdgmm(A, B, inplace=False):
         B : tensor
             B is a complex tensor of size (M, N, 2) or real tensor of (M, N, 1)
         inplace : boolean, optional
-            if set to True, all the operations are performed inplace
+            If set to True, all the operations are performed inplace
 
         Returns
         -------
         C : tensor
-            output tensor of size (B, C, M, N, 2) such that:
+            Output tensor of size (B, C, M, N, 2) such that:
             C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
     """
     if not iscomplex(A):

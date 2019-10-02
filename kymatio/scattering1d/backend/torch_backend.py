@@ -178,7 +178,7 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
         Amount to add on the left of the tensor (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the tensor (at the end of the temporal
+        Amount to add on the right of the tensor (at the end of the temporal
         axis).
     mode : string, optional
         Padding mode. Options include 'constant' and 'reflect'. See the

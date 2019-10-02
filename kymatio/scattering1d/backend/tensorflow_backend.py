@@ -71,7 +71,7 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
         Amount to add on the left of the tensor (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the tensor (at the end of the temporal
+        Amount to add on the right of the tensor (at the end of the temporal
         axis).
     mode : string, optional
         Padding mode. Only option on Tensorflow backend is reflect. 
@@ -107,7 +107,7 @@ def pad(x, pad_left=0, pad_right=0, to_complex=True):
         Amount to add on the left of the tensor (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the tensor (at the end of the temporal
+        Amount to add on the right of the tensor (at the end of the temporal
         axis).
     to_complex : boolean, optional
         Whether to map the resulting padded tensor to a complex type (seen

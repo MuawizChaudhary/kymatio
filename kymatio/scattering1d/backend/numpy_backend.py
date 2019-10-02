@@ -67,7 +67,7 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
         Amount to add on the left of the array (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the array (at the end of the temporal
+        Amount to add on the right of the array (at the end of the temporal
         axis).
     mode : string, optional
         Padding mode. Options for numpy backend only includes 'reflect'.
@@ -99,7 +99,7 @@ def pad(x, pad_left=0, pad_right=0, to_complex=True):
         Amount to add on the left of the numpy array (at the beginning of the
         temporal axis).
     pad_right : int
-        amount to add on the right of the numpy array (at the end of the temporal
+        Amount to add on the right of the numpy array (at the end of the temporal
         axis).
     to_complex : boolean, optional
         Whether to map the resulting padded numpy array to a complex type (seen
@@ -191,11 +191,11 @@ def finalize(s0, s1, s2):
     Parameters
     ----------
     s0 : numpy array
-        numpy array which contains the zeroth order scattering coefficents.
+        Numpy array which contains the zeroth order scattering coefficents.
     s1 : numpy array
-        numpy array which contains the first order scattering coefficents.
+        Numpy array which contains the first order scattering coefficents.
     s2 : numpy array
-        numpy array which contains the second order scattering coefficents.
+        Numpy array which contains the second order scattering coefficents.
     
     Returns
     -------

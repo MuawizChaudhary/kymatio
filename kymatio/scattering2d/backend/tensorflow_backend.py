@@ -13,11 +13,11 @@ class Pad(object):
             Parameters
             ----------
             pad_size : list of 4 integers
-                size of padding to apply.
+                Size of padding to apply.
             input_size : list of 2 integers
-                size of the original signal
+                Size of the original signal
             pre_pad : boolean
-                if set to true, then there is no padding, one simply adds the imaginarty part.
+                If set to true, then there is no padding, one simply adds the imaginarty part.
         """
         self.pre_pad = pre_pad
         self.pad_size = pad_size
@@ -36,7 +36,7 @@ def unpad(in_):
         Parameters
         ----------
         in_ : tensor_like
-            input tensor
+            Input tensor
         
         Returns
         -------
@@ -52,16 +52,16 @@ class SubsampleFourier(object):
         Parameters
         ----------
         x : tensor_like
-            input tensor with at least 5 dimensions, the last being the real
+            Input tensor with at least 5 dimensions, the last being the real
              and imaginary parts.
             Ideally, the last dimension should be a power of 2 to avoid errors.
         k : int
-            integer such that x is subsampled by 2**k along the spatial variables.
+            Integer such that x is subsampled by 2**k along the spatial variables.
         
         Returns
         -------
         out : tensor_like
-            tensor such that its fourier transform is the Fourier
+            Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
     """
@@ -76,20 +76,25 @@ class SubsampleFourier(object):
 
 class Modulus(object):
     """This class implements a modulus transform for complex numbers.
-        
+
         Usage
         -----
         modulus = Modulus()
         x_mod = modulus(x)
-        
+
         Parameters
         ---------
-        x: input complex tensor.
-       
+        x : input tensor
+            Complex torch tensor.
+
         Returns
         -------
-        output: a real tensor equal to the modulus of x.
+        output : output tensor 
+            A tensor with the same dimensions as x, such that
+            tf.math.real(norm) contains the complex modulus of x, while
+            tf.math.imag(norm) = 0.
     """
+
     def __call__(self, x):
         norm = tf.abs(x)
         return tf.cast(norm, tf.complex64)
@@ -100,23 +105,32 @@ def fft(x, direction='C2C', inverse=False):
         
         Example
         -------
-        x = torch.randn(128, 32, 32, 2)
-        x_fft = fft(x, inverse=True)
+        real = tf.random.uniform(128, 32, 32)
+        imag = tf.random.uniform(128, 32, 32)
+        
+        x = tf.complex(real, imag)
+        
+        x_fft = fft(x)
+        x_ifft = fft(x, inverse=True)
+
+        x = fft(x_fft, inverse=True)
+        x = fft(x_ifft, inverse=False)
+
         
         Parameters
         ----------
         input : tensor
-            complex input for the FFT
+            Complex input for the FFT
         direction : string
             'C2R' for complex to real, 'C2C' for complex to complex
         inverse : bool
             True for computing the inverse FFT.
-            NB : if direction is equal to 'C2R', then an error is raised.
+            NB : If direction is equal to 'C2R', then an error is raised.
         
         Returns
         -------
         output : tensor
-            result of FFT or IFFT.
+            Result of FFT or IFFT.
          
     """
     if direction == 'C2R':
@@ -144,12 +158,12 @@ def cdgmm(A, B, inplace=False):
         B : tensor
             B is a complex tensor of size (M, N) or real tensor of (M, N)
         inplace : boolean, optional
-            if set to True, all the operations are performed inplace
+            If set to True, all the operations are performed inplace
        
         Returns
         -------
         C : tensor
-            output tensor of size (B, C, M, N, 2) such that:
+            Output tensor of size (B, C, M, N, 2) such that:
             C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
     """
     if B.ndim != 2:

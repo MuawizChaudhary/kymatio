@@ -13,20 +13,20 @@ class Pad(object):
             Parameters
             ----------
             pad_size : list of 4 integers
-                size of padding to apply [top, bottom, left, right].
+                Size of padding to apply [top, bottom, left, right].
             input_size : list of 2 integers
-                size of the original signal [height, width].
+                Size of the original signal [height, width].
             pre_pad : boolean, optional
-                if set to true, then there is no padding, one simply adds the imaginary part.
+                If set to true, then there is no padding, one simply adds the imaginary part.
 
             Attributes
             ----------
             pad_size : list of 4 integers 
-                size of padding to apply [top, bottom, left, right].
+                Size of padding to apply [top, bottom, left, right].
             input_size : list of 2 integers
-                size of the original signal [height, width].
+                Size of the original signal [height, width].
             pre_pad : boolean
-                if set to true, then there is no padding, one simply adds the imaginary part.
+                If set to true, then there is no padding, one simply adds the imaginary part.
         """
         self.pre_pad = pre_pad
         self.pad_size = pad_size
@@ -37,12 +37,12 @@ class Pad(object):
             Parameters
             ----------
             x : numpy array
-                input to be padded.
+                Input to be padded.
 
             Returns
             -------
             output : numpy array
-                numpy array that has been padded.
+                Numpy array that has been padded.
         """
         if self.pre_pad:
             return x
@@ -57,7 +57,7 @@ def unpad(in_):
         Parameters
         ----------
         in_ : numpy array_like
-            input numpy array
+            Input numpy array
         
         Returns
         -------
@@ -73,16 +73,16 @@ class SubsampleFourier(object):
         Parameters
         ----------
         x : numpy array_like
-            input array with at least 5 dimensions, the last being the real
+            Input array with at least 5 dimensions, the last being the real
              and imaginary parts.
             Ideally, the last dimension should be a power of 2 to avoid errors.
         k : int
-            integer such that x is subsampled by 2**k along the spatial variables.
+            Integer such that x is subsampled by 2**k along the spatial variables.
         
         Returns
         -------
         out : numpy array_like
-            numpy array such that its fourier transform is the Fourier
+            Numpy array such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
     """
@@ -107,11 +107,11 @@ class Modulus(object):
         
         Parameters
         ---------
-        x: input complex numpy array.
+        x: Input complex numpy array.
         
         Returns
         -------
-        output: a real numpy array equal to the modulus of x.
+        output: A real numpy array equal to the modulus of x.
     """
     def __call__(self, x):
         norm = np.abs(x)
@@ -133,12 +133,12 @@ def fft(x, direction='C2C', inverse=False):
         Parameters
         ----------
         input : numpy array
-            complex input for the FFT
+            Complex input for the FFT
         direction : string
             'C2R' for complex to real, 'C2C' for complex to complex
         inverse : bool
             True for computing the inverse FFT.
-            NB : if direction is equal to 'C2R', then an error is raised.
+            NB : If direction is equal to 'C2R', then an error is raised.
     """
     if direction == 'C2R':
         if not inverse:
@@ -168,12 +168,12 @@ def cdgmm(A, B, inplace=False):
         B : numpy array
             B is a complex numpy array of size (M, N) or real numpy array of (M, N)
         inplace : boolean, optional
-            if set to True, all the operations are performed inplace
+            If set to True, all the operations are performed inplace
         
         Returns
         -------
         C : numpy array
-            output numpy array of size (B, C, M, N, 2) such that:
+            Output numpy array of size (B, C, M, N, 2) such that:
             C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
     """
 
