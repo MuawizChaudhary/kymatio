@@ -8,14 +8,33 @@ def iscomplex(input):
     """Checks if input is complex.
       
         Parameters
-        -------
+        ----------
         input : tensor
-            Input to check if complex.
-        
+            Input to be checked if complex.
+
+        Returns
+        -------
+        output : boolean
+            Returns True if complex (i.e. final dimension is 2), False
+            otherwise.
     """
     return input.size(-1) == 2
 
 def complex_modulus(input_array):
+    """Computes the complex modulus of input.
+      
+        Parameters
+        ----------
+        input_array : tensor
+            Input tensor whose complex modulus is to be calculated.
+
+        Returns
+        -------
+        modulus : tensor
+            Tensor the same size as input_array. modulus[..., 0] holds the
+            result of the complex modulus, modulus[..., 1] = 0.
+             
+    """
     modulus = torch.zeros_like(input_array)
     modulus[..., 0] += torch.sqrt((input_array ** 2).sum(-1))
     return modulus
@@ -127,7 +146,6 @@ def compute_integrals(input_array, integral_powers):
         ----------
         input_array: torch tensor
             Size (B, M, N, O), B batch_size, M, N, O spatial dims.
-
         integral_powers: list
             List of P positive floats containing the p values used to
             compute the integrals of the input_array to the power p (l_p
@@ -147,7 +165,7 @@ def compute_integrals(input_array, integral_powers):
     return integrals
 
 def fft(input, inverse=False):
-    """Fft of a 3d signal
+    """Interface with torch FFT routines for 3D signals.
 
         Example
         -------
@@ -157,11 +175,21 @@ def fft(input, inverse=False):
 
         Parameters
         ----------
-        input : tensor
-            Complex input for the FFT
+        x : tensor
+            Complex input for the FFT.
         inverse : bool
             True for computing the inverse FFT.
-
+        
+        Raises
+        ------
+        TypeError
+            In the event that x does not have a final dimension 2 i.e. not
+            complex. 
+        
+        Returns
+        -------
+        output : tensor
+            Result of FFT or IFFT.
     """
     if not iscomplex(input):
         raise(TypeError('The input should be complex (e.g. last dimension is 2)'))
@@ -182,6 +210,16 @@ def cdgmm3d(A, B, inplace=False):
     inplace : boolean, optional
         If set True, all the operations are performed inplace
     
+    Raises
+    ------
+    RuntimeError
+        In the event that the tensors are not compatibile for multiplication
+        (i.e. the final four dimensions do not match with the dimensions of B)
+        or in the event that 
+    TypeError
+        In the event that x is not complex i.e. does not have a final dimension
+        of 2, or in the event that both tensors are not on the same device.
+
     Returns
     -------
     output : torch tensor
@@ -196,8 +234,7 @@ def cdgmm3d(A, B, inplace=False):
         B = B.contiguous()
 
     if A.size()[-4:] != B.size():
-        raise RuntimeError(
-            'The tensors are not compatible for multiplication!')
+        raise RuntimeError('The tensors are not compatible for multiplication!')
 
     if not iscomplex(A) or not iscomplex(B):
         raise TypeError('The input, filter and output should be complex')

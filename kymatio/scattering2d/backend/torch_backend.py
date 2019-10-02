@@ -176,8 +176,7 @@ class Modulus(object):
 
 
 def fft(x, direction='C2C', inverse=False):
-    """
-        Interface with torch FFT routines for 2D signals.
+    """Interface with torch FFT routines for 2D signals.
 
         Example
         -------
@@ -194,6 +193,15 @@ def fft(x, direction='C2C', inverse=False):
         inverse : bool
             True for computing the inverse FFT.
             NB : If direction is equal to 'C2R', then an error is raised.
+        
+        Raises
+        ------
+        RuntimeError
+            In the event that we are going from complex to real and not doing
+            the inverse fft or in the event x is not contiguous.
+        TypeError
+            In the event that x does not have a final dimension 2 i.e. not
+            complex. 
         
         Returns
         -------
