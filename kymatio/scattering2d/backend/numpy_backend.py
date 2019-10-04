@@ -27,12 +27,13 @@ class Pad(object):
                 Size of the original signal [height, width].
             pre_pad : boolean
                 If set to true, then there is no padding, one simply adds the imaginary part.
+
         """
         self.pre_pad = pre_pad
         self.pad_size = pad_size
 
     def __call__(self, x):
-        """Applies padding 
+        """Applies padding.
             
             Parameters
             ----------
@@ -43,6 +44,7 @@ class Pad(object):
             -------
             output : numpy array
                 Numpy array that has been padded.
+
         """
         if self.pre_pad:
             return x
@@ -52,30 +54,32 @@ class Pad(object):
 
 def unpad(in_):
     """
-        Slices the input numpy array at indices between 1::-1
+        Slices the input numpy array at indices between 1::-1.
         
         Parameters
         ----------
         in_ : numpy array_like
-            Input numpy array
+            Input numpy array.
         
         Returns
         -------
-        in_[..., 1:-1, 1:-1]
+        in_[..., 1:-1, 1:-1] : numpy array_like
+            Output sliced numpy array.
+
+
     """
     return np.expand_dims(in_[..., 1:-1, 1:-1],-3)
 
 class SubsampleFourier(object):
-    """Subsampling of a 2D image performed in the Fourier domain
+    """Subsampling of a 2D image performed in the Fourier domain.
+        
         Subsampling in the spatial domain amounts to periodization
         in the Fourier domain, hence the formula.
         
         Parameters
         ----------
         x : numpy array_like
-            Input array with at least 5 dimensions, the last being the real
-             and imaginary parts.
-            Ideally, the last dimension should be a power of 2 to avoid errors.
+            Input array with at least 4 dimensions.
         k : int
             Integer such that x is subsampled by 2**k along the spatial variables.
         
@@ -84,7 +88,8 @@ class SubsampleFourier(object):
         out : numpy array_like
             Numpy array such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
-            FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
+            FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
+
     """
     def __call__(self, x, k):
         out = np.zeros((x.shape[0], x.shape[1], x.shape[2] // k, x.shape[3] // k), dtype=x.dtype)
@@ -112,6 +117,7 @@ class Modulus(object):
         Returns
         -------
         output: A real numpy array equal to the modulus of x.
+
     """
     def __call__(self, x):
         norm = np.abs(x)
@@ -121,8 +127,7 @@ class Modulus(object):
 
 
 def fft(x, direction='C2C', inverse=False):
-    """
-        Interface with numpy FFT routines for 2D signals.
+    """Interface with numpy FFT routines for 2D signals.
         
         Example
         -------
@@ -139,6 +144,19 @@ def fft(x, direction='C2C', inverse=False):
         inverse : bool
             True for computing the inverse FFT.
             NB : If direction is equal to 'C2R', then an error is raised.
+
+        Raises
+        ------
+        RuntimeError
+            Raised in event we attempt to map from complex to real without
+            inverse fft.
+
+        Returns
+        -------
+        output : numpy array
+            Numpy array of the same size as A containing the result of the
+            elementwise complex multiplication of A with B.
+            
     """
     if direction == 'C2R':
         if not inverse:
@@ -155,28 +173,34 @@ def fft(x, direction='C2C', inverse=False):
     return output
 
 
-
-
 def cdgmm(A, B, inplace=False):
-    """
-        Complex pointwise multiplication between (batched) numpy array A and numpy array B.
+    """Complex pointwise multiplication.
+
+        Complex pointwise multiplication between (batched) numpy array A and
+        numpy array B.
 
         Parameters
         ----------
         A : numpy array
-            A is a complex numpy array of size (B, C, M, N, 2)
+            A is a complex numpy array of size (B, C, M, N).
         B : numpy array
-            B is a complex numpy array of size (M, N) or real numpy array of (M, N)
+            B is a complex numpy array of size (M, N) or real numpy array of
+            (M, N).
         inplace : boolean, optional
-            If set to True, all the operations are performed inplace
+            If set to True, all the operations are performed inplace.
+
+        Raises
+        ------
+        RuntimeError
+            Raised in event B is not two dimensional.
         
         Returns
         -------
         C : numpy array
             Output numpy array of size (B, C, M, N, 2) such that:
-            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
-    """
+            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
 
+    """
     if B.ndim != 2:
         raise RuntimeError('The dimension of the second input must be 2.')
 
@@ -202,6 +226,7 @@ def finalize(s0, s1, s2):
     -------
     s : numpy array
         Final output. Scattering transform.
+
     """
     return np.concatenate([np.concatenate(s0, axis=-3), np.concatenate(s1, axis=-3), np.concatenate(s2, axis=-3)], axis=-3)
 

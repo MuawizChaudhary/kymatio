@@ -5,87 +5,33 @@ BACKEND_NAME = 'numpy'
 from collections import namedtuple
 
 def complex_modulus(input_array):
+    """Compute the complex modulus.
+
+    Computes the modulus of x and stores the result in a real numpy array.
+
+    Parameters
+    ----------
+    x : numpy array
+        A complex numpy array.
+
+    Returns
+    -------
+    norm : numpy array
+        A real numpy array with the same dimensions as x and is the complex
+        modulus of x.
+
+    """
     return np.abs(input_array)
 
 
 
-def fft(x, direction='C2C', inverse=False):
-    """
-        fft of a 3d signal
-
-        Example
-        -------
-        x = torch.randn(128, 32, 32, 32, 2)
-        x_fft = fft(x, inverse=True)
-
-        Parameters
-        ----------
-        input : tensor
-            complex input for the FFT
-        inverse : bool
-            True for computing the inverse FFT.
-.
-    """
-    if direction == 'C2R':
-        if not inverse:
-            raise RuntimeError('C2R mode can only be done with an inverse FFT.')
-
-    if direction == 'C2R':
-        output = np.real(np.fft.ifftn(x, axes=(-3,-2,-1)))
-    elif direction == 'C2C':
-        if inverse:
-            output = np.fft.ifftn(x, axes=(-3,-2,-1))
-        else:
-            output = np.fft.fftn(x, axes=(-3,-2,-1))
-    return output
-
-
-def cdgmm3d(A, B, inplace=False):
-    """
-        Complex pointwise multiplication between (batched) tensor A and tensor B.
-        Parameters
-        ----------
-        A : tensor
-            A is a complex tensor of size (B, C, M, N, 2)
-        B : tensor
-            B is a complex tensor of size (M, N) or real tensor of (M, N)
-        inplace : boolean, optional
-            if set to True, all the operations are performed inplace
-        Returns
-        -------
-        C : tensor
-            output tensor of size (B, C, M, N, 2) such that:
-            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
-    """
-
-    if B.ndim != 3:
-        raise RuntimeError('The dimension of the second input must be 3.')
-
-    if inplace:
-        return np.multiply(A, B, out=A)
-    else:
-        return A * B
-
-def finalize(s_order_1, s_order_2, max_order):
-    s_order_1 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_1], axis=2)
-
-
-    if max_order == 2:
-        s_order_2 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_2], axis=2)
-        return np.concatenate([s_order_1, s_order_2], axis=1)
-    else:
-        return s_order_1
-
-
-
 def modulus_rotation(x, module):
-    """
-    Computes the convolution with a set of solid harmonics of scale j and
+    """Computes the convolution with a set of solid harmonics of scale j and
     degree l and returns the square root of their squared sum over m
 
     Parameters
     ----------
-    input_array : tensor
+    input_array : numpy array
         size (batchsize, M, N, O, 2)
     l : int
         solid harmonic degree l
@@ -96,8 +42,8 @@ def modulus_rotation(x, module):
     Returns
     -------
 
-    output : torch tensor
-        tensor of the same size as input_array. It holds the output of
+    output : torch numpy array
+        numpy array of the same size as input_array. It holds the output of
         the operation::
 
         $\\sqrt{\\sum_m (\\text{input}_\\text{array} \\star \\psi_{j,l,m})^2)}$
@@ -115,14 +61,13 @@ def modulus_rotation(x, module):
 
 
 def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
-    """
-    Computes the convolution of input_array with a lowpass filter phi_J
+    """Computes the convolution of input_array with a lowpass filter phi_J
     and downsamples by a factor J.
 
     Parameters
     ----------
-    input_array: torch tensor of size (batchsize, M, N, O, 2)
-    filter: torch tensor
+    input_array: torch numpy array of size (batchsize, M, N, O, 2)
+    filter: torch numpy array
         size (M, N, O, 2)
 
 
@@ -145,18 +90,18 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
 
     Parameters
     ----------
-    input_array: torch tensor
+    input_array: torch numpy array
         size (batchsize, M, N, O, 2)
-    filter: torch tensor
+    filter: torch numpy array
         size (M, N, O, 2)
     j: int
         the lowpass scale j of phi_j
-    points: torch tensor
+    points: torch numpy array
         size (batchsize, number of points, 3)
 
     Returns
     -------
-    output: torch tensor of size (batchsize, number of points, 1) with
+    output: torch numpy array of size (batchsize, number of points, 1) with
             the values of the lowpass filtered moduli at the points given.
 
     """
@@ -184,7 +129,7 @@ def compute_integrals(input_array, integral_powers):
 
         Parameters
         ----------
-        input_array: torch tensor
+        input_array: torch numpy array
             size (B, M, N, O), B batch_size, M, N, O spatial dims
 
         integral_powers: list
@@ -193,8 +138,8 @@ def compute_integrals(input_array, integral_powers):
 
         Returns
         -------
-        integrals: torch tensor
-            tensor of size (B, P) containing the integrals of the input_array
+        integrals: torch numpy array
+            numpy array of size (B, P) containing the integrals of the input_array
             to the powers p (l_p norms)
 
     """
@@ -203,6 +148,111 @@ def compute_integrals(input_array, integral_powers):
         integrals[:, i_q] = (input_array ** q).reshape((
                                         input_array.shape[0], -1)).sum(axis=1)
     return integrals
+
+
+def fft(x, direction='C2C', inverse=False):
+    """fft of a 3d signal.
+
+        Example
+        -------
+        x = numpy.random.randn(128, 32, 32, 32, 2).view(numpy.complex64)
+        x_fft = fft(x)
+        x_ifft = fft(x, inverse=True)
+
+        Parameters
+        ----------
+        input : numpy array
+            Complex input for the FFT.
+        inverse : bool
+            True for computing the inverse FFT.
+
+        Raises
+        ------
+        RuntimeError
+            Raised in event we attempt to map from complex to real without
+            inverse fft.
+
+        Returns
+        -------
+        output : numpy array
+            Numpy array of the same size as A containing the result of the
+            elementwise complex multiplication of A with B.
+.
+    """
+    if direction == 'C2R':
+        if not inverse:
+            raise RuntimeError('C2R mode can only be done with an inverse FFT.')
+
+    if direction == 'C2R':
+        output = np.real(np.fft.ifftn(x, axes=(-3,-2,-1)))
+    elif direction == 'C2C':
+        if inverse:
+            output = np.fft.ifftn(x, axes=(-3,-2,-1))
+        else:
+            output = np.fft.fftn(x, axes=(-3,-2,-1))
+    return output
+
+
+def cdgmm3d(A, B, inplace=False):
+    """Complex pointwise multiplication.
+
+        Complex pointwise multiplication between (batched) numpy array A and
+        numpy array B.
+
+        Parameters
+        ----------
+        A : numpy array
+            A is a complex numpy array of size (B, C, M, N).
+        B : numpy array
+            B is a complex or real numpy array of size (M, N).
+        inplace : boolean, optional
+            If set to True, all the operations are performed inplace.
+
+        Raises
+        ------
+        RuntimeError
+            Raised in event B is not three dimensional.
+        
+        Returns
+        -------
+        C : numpy array
+            Output numpy array of size (B, C, M, N) such that:
+            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
+
+    """
+    if B.ndim != 3:
+        raise RuntimeError('The dimension of the second input must be 3.')
+
+    if inplace:
+        return np.multiply(A, B, out=A)
+    else:
+        return A * B
+
+
+def finalize(s_order_1, s_order_2, max_order):
+    """Concatenate scattering of different orders.
+    
+        Parameters
+        ----------
+        s0 : numpy array
+            numpy array which contains the zeroth order scattering coefficents.
+        s1 : numpy array
+            numpy array which contains the first order scattering coefficents.
+        s2 : numpy array
+            numpy array which contains the second order scattering coefficents.
+        
+        Returns
+        -------
+        s : numpy array
+            Final output. Scattering transform.
+    
+        """
+    s_order_1 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_1], axis=2)
+    if max_order == 2:
+        s_order_2 = np.concatenate([np.expand_dims(arr, 2) for arr in s_order_2], axis=2)
+        return np.concatenate([s_order_1, s_order_2], axis=1)
+    else:
+        return s_order_1
 
 
 def aggregate(x):

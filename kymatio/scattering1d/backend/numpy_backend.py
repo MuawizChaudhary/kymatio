@@ -21,7 +21,7 @@ def modulus_complex(x):
     Returns
     -------
     norm : numpy array
-        A complex numpy array with the same dimensions as x and is the complex
+        A real numpy array with the same dimensions as x and is the complex
         modulus of x.
     """
 

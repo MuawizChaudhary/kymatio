@@ -21,7 +21,7 @@ def iscomplex(input):
     return input.size(-1) == 2
 
 def complex_modulus(input_array):
-    """Computes the complex modulus of input.
+    """Computes complex modulus.
       
         Parameters
         ----------
@@ -214,8 +214,9 @@ def cdgmm3d(A, B, inplace=False):
     ------
     RuntimeError
         In the event that the tensors are not compatibile for multiplication
-        (i.e. the final four dimensions do not match with the dimensions of B)
-        or in the event that 
+        (i.e. the final four dimensions of A do not match with the dimensions
+        of B), or in the event that B is not complex, or in the event that the
+        type of A and B are not the same.
     TypeError
         In the event that x is not complex i.e. does not have a final dimension
         of 2, or in the event that both tensors are not on the same device.
