@@ -100,7 +100,7 @@ class Scattering2DTorch(ScatteringTorch):
         if not self.backend:
             from ..backend.torch_backend import backend
             self.backend = backend
-        elif self.backend.name.startswith('torch'):
+        elif not self.backend.name.startswith('torch'):
             raise RuntimeError('This backend is not supported.')
 
         if 2 ** self.J > self.shape[0] or 2 ** self.J > self.shape[1]:

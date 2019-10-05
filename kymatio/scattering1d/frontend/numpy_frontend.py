@@ -190,7 +190,7 @@ class Scattering1DNumpy(ScatteringNumpy):
         if not self.backend:
             from ..backend.numpy_backend import backend
             self.backend = backend
-        elif self.backend.name.startswith('numpy'):
+        elif not self.backend.name.startswith('numpy'):
             raise RuntimeError('This backend is not supported.')
 
         self.r_psi = math.sqrt(0.5)

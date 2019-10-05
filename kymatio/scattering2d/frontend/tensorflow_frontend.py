@@ -96,7 +96,7 @@ class Scattering2DTensorflow(ScatteringTensorflow):
         if not self.backend:
             from ..backend.tensorflow_backend import backend # is imported like a module and not a class?
             self.backend = backend
-        elif self.backend.name.startswith('tensorflow'):
+        elif not self.backend.name.startswith('tensorflow'):
             raise RuntimeError('This backend is not supported.')
 
         if 2 ** self.J > self.shape[0] or 2 ** self.J > self.shape[1]:

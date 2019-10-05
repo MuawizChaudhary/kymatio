@@ -95,7 +95,7 @@ class Scattering2DNumpy(ScatteringNumpy):
         if not self.backend:
             from ..backend.numpy_backend import backend # is imported like a module and not a class?
             self.backend = backend
-        elif self.backend.name.startswith('numpy'):
+        elif not self.backend.name.startswith('numpy'):
             raise RuntimeError('This backend is not supported.')
 
         if 2 ** self.J > self.shape[0] or 2 ** self.J > self.shape[1]:

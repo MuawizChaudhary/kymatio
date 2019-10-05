@@ -192,7 +192,7 @@ class Scattering1DTensorflow(ScatteringTensorflow):
         if not self.backend:
             from ..backend.tensorflow_backend import backend
             self.backend = backend
-        elif self.backend.name.startswith('tensorflow'):
+        elif not self.backend.name.startswith('tensorflow'):
             raise RuntimeError('This backend is not supported.')
 
         self.r_psi = math.sqrt(0.5)
