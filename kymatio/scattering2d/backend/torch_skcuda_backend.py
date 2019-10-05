@@ -33,8 +33,8 @@ def isreal(x):
     return x.size(-1) == 1
 
 class SubsampleFourier(object):
-    """
-        Subsampling of a 2D image performed in the Fourier domain
+    """Subsampling of a 2D image performed in the Fourier domain.
+
         Subsampling in the spatial domain amounts to periodization
         in the Fourier domain, hence the formula.
 
@@ -52,7 +52,8 @@ class SubsampleFourier(object):
         res : tensor_like
             Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
-            FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)]
+            FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
+
     """
     def __init__(self):
         self.block = (32, 32, 1)
@@ -133,6 +134,7 @@ class Modulus(object):
         output : output tensor 
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
+
     """    
     def __init__(self):
         self.CUDA_NUM_THREADS = 1024
@@ -172,23 +174,27 @@ class Modulus(object):
 
 
 def cdgmm(A, B, inplace=False):
-    """
-        Complex pointwise multiplication between (batched) tensor A and tensor B.
-
+    """Complex pointwise multiplication. 
+    
+        Complex pointwise multiplication between (batched) tensor A and tensor
+        B.
+       
         Parameters
         ----------
         A : tensor
-            A is a complex tensor of size (B, C, M, N, 2)
+            A is a complex tensor of size (B, C, M, N, 2).
         B : tensor
-            B is a complex tensor of size (M, N, 2) or real tensor of (M, N, 1)
+            B is a complex tensor of size (M, N, 2) or real tensor of (M, N,
+            1).
         inplace : boolean, optional
-            If set to True, all the operations are performed inplace
+            If set to True, all the operations are performed inplace.
 
         Returns
         -------
         C : tensor
             Output tensor of size (B, C, M, N, 2) such that:
-            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
+            C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
+
     """
     if not iscomplex(A):
         raise TypeError('The input must be complex, indicated by a last '

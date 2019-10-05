@@ -45,13 +45,14 @@ class Pad(object):
         self.build()
 
     def build(self):
-        """Builds the padding module
+        """Builds the padding module.
 
             Attributes
             ----------
             padding_module : ReflectionPad2d
                 Pads the input tensor using the reflection of the input
                 boundary. 
+
         """
         pad_size_tmp = list(self.pad_size)
 
@@ -67,7 +68,7 @@ class Pad(object):
                                                pad_size_tmp[0], pad_size_tmp[1]])
 
     def __call__(self, x):
-        """Applies padding and maps to complex
+        """Applies padding and maps to complex.
             
             Parameters
             ----------
@@ -78,6 +79,7 @@ class Pad(object):
             -------
             output : tensor
                 Complex torch tensor that has been padded.
+
         """
         batch_shape = x.shape[:-2]
         signal_shape = x.shape[-2:]
@@ -95,7 +97,9 @@ class Pad(object):
         return output
 
 def unpad(in_):
-    """Slices the input tensor at indices between 1::-1
+    """Unpads input.
+        
+        Slices the input tensor at indices between 1::-1.
 
         Parameters
         ----------
@@ -105,13 +109,14 @@ def unpad(in_):
         Returns
         -------
         in_[..., 1:-1, 1:-1] : tensor_like
-            Output tensor.
+            Output tensor.  Unpadded input.
+
     """
     return torch.unsqueeze(in_[..., 1:-1, 1:-1], -3)
 
 class SubsampleFourier(object):
-    """
-        Subsampling of a 2D image performed in the Fourier domain
+    """Subsampling of a 2D image performed in the Fourier domain
+        
         Subsampling in the spatial domain amounts to periodization
         in the Fourier domain, hence the formula.
 
@@ -130,6 +135,7 @@ class SubsampleFourier(object):
             Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
+
     """
     def __call__(self, x, k):
         batch_shape = x.shape[:-3]
@@ -146,8 +152,7 @@ class SubsampleFourier(object):
 
 
 class Modulus(object):
-    """
-        This class implements a modulus transform for complex numbers.
+    """This class implements a modulus transform for complex numbers.
 
         Usage
         -----
@@ -164,9 +169,9 @@ class Modulus(object):
         output : output tensor 
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
+
     """
     def __call__(self, x):
-
         norm = torch.zeros_like(x)
         norm[...,0] = (x[...,0]*x[...,0] +
                        x[...,1]*x[...,1]).sqrt()
@@ -230,10 +235,9 @@ def fft(x, direction='C2C', inverse=False):
     return output
 
 
-
-
 def cdgmm(A, B, inplace=False):
-    """
+    """Complex pointwise multiplication.
+    
         Complex pointwise multiplication between (batched) tensor A and tensor B.
 
         Parameters
@@ -250,6 +254,7 @@ def cdgmm(A, B, inplace=False):
         C : tensor
             Output tensor of size (B, C, M, N, 2) such that:
             C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
+
     """
     if not iscomplex(A):
         raise TypeError('The input must be complex, indicated by a last '
@@ -298,7 +303,7 @@ def cdgmm(A, B, inplace=False):
 
 
 def finalize(s0, s1, s2):
-    """Concatenate scattering of different orders
+    """Concatenate scattering of different orders.
 
     Parameters
     ----------
@@ -313,6 +318,7 @@ def finalize(s0, s1, s2):
     -------
     s : tensor
         Final output. Scattering transform.
+
     """
     if len(s2)>0:
         return torch.cat([torch.cat(s0, -3), torch.cat(s1, -3), torch.cat(s2, -3)], -3)

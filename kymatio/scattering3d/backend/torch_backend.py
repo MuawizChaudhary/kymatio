@@ -17,11 +17,13 @@ def iscomplex(input):
         output : boolean
             Returns True if complex (i.e. final dimension is 2), False
             otherwise.
+
     """
     return input.size(-1) == 2
 
 def complex_modulus(input_array):
     """Computes complex modulus.
+
       
         Parameters
         ----------
@@ -42,28 +44,24 @@ def complex_modulus(input_array):
 
 
 def modulus_rotation(x, module):
-    """Computes the convolution with a set of solid harmonics of scale j and
-    degree l and returns the square root of their squared sum over m.
+    """Used for computing rotation invariant scattering transform coefficents.
+    
+        Parameters
+        ----------
+        x : tensor
+            Size (batchsize, M, N, O, 2).
+        module : tensor
+            Tensor that holds the overall sum.
 
-    Parameters
-    ----------
-    input_array : tensor
-        Size (batchsize, M, N, O, 2).
-    l : int
-        Solid harmonic degree l.
+        Returns
+        -------
+        output : torch tensor
+            Tensor of the same size as input_array. It holds the output of
+            the operation::
 
-    j : int
-        Solid harmonic scale j.
+            $\\sqrt{\\sum_m (\\text{input}_\\text{array} \\star \\psi_{j,l,m})^2)}$
 
-    Returns
-    -------
-    output : torch tensor
-        Tensor of the same size as input_array. It holds the output of
-        the operation::
-
-        $\\sqrt{\\sum_m (\\text{input}_\\text{array} \\star \\psi_{j,l,m})^2)}$
-
-        which is covariant to 3D translations and rotations.
+            which is covariant to 3D translations and rotations.
 
     """
     if module is None:
@@ -76,21 +74,27 @@ def modulus_rotation(x, module):
 
 
 def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
-    """Computes the convolution of input_array with a lowpass filter phi_J
-    and downsamples by a factor J.
-
-    Parameters
-    ----------
-    input_array : torch tensor 
-        size (batchsize, M, N, O, 2).
-    filter : torch tensor
-        size (M, N, O, 2).
-
-    Returns
-    -------
-    output : tensor 
-        The result of input_array \\star phi_J downsampled by a factor J.
-
+    """Computes convolution and downsamples.
+    
+        Computes the convolution of input_array with a lowpass filter phi_J
+        and downsamples by a factor J.
+    
+        Parameters
+        ----------
+        input_array : torch tensor 
+            Size (batchsize, M, N, O, 2).
+        filter : torch tensor
+            Size (M, N, O, 2).
+        J : int
+            Low pass scale of phi_J.
+        subsample : function
+            Subsampling function.
+    
+        Returns
+        -------
+        output : tensor 
+            The result of input_array \\star phi_J downsampled by a factor J.
+    
     """
     low_pass = filter[J]
     convolved_input = cdgmm3d(input_array, low_pass)
@@ -98,27 +102,28 @@ def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
     return subsample(convolved_input, J)
 
 
-
 def _compute_local_scattering_coefs(input_array, filter, j, points):
-    """Computes the convolution of input_array with a lowpass filter phi_j+1 and
-    and returns the value of the output at particular points.
+    """Compute convolution and returns particular points.
+    
+        Computes the convolution of input_array with a lowpass filter phi_j+1
+        and returns the value of the output at particular points.
 
-    Parameters
-    ----------
-    input_array : torch tensor
-        Size (batchsize, M, N, O, 2).
-    filter : torch tensor
-        Size (M, N, O, 2).
-    j : int
-        The lowpass scale j of phi_j.
-    points : torch tensor
-        Size (batchsize, number of points, 3).
+        Parameters
+        ----------
+        input_array : torch tensor
+            Size (batchsize, M, N, O, 2).
+        filter : torch tensor
+            Size (M, N, O, 2).
+        j : int
+            The lowpass scale j of phi_j.
+        points : torch tensor
+            Size (batchsize, number of points, 3).
 
-    Returns
-    -------
-    output : torch tensor 
-        Torch tensor of size (batchsize, number of points, 1) with the values
-        of the lowpass filtered moduli at the points given.
+        Returns
+        -------
+        output : torch tensor 
+            Torch tensor of size (batchsize, number of points, 1) with the values
+            of the lowpass filtered moduli at the points given.
 
     """
     local_coefs = torch.zeros(input_array.size(0), points.size(1), 1)
@@ -135,25 +140,42 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
 
 
 def subsample(input_array, j):
-    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j, :].contiguous()
-
-
-
-def compute_integrals(input_array, integral_powers):
-    """Computes integrals of the input_array to the given powers.
+    """Downsamples.
 
         Parameters
         ----------
-        input_array: torch tensor
-            Size (B, M, N, O), B batch_size, M, N, O spatial dims.
-        integral_powers: list
+        input_array : tensor
+            Input tensor.
+        j : int
+            Downsampling factor.
+
+        Returns
+        -------
+        out : tensor
+            Downsampled tensor. 
+        
+    """
+    return input_array[..., ::2 ** j, ::2 ** j, ::2 ** j, :].contiguous()
+
+
+def compute_integrals(input_array, integral_powers):
+    """Computes integrals.
+    
+        Computes integrals of the input_array to the given powers.
+
+        Parameters
+        ----------
+        input_array : torch tensor
+            Size (B, M, N, O), where B is batch_size, and M, N, O are spatial
+            dims.
+        integral_powers : list
             List of P positive floats containing the p values used to
             compute the integrals of the input_array to the power p (l_p
             norms).
 
         Returns
         -------
-        integrals: torch tensor
+        integrals : torch tensor
             Tensor of size (B, P) containing the integrals of the input_array
             to the powers p (l_p norms).
 
@@ -190,6 +212,7 @@ def fft(input, inverse=False):
         -------
         output : tensor
             Result of FFT or IFFT.
+
     """
     if not iscomplex(input):
         raise(TypeError('The input should be complex (e.g. last dimension is 2)'))
@@ -199,33 +222,36 @@ def fft(input, inverse=False):
 
 
 def cdgmm3d(A, B, inplace=False):
-    """Pointwise multiplication of complex tensors.
-
-    Parameters
-    ----------
-    A : torch tensor
-        Complex torch tensor.
-    B : torch tensor
-        Complex of the same size as A.
-    inplace : boolean, optional
-        If set True, all the operations are performed inplace
+    """Complex pointwise multiplication.
     
-    Raises
-    ------
-    RuntimeError
-        In the event that the tensors are not compatibile for multiplication
-        (i.e. the final four dimensions of A do not match with the dimensions
-        of B), or in the event that B is not complex, or in the event that the
-        type of A and B are not the same.
-    TypeError
-        In the event that x is not complex i.e. does not have a final dimension
-        of 2, or in the event that both tensors are not on the same device.
-
-    Returns
-    -------
-    output : torch tensor
-        Torch tensor of the same size as A containing the result of the
-        elementwise complex multiplication of A with B 
+        Complex pointwise multiplication between (batched) tensor A and tensor B.
+    
+        Parameters
+        ----------
+        A : torch tensor
+            Complex torch tensor.
+        B : torch tensor
+            Complex of the same size as A.
+        inplace : boolean, optional
+            If set True, all the operations are performed inplace.
+        
+        Raises
+        ------
+        RuntimeError
+            In the event that the tensors are not compatibile for multiplication
+            (i.e. the final four dimensions of A do not match with the dimensions
+            of B), or in the event that B is not complex, or in the event that the
+            type of A and B are not the same.
+        TypeError
+            In the event that x is not complex i.e. does not have a final dimension
+            of 2, or in the event that both tensors are not on the same device.
+    
+        Returns
+        -------
+        output : torch tensor
+            Torch tensor of the same size as A containing the result of the
+            elementwise complex multiplication of A with B.
+    
     """
     if not A.is_contiguous():
         warnings.warn("cdgmm3d: tensor A is converted to a contiguous array")
@@ -261,6 +287,23 @@ def cdgmm3d(A, B, inplace=False):
     return C if not inplace else A.copy_(C)
 
 def finalize(s_order_1, s_order_2, max_order):
+    """Concatenate scattering of different orders.
+
+        Parameters
+        ----------
+        s0 : tensor
+            Tensor which contains the zeroth order scattering coefficents.
+        s1 : tensor
+            Tensor which contains the first order scattering coefficents.
+        s2 : tensor
+            Tensor which contains the second order scattering coefficents.
+        
+        Returns
+        -------
+        s : tensor
+            Final output. Scattering transform.
+
+    """
     s_order_1 = torch.stack(s_order_1, 2)
     if max_order == 2:
         s_order_2 = torch.stack(s_order_2, 2)
@@ -269,6 +312,19 @@ def finalize(s_order_1, s_order_2, max_order):
         return s_order_1
 
 def aggregate(x):
+    """Aggregation of scattering coefficents.
+
+        Parameters
+        ----------
+        x : list 
+            List of tensors. 
+    
+        Returns
+        -------
+        out : tensor
+            Stacked scattering coefficents.
+    
+    """
     return torch.stack([arr[..., 0] for arr in x], 1)
 
 backend = namedtuple('backend', ['name', 'cdgmm3d', 'fft', 'finalize', 'modulus', 'modulus_rotation', 'subsample',\

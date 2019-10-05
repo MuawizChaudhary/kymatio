@@ -53,7 +53,8 @@ class Pad(object):
             return np.pad(x, ((0,0), (0,0), np_pad[0], np_pad[1]), mode='reflect')
 
 def unpad(in_):
-    """
+    """Unpads input.
+
         Slices the input numpy array at indices between 1::-1.
         
         Parameters
@@ -64,8 +65,7 @@ def unpad(in_):
         Returns
         -------
         in_[..., 1:-1, 1:-1] : numpy array_like
-            Output sliced numpy array.
-
+            Output numpy array. Unpadded input.
 
     """
     return np.expand_dims(in_[..., 1:-1, 1:-1],-3)
@@ -112,18 +112,18 @@ class Modulus(object):
         
         Parameters
         ---------
-        x: Input complex numpy array.
+        x : numpy array
+            Input complex numpy array.
         
         Returns
         -------
-        output: A real numpy array equal to the modulus of x.
+        output : numpy array
+            A real numpy array equal to the modulus of x.
 
     """
     def __call__(self, x):
         norm = np.abs(x)
         return norm
-
-
 
 
 def fft(x, direction='C2C', inverse=False):
@@ -138,9 +138,9 @@ def fft(x, direction='C2C', inverse=False):
         Parameters
         ----------
         input : numpy array
-            Complex input for the FFT
+            Complex input for the FFT.
         direction : string
-            'C2R' for complex to real, 'C2C' for complex to complex
+            'C2R' for complex to real, 'C2C' for complex to complex.
         inverse : bool
             True for computing the inverse FFT.
             NB : If direction is equal to 'C2R', then an error is raised.
@@ -149,7 +149,7 @@ def fft(x, direction='C2C', inverse=False):
         ------
         RuntimeError
             Raised in event we attempt to map from complex to real without
-            inverse fft.
+            inverse FFT.
 
         Returns
         -------
@@ -211,7 +211,7 @@ def cdgmm(A, B, inplace=False):
 
 
 def finalize(s0, s1, s2):
-    """Concatenate scattering of different orders
+    """Concatenate scattering of different orders.
 
     Parameters
     ----------

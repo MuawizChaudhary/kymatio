@@ -7,11 +7,9 @@ from collections import namedtuple
 BACKEND_NAME = 'numpy'
 
 def modulus_complex(x):
-    """Compute the complex modulus
+    """Compute the complex modulus.
 
-    Computes the modulus of x and stores the result in a complex numpy array of the
-    same size, with the real part equal to the modulus and the imaginary part
-    equal to zero.
+    Computes the modulus of x and stores the result in a real numpy array.
 
     Parameters
     ----------
@@ -23,6 +21,7 @@ def modulus_complex(x):
     norm : numpy array
         A real numpy array with the same dimensions as x and is the complex
         modulus of x.
+
     """
 
     norm = np.abs(x)
@@ -30,7 +29,7 @@ def modulus_complex(x):
     return norm
 
 def subsample_fourier(x, k):
-    """Subsampling in the Fourier domain
+    """Subsampling in the Fourier domain.
 
     Subsampling in the temporal domain amounts to periodization in the Fourier
     domain, so the input is periodized according to the subsampling factor.
@@ -47,6 +46,7 @@ def subsample_fourier(x, k):
     res : numpy array
         The input numpy array periodized along the next to last axis to yield a
         numpy array of size x.shape[-2] // k along that dimension.
+
     """
 
     N = x.shape[-1]
@@ -54,7 +54,7 @@ def subsample_fourier(x, k):
     return res
 
 def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
-    """Pad real 1D numpy arrays
+    """Pad real 1D numpy arrays.
 
     1D implementation of the padding function for real numpy arrays.
 
@@ -85,7 +85,7 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
     return np.pad(x, ((0,0), (0,0), (pad_left, pad_right)), mode='reflect')
 
 def pad(x, pad_left=0, pad_right=0, to_complex=True):
-    """Pad real 1D numpy arrays and map to complex
+    """Pad 1D numpy arrays.
 
     Padding which allows to simultaneously pad in a reflection fashion and map
     to complex if necessary.
@@ -110,12 +110,13 @@ def pad(x, pad_left=0, pad_right=0, to_complex=True):
     output : numpy array
         A padded signal, possibly transformed into a four-dimensional numpy
         array.
+
     """
     output = pad_1d(x, pad_left, pad_right, mode='reflect')
     return output
 
 def unpad(x, i0, i1):
-    """Unpad real 1D numpy array
+    """Unpad real 1D numpy array.
 
     Slices the input numpy array at indices between i0 and i1 along the last axis.
 
@@ -132,11 +133,12 @@ def unpad(x, i0, i1):
     -------
     x_unpadded : numpy array
         The numpy array x[..., i0:i1].
+
     """
     return x[..., i0:i1]
 
 def real(x):
-    """Real part of complex numpy array
+    """Real part of complex numpy array.
 
     Takes the real part of a complex numpy array.
 
@@ -149,11 +151,12 @@ def real(x):
     -------
     x_real : numpy array
         The numpy array np.real(x) which is interpreted as the real part of x.
+
     """
     return np.real(x)
 
 def fft1d_c2c(x):
-    """Compute the 1D FFT of a complex signal
+    """Compute the 1D FFT of a complex signal.
 
     Input
     -----
@@ -165,11 +168,12 @@ def fft1d_c2c(x):
     x_f : numpy array
         A numpy array of the same size as x containing its Fourier transform in the
         standard numpy FFT ordering.
+
     """
     return np.fft.fft(x)
 
 def ifft1d_c2c(x):
-    """Compute the normalized 1D inverse FFT of a complex signal
+    """Compute the normalized 1D inverse FFT of a complex signal.
 
     Input
     -----
@@ -182,11 +186,12 @@ def ifft1d_c2c(x):
     x : numpy array
         A numpy array of the same size of x_f containing the normalized inverse
         Fourier transform of x_f.
+
     """
     return np.fft.ifft(x)
 
 def finalize(s0, s1, s2):
-    """Concatenate scattering of different orders
+    """Concatenate scattering of different orders.
 
     Parameters
     ----------
@@ -201,6 +206,7 @@ def finalize(s0, s1, s2):
     -------
     s : numpy array
         Final output. Scattering transform.
+
     """
     return np.concatenate([np.concatenate(s0, axis=-2), np.concatenate(s1, axis=-2), np.concatenate(s2, axis=-2)], axis=-2)
 
