@@ -192,7 +192,7 @@ class Scattering1DTensorflow(ScatteringTensorflow):
         if not self.backend:
             from ..backend.tensorflow_backend import backend
             self.backend = backend
-        elif self.backend.name[0:5] != 'tensorflow':
+        elif self.backend.name.startswith('tensorflow'):
             raise RuntimeError('This backend is not supported.')
 
         self.r_psi = math.sqrt(0.5)
@@ -314,7 +314,6 @@ class Scattering1DTensorflow(ScatteringTensorflow):
         signal_shape = x.shape[-1:]
         x = tf.reshape(x, [-1, 1] + signal_shape.as_list())
 
-
         # get the arguments before calling the scattering
         # treat the arguments
         if self.vectorize:
@@ -326,7 +325,6 @@ class Scattering1DTensorflow(ScatteringTensorflow):
                 self.J, self.Q, max_order=self.max_order, detail=True)
         else:
             size_scattering = 0
-
 
         S = scattering1d(x, self.backend.pad, self.backend.unpad, self.backend, self.J, self.psi1_f, self.psi2_f, self.phi_f,\
                          max_order=self.max_order, average=self.average,
@@ -352,3 +350,4 @@ class Scattering1DTensorflow(ScatteringTensorflow):
 
     def loginfo(self):
         return 'TensorFlow frontend is used.'
+

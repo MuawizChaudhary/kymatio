@@ -192,7 +192,7 @@ class Scattering1DTorch(ScatteringTorch):
         if not self.backend:
             from ..backend.torch_backend import backend
             self.backend = backend
-        elif self.backend.name[0:5] != 'torch':
+        elif self.backend.name.startswith('torch'):
             raise RuntimeError('This backend is not supported.')
 
         self.r_psi = math.sqrt(0.5)

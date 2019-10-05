@@ -23,9 +23,7 @@ def modulus_complex(x):
         modulus of x.
 
     """
-
     norm = np.abs(x)
-
     return norm
 
 def subsample_fourier(x, k):
@@ -44,11 +42,10 @@ def subsample_fourier(x, k):
     Returns
     -------
     res : numpy array
-        The input numpy array periodized along the next to last axis to yield a
+        The input numpy array periodized along the last axis to yield a
         numpy array of size x.shape[-2] // k along that dimension.
 
     """
-
     N = x.shape[-1]
     res = x.reshape(x.shape[:-2] + (k, N // k)).mean(axis=-2, keepdims=True)
     return res
@@ -78,6 +75,7 @@ def pad_1d(x, pad_left, pad_right, mode='constant', value=0.):
     -------
     res : numpy array
         The numpy array passed along the third dimension.
+
     """
     if (pad_left >= x.shape[-1]) or (pad_right >= x.shape[-1]):
         if mode == 'reflect':
@@ -222,3 +220,4 @@ backend.pad_1d = pad_1d
 backend.fft1d_c2c = fft1d_c2c
 backend.ifft1d_c2c = ifft1d_c2c
 backend.finalize = finalize
+

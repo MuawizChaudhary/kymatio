@@ -60,8 +60,8 @@ class Modulus(object):
 
     def __call__(self, x):
 
-        if not x.is_cuda and self.backend=='skcuda':
-            raise TypeError('Use the torch backend (without skcuda) for cpu tensors!')
+        if not x.is_cuda and self.backend =='skcuda':
+            raise TypeError('Use the torch backend (without skcuda) for CPU tensors!')
 
         out = x.new(x.size())
 
@@ -150,7 +150,7 @@ class SubsampleFourier(object):
 
     def __call__(self, x, k):
         if not x.is_cuda and self.backend == 'skcuda':
-            raise TypeError('Use the torch backend (without skcuda) for cpu tensors!')
+            raise TypeError('Use the torch backend (without skcuda) for CPU tensors!')
 
         if not is_complex(x):
             raise TypeError('The input and outputs should be complex')
@@ -239,3 +239,4 @@ backend.pad_1d = pad_1d
 backend.fft1d_c2c = fft1d_c2c
 backend.ifft1d_c2c = ifft1d_c2c
 backend.finalize = finalize
+
