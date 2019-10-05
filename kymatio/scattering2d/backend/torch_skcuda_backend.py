@@ -213,7 +213,7 @@ def cdgmm(A, B, inplace=False):
         raise TypeError('A and B must be of the same dtype.')
 
     if not A.is_cuda or not B.is_cuda:
-        raise TypeError('A and B must be CUDA tensors.')
+        raise TypeError('A and B must be cuda tensors.')
 
     if A.device.index != B.device.index:
         raise TypeError('A and B must be on the same GPU!')
