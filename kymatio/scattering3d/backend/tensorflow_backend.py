@@ -18,7 +18,6 @@ def complex_modulus(x):
             result of the complex modulus.
              
     """
-
     modulus = tf.abs(x)
     return modulus
 
@@ -48,6 +47,7 @@ def modulus_rotation(x, module):
         module = tf.zeros_like(x, tf.float32)
     else:
         module = module**2
+
     module += tf.abs(x)**2
     return tf.sqrt(module)
 
@@ -73,7 +73,7 @@ def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
         -------
         output : tensor 
             The result of input_array \\star phi_J downsampled by a factor J.
-    
+            
     """
     low_pass = filter[J]
     convolved_input = cdgmm3d(input_array, low_pass)
@@ -138,7 +138,7 @@ def subsample(input_array, j):
 
 def compute_integrals(input_array, integral_powers):
     """Computes integrals.
-    
+        
         Computes integrals of the input_array to the given powers.
 
         Parameters
@@ -159,10 +159,8 @@ def compute_integrals(input_array, integral_powers):
 
     """
     integrals = []
-
     for i_q, q in enumerate(integral_powers):
         integrals.append(tf.reduce_sum(tf.reshape(tf.pow(input_array, q), shape=(input_array.shape[0], -1)), axis=1))
-
     return tf.expand_dims(tf.stack(integrals, axis=-1), axis=-1)
 
 
@@ -275,8 +273,6 @@ def finalize(s_order_1, s_order_2, max_order):
         return tf.squeeze(tf.concat([s_order_1, s_order_2], axis=1), axis=-1)
     else:
         return tf.squeeze(s_order_1, axis=-1)
-
-
 
 
 def aggregate(x):

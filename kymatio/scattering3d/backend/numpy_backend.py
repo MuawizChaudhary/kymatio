@@ -45,7 +45,7 @@ def modulus_rotation(x, module):
     
             which is covariant to 3D translations and rotations.
     
-    """
+   """
     if module is None:
         module = np.zeros_like(x)
     else:
@@ -84,7 +84,6 @@ def _compute_standard_scattering_coefs(input_array, filter, J, subsample):
     return subsample(convolved_input, J)
 
 
-
 def _compute_local_scattering_coefs(input_array, filter, j, points):
     """Compute convolution and returns particular points.
 
@@ -107,7 +106,7 @@ def _compute_local_scattering_coefs(input_array, filter, j, points):
         output : numpy array
             Numpy array of size (batchsize, number of points, 1) with the values
             of the lowpass filtered moduli at the points given.
-
+            
     """
     local_coefs = np.zeros((input_array.shape[0], points.shape[1]), dtype=np.complex64)
     low_pass = filter[j+1]
@@ -139,7 +138,6 @@ def subsample(input_array, j):
         
     """
     return np.ascontiguousarray(input_array[..., ::2 ** j, ::2 ** j, ::2 ** j])
-
 
 
 def compute_integrals(input_array, integral_powers):

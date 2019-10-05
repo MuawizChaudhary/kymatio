@@ -23,11 +23,13 @@ def complex_modulus(input_array):
 
 
 def fft(input, inverse=False):
-"""Interface with torch FFT routines for 3D signals.
+    """Interface with torch FFT routines for 3D signals.
+        fft of a 3d signal
 
         Example
         -------
         x = torch.randn(128, 32, 32, 32, 2)
+        
         x_fft = fft(x)
         x_ifft = fft(x, inverse=True)
 

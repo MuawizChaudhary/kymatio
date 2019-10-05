@@ -188,10 +188,12 @@ def compute_integrals(input_array, integral_powers):
 
 def fft(input, inverse=False):
     """Interface with torch FFT routines for 3D signals.
+        fft of a 3d signal
 
         Example
         -------
         x = torch.randn(128, 32, 32, 32, 2)
+        
         x_fft = fft(x)
         x_ifft = fft(x, inverse=True)
 
@@ -212,7 +214,6 @@ def fft(input, inverse=False):
         -------
         output : tensor
             Result of FFT or IFFT.
-
     """
     if not iscomplex(input):
         raise(TypeError('The input should be complex (e.g. last dimension is 2)'))
