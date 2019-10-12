@@ -62,15 +62,17 @@ class Modulus(object):
 
         if not x.is_cuda and self.backend =='skcuda':
             raise TypeError('Use the torch backend (without skcuda) for CPU tensors!')
-
-        out = x.new(x.shape)
-
-        if not x.is_contiguous():
-            raise RuntimeError('Input should be contiguous.')
-
+        
         if not is_complex(x):
             raise TypeError('The input and outputs should be complex.')
 
+        if not x.is_contiguous():
+            warnings.warn("Modulus: tensor x is converted to a contiguous
+                    array.")
+            x = x.contiguous()
+        
+        out = x.new(x.shape)
+        
         kernel = """
         extern "C"
         __global__ void abs_complex_value(const ${dtype} * x, ${dtype}2 * z, int n)
@@ -156,8 +158,10 @@ class SubsampleFourier(object):
             raise TypeError('The input and outputs should be complex')
 
         if not x.is_contiguous():
-            raise RuntimeError('Input should be contiguous.')
-
+            warnings.warn("Modulus: tensor x is converted to a contiguous
+                    array.")
+            x = x.contiguous()
+        
         out = x.new(x.shape[0], x.shape[1], x..shape[2] // k, 2)
 
         kernel = '''
