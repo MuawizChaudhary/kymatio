@@ -11,10 +11,13 @@ def scattering1d(x, backend, J, psi1, psi2, phi, pad_left=0, pad_right=0,
 
     Parameters
     ----------
-    x : Tensor
-        a torch Tensor of size `(B, 1, T)` where `T` is the temporal size
+    x : Tensor | Numpy array
+        A tensor/numpy array of size `(B, 1, T)` where `T` is the temporal size.
+    backend : named tuple
+        Named tuple which holds all functions needed for the scattering
+        transform.
     psi1 : dictionary
-        a dictionary of filters (in the Fourier domain), with keys (`j`, `q`).
+        A dictionary of filters (in the Fourier domain), with keys (`j`, `q`).
         `j` corresponds to the downsampling factor for
         :math:`x \\ast psi1[(j, q)]``, and `q` corresponds to a pitch class
         (chroma).
@@ -25,36 +28,36 @@ def scattering1d(x, backend, J, psi1, psi2, phi, pad_left=0, pad_right=0,
         * psi1[(j, n)] only has real values;
         the tensors are complex so that broadcasting applies
     psi2 : dictionary
-        a dictionary of filters, with keys (j2, n2). Same remarks as for psi1
+        A dictionary of filters, with keys (j2, n2). Same remarks as for psi1
     phi : dictionary
-        a dictionary of filters of scale :math:`2^J` with keys (`j`)
+        A dictionary of filters of scale :math:`2^J` with keys (`j`)
         where :math:`2^j` is the downsampling factor.
         The array `phi[j]` is a real-valued filter.
     J : int
-        scale of the scattering
+        Scale of the scattering.
     pad_left : int, optional
-        how much to pad the signal on the left. Defaults to `0`
+        How much to pad the signal on the left. Defaults to `0`.
     pad_right : int, optional
-        how much to pad the signal on the right. Defaults to `0`
+        How much to pad the signal on the right. Defaults to `0`.
     ind_start : dictionary of ints, optional
-        indices to truncate the signal to recover only the
+        Indices to truncate the signal to recover only the
         parts which correspond to the actual signal after padding and
-        downsampling. Defaults to None
+        downsampling. Defaults to None.
     ind_end : dictionary of ints, optional
-        See description of ind_start
+        See description of ind_start.
     oversampling : int, optional
-        how much to oversample the scattering (with respect to :math:`2^J`):
+        How much to oversample the scattering (with respect to :math:`2^J`):
         the higher, the larger the resulting scattering
-        tensor along time. Defaults to `0`
+        tensor along time. Defaults to `0`.
     order2 : boolean, optional
         Whether to compute the 2nd order or not. Defaults to `False`.
     average_U1 : boolean, optional
-        whether to average the first order vector. Defaults to `True`
+        Whether to average the first order vector. Defaults to `True`.
     size_scattering : tuple
         Contains the number of channels of the scattering, precomputed for
         speed-up. Defaults to `(0, 0, 0)`.
     vectorize : boolean, optional
-        whether to return a dictionary or a tensor. Defaults to False.
+        Whether to return a dictionary or a tensor. Defaults to False.
 
     """
     subsample_fourier, modulus_complex, fft1d_c2c, ifft1d_c2c, real, pad,\
