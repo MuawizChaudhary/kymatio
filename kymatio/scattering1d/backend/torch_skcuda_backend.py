@@ -33,7 +33,7 @@ class Modulus(object):
 
     Usage
     -----
-    modulus = ModulusStable.apply  # apply inherited from Function
+    modulus = Modulus()      
     x_mod = modulus(x)
 
     Parameters
@@ -158,7 +158,7 @@ class SubsampleFourier(object):
             raise TypeError('The input and outputs should be complex')
 
         if not x.is_contiguous():
-            warnings.warn("Modulus: tensor x is converted to a contiguous
+            warnings.warn("SubsampleFourier: tensor x is converted to a contiguous
                     array.")
             x = x.contiguous()
         
@@ -227,14 +227,13 @@ def subsample_fourier(x, k):
     return subsamplefourier(x,k)
 
 
-from .torch_backend import ifft1d_c2c, fft1d_c2c, real, unpad, pad, pad_1d, finalize, ModulusStable
+from .torch_backend import ifft1d_c2c, fft1d_c2c, real, unpad, pad, pad_1d, finalize
 
 backend = namedtuple('backend', ['name', 'modulus_complex', 'subsample_fourier', 'real', 'unpad', 'fft1d_c2c',\
                                  'ifft1d_c2c', 'finalize'])
 
 backend.name = 'torch_skcuda'
 backend.modulus_complex = modulus_complex
-backend.ModulusStable = ModulusStable
 backend.subsample_fourier = subsample_fourier
 backend.real = real
 backend.unpad = unpad
