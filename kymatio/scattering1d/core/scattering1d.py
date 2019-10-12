@@ -3,7 +3,7 @@
 
 __all__ = ['scattering1d']
 
-def scattering1d(x, pad, unpad, backend, J, psi1, psi2, phi, pad_left=0, pad_right=0,
+def scattering1d(x, backend, J, psi1, psi2, phi, pad_left=0, pad_right=0,
                ind_start=None, ind_end=None, oversampling=0,
                max_order=2, average=True, size_scattering=(0, 0, 0), vectorize=False):
     """
@@ -57,10 +57,9 @@ def scattering1d(x, pad, unpad, backend, J, psi1, psi2, phi, pad_left=0, pad_rig
         whether to return a dictionary or a tensor. Defaults to False.
 
     """
-    subsample_fourier, modulus_complex, fft1d_c2c, ifft1d_c2c, real, finalize = backend.subsample_fourier,\
-                                                               backend.modulus_complex, backend.fft1d_c2c,\
-                                                                      backend.ifft1d_c2c,  backend.real,\
-    backend.finalize
+    subsample_fourier, modulus_complex, fft1d_c2c, ifft1d_c2c, real, pad,\
+    unpad, finalize = backend.subsample_fourier, backend.modulus_complex, backend.fft1d_c2c,\
+    backend.ifft1d_c2c,  backend.real, backend.pad, backend.unpad, backend.finalize
 
     # S is simply a dictionary if we do not perform the averaging...
     if vectorize:

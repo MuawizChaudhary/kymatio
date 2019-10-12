@@ -400,7 +400,7 @@ class Scattering1DTorch(ScatteringTorch):
                     psi_f[sub_k] = buffer_dict['tensor' + str(n)]
                     n += 1
 
-        S = scattering1d(x, self.backend.pad, self.backend.unpad, self.backend, self.J, self.psi1_f, self.psi2_f, self.phi_f,\
+        S = scattering1d(x, self.backend, self.J, self.psi1_f, self.psi2_f, self.phi_f,\
                          max_order=self.max_order, average=self.average,
                        pad_left=self.pad_left, pad_right=self.pad_right,
                        ind_start=self.ind_start, ind_end=self.ind_end,
