@@ -21,7 +21,7 @@ def modulus_complex(x):
     norm : numpy array
         A real numpy array with the same dimensions as x and is the complex
         modulus of x.
-
+        
     """
     norm = np.abs(x)
     return norm
@@ -44,7 +44,7 @@ def subsample_fourier(x, k):
     res : numpy array
         The input numpy array periodized along the last axis to yield a
         numpy array of size x.shape[-2] // k along that dimension.
-
+        
     """
     N = x.shape[-1]
     res = x.reshape(x.shape[:-2] + (k, N // k)).mean(axis=-2, keepdims=True)
@@ -220,4 +220,3 @@ backend.pad_1d = pad_1d
 backend.fft1d_c2c = fft1d_c2c
 backend.ifft1d_c2c = ifft1d_c2c
 backend.finalize = finalize
-
