@@ -20,3 +20,4 @@ class ScatteringTorch(nn.Module):
         """ This function provides the standard calling interface for PyTorch
         modules."""
         return self.scattering(x)
+

@@ -11,3 +11,4 @@ class ScatteringNumPy(object):
         """ This function provides a standard NumPy calling interface to the
         scattering computation."""
         return self.scattering(x)
+
