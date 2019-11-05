@@ -20,4 +20,3 @@ class ScatteringTensorFlow(tf.Module):
         """ This function provides the standard TensorFlow calling interface for
         the scattering computation."""
         return self.scattering(x)
-
