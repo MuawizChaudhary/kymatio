@@ -5,9 +5,7 @@ import numpy as np
 import torch
 import pytest
 from kymatio.scattering2d import Scattering2D
-from kymatio.backend.fake_backend import backend as fake_backend
 from torch.autograd import gradcheck
-
 
 backends = []
 
@@ -23,8 +21,6 @@ except:
 
 from kymatio.scattering2d.backend.torch_backend import backend
 backends.append(backend)
-
-
 
 if torch.cuda.is_available():
     devices = ['cuda', 'cpu']
