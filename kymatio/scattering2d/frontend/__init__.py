@@ -6,7 +6,7 @@ import warnings
 class Scattering2D(object):
     def __init__(self, *args, **kwargs):
         if 'frontend' not in kwargs:
-            warnings.warn("Torch backend is currently the default, but NumPy will become the default in the next"\
+            warnings.warn("Torch frontend is currently the default, but NumPy will become the default in the next"\
                           " version.", PendingDeprecationWarning)
             frontend='torch'
         else:
