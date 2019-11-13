@@ -54,7 +54,7 @@ class Pad(object):
         """
         pad_size_tmp = list(self.pad_size)
 
-        # This allow to handle the case where the padding is equal to the image size
+        # This handles the case where the padding is equal to the image size
         if pad_size_tmp[0] == self.input_size[0]:
             pad_size_tmp[0] -= 1
             pad_size_tmp[1] -= 1
