@@ -1,7 +1,6 @@
 __all__ = ['Scattering2DTorch']
 
 import torch
-import torch.nn as nn
 
 from .base_frontend import Scattering2DBase
 from kymatio.scattering2d.core.scattering2d import scattering2d
@@ -18,16 +17,6 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         Scattering2DBase.create_filters(self)
 
         self.register_filters()
-
-        """
-    def backend_setup(self):
-        if not self.backend:
-            from ..backend.torch_backend import backend
-            self.backend = backend
-        elif not self.backend.name.startswith('torch'):
-            raise RuntimeError('This backend is not supported.')
-        """
-        
 
     def register_filters(self):
         """ This function run the filterbank function that
