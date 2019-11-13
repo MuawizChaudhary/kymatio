@@ -91,7 +91,6 @@ class Scattering2DBase(ScatteringBase):
 
     def build(self):
         self.M, self.N = self.shape
-        # use the default backend if no backend is provided
 
         if 2 ** self.J > self.shape[0] or 2 ** self.J > self.shape[1]:
             raise RuntimeError('The smallest dimension should be larger than 2^J.')
