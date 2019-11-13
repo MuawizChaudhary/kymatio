@@ -5,7 +5,7 @@ from kymatio import Scattering2D
 # Check that the default frontend is numpy and that errors are correctly launched.
 def test_scattering2d_frontend():
     scattering = Scattering2D(2, shape=(10, 10))
-    assert isinstance(scattering, Scattering2DNumpy), 'NumPy frontend is not selected by default'
+    assert isinstance(scattering, Scattering2DTorch), 'Torch frontend is not selected by default'
 
     with pytest.raises(ImportError) as ve:
         scattering = Scattering2D(2, shape=(10, 10), frontend='doesnotexist')
