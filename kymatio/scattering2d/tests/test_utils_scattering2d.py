@@ -1,7 +1,6 @@
 import pytest
 
 from kymatio import Scattering2D
-from kymatio.scattering2d.frontend.numpy_frontend import Scattering2DNumpy
 
 # Check that the default frontend is numpy and that errors are correctly launched.
 def test_scattering2d_frontend():
