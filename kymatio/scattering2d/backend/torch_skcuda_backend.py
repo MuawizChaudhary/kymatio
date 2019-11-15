@@ -26,10 +26,10 @@ def getDtype(t):
         return 'double'
 
 def iscomplex(x):
-    return x.size(-1) == 2
+    return x.shape[-1] == 2
 
 def isreal(x):
-    return x.size(-1) == 1
+    return x.shape[-1] == 1
 
 class SubsampleFourier(object):
     """Subsampling of a 2D image performed in the Fourier domain.
@@ -68,7 +68,7 @@ class SubsampleFourier(object):
         signal_shape = x.shape[-3:]
         x = x.view((-1,) + signal_shape)
 
-        out = x.new(size=[x.size(0), x.size(1) // k, x.size(2) // k, 2])
+        out = x.new(size=[x.shape[0], x.shape[1] // k, x.shape[2] // k, 2])
 
         if not iscomplex(x):
             raise TypeError('The x and outputs should be complex.')
@@ -101,14 +101,14 @@ class SubsampleFourier(object):
           output[tz * NH * NW + ty * NW + tx] = res;
         }
         '''
-        B = x.size(0)
-        W = x.size(2)
-        H = x.size(1)
+        B = x.shape[0]
+        W = x.shape[2]
+        H = x.shape[1]
 
         periodize = load_kernel('periodize', kernel, B=B, H=H, W=W, k=k, Dtype=getDtype(x))
-        grid = (self.GET_BLOCKS(out.size(1), self.block[0]),
-                self.GET_BLOCKS(out.size(2), self.block[1]),
-                self.GET_BLOCKS(out.size(0), self.block[2]))
+        grid = (self.GET_BLOCKS(out.shape[1], self.block[0]),
+                self.GET_BLOCKS(out.shape[2], self.block[1]),
+                self.GET_BLOCKS(out.shape[0], self.block[2]))
         periodize(grid=grid, block=self.block, args=[x.data_ptr(), out.data_ptr()],
                   stream=Stream(ptr=torch.cuda.current_stream().cuda_stream))
         out = out.reshape(batch_shape + out.shape[-3:])
@@ -144,7 +144,7 @@ class Modulus(object):
         if not x.is_cuda:
             raise TypeError('Use the torch backend (without skcuda) for CPU tensors!')
 
-        out = x.new(x.size())
+        out = x.new(x.shape)
 
         if not iscomplex(x):
             raise TypeError('The input and outputs should be complex')
@@ -206,7 +206,7 @@ def cdgmm(A, B, inplace=False):
         raise TypeError('The filter must be complex or real, indicated by a '
                         'last dimension of size 2 or 1, respectively')
 
-    if A.size()[-3:-1] != B.size()[-3:-1]:
+    if A.shape[-3:-1] != B.shape[-3:-1]:
         raise RuntimeError('The filters are not compatible for multiplication!')
 
     if A.dtype is not B.dtype:
@@ -227,7 +227,7 @@ def cdgmm(A, B, inplace=False):
         if not A.is_contiguous() or not B.is_contiguous():
             raise RuntimeError('A and B should be contiguous.')
 
-        C = A.new(A.size()) if not inplace else A
+        C = A.new(A.shape) if not inplace else A
         m, n = B.nelement() // 2, A.nelement() // B.nelement()
         lda = m
         ldc = m

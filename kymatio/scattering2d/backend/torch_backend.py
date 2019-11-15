@@ -7,10 +7,10 @@ from collections import namedtuple
 BACKEND_NAME = 'torch'
 
 def iscomplex(x):
-    return x.size(-1) == 2
+    return x.shape[-1] == 2
 
 def isreal(x):
-    return x.size(-1) == 1
+    return x.shape[-1] == 1
 
 class Pad(object):
     def __init__(self, pad_size, input_size, pre_pad=False):
@@ -85,9 +85,9 @@ class Pad(object):
         if not self.pre_pad:
             x = self.padding_module(x)
             if self.pad_size[0] == self.input_size[0]:
-                x = torch.cat([x[:, :, 1, :].unsqueeze(2), x, x[:, :, x.size(2) - 2, :].unsqueeze(2)], 2)
+                x = torch.cat([x[:, :, 1, :].unsqueeze(2), x, x[:, :, x.shape[2] - 2, :].unsqueeze(2)], 2)
             if self.pad_size[2] == self.input_size[1]:
-                x = torch.cat([x[:, :, :, 1].unsqueeze(3), x, x[:, :, :, x.size(3) - 2].unsqueeze(3)], 3)
+                x = torch.cat([x[:, :, :, 1].unsqueeze(3), x, x[:, :, :, x.shape[3] - 2].unsqueeze(3)], 3)
 
         output = x.new_zeros(x.shape + (2,))
         output[..., 0] = x
@@ -140,8 +140,8 @@ class SubsampleFourier(object):
         signal_shape = x.shape[-3:]
         x = x.view((-1,) + signal_shape)
         y = x.view(-1,
-                       k, x.size(1) // k,
-                       k, x.size(2) // k,
+                       k, x.shape[1] // k,
+                       k, x.shape[2] // k,
                        2)
 
         out = y.mean(3, keepdim=False).mean(1, keepdim=False)
@@ -219,10 +219,10 @@ def fft(x, direction='C2C', inverse=False):
         raise RuntimeError('Tensors must be contiguous!')
 
     if direction == 'C2R':
-        output = torch.irfft(x, 2, normalized=False, onesided=False) * x.size(-2) * x.size(-3)
+        output = torch.irfft(x, 2, normalized=False, onesided=False) * x.shape[-2] * x.shape[-3]
     elif direction == 'C2C':
         if inverse:
-            output = torch.ifft(x, 2, normalized=False) * x.size(-2) * x.size(-3)
+            output = torch.ifft(x, 2, normalized=False) * x.shape[-2] * x.shape[-3]
         else:
             output = torch.fft(x, 2, normalized=False)
 
@@ -262,7 +262,7 @@ def cdgmm(A, B, inplace=False):
         raise TypeError('The filter must be complex or real, indicated by a '
                         'last dimension of size 2 or 1, respectively.')
 
-    if A.size()[-3:-1] != B.size()[-3:-1]:
+    if A.shape[-3:-1] != B.shape[-3:-1]:
         raise RuntimeError('The filters are not compatible for multiplication!')
 
     if A.dtype is not B.dtype:
@@ -281,35 +281,35 @@ def cdgmm(A, B, inplace=False):
         else:
             return A * B
     else:
-        C = A.new(A.size())
+        C = A.new(A.shape)
 
-        A_r = A[..., 0].contiguous().view(-1, A.size(-2)*A.size(-3))
-        A_i = A[..., 1].contiguous().view(-1, A.size(-2)*A.size(-3))
+        A_r = A[..., 0].contiguous().view(-1, A.shape[-2]*A.shape[-3])
+        A_i = A[..., 1].contiguous().view(-1, A.shape[-2]*A.shape[-3])
 
-        B_r = B[...,0].contiguous().view(B.size(-2)*B.size(-3)).unsqueeze(0).expand_as(A_i)
-        B_i = B[..., 1].contiguous().view(B.size(-2)*B.size(-3)).unsqueeze(0).expand_as(A_r)
+        B_r = B[...,0].contiguous().view(B.shape[-2]*B.shape[-3]).unsqueeze(0).expand_as(A_i)
+        B_i = B[..., 1].contiguous().view(B.shape[-2]*B.shape[-3]).unsqueeze(0).expand_as(A_r)
 
-        C[..., 0].view(-1, C.size(-2)*C.size(-3))[:] = A_r * B_r - A_i * B_i
-        C[..., 1].view(-1, C.size(-2)*C.size(-3))[:] = A_r * B_i + A_i * B_r
+        C[..., 0].view(-1, C.shape[-2]*C.shape[-3])[:] = A_r * B_r - A_i * B_i
+        C[..., 1].view(-1, C.shape[-2]*C.shape[-3])[:] = A_r * B_i + A_i * B_r
 
         return C if not inplace else A.copy_(C)
 
 def finalize(s0, s1, s2):
     """Concatenate scattering of different orders.
-
-    Parameters
-    ----------
-    s0 : tensor
-        Tensor which contains the zeroth order scattering coefficents.
-    s1 : tensor
-        Tensor which contains the first order scattering coefficents.
-    s2 : tensor
-        Tensor which contains the second order scattering coefficents.
     
-    Returns
-    -------
-    s : tensor
-        Final output. Scattering transform.
+        Parameters
+        ----------
+        s0 : tensor
+            Tensor which contains the zeroth order scattering coefficents.
+        s1 : tensor
+            Tensor which contains the first order scattering coefficents.
+        s2 : tensor
+            Tensor which contains the second order scattering coefficents.
+        
+        Returns
+        -------
+        s : tensor
+            Final output. Scattering transform.
 
     """
     if len(s2)>0:
