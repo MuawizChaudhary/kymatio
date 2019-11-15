@@ -68,10 +68,10 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         if not input.is_contiguous():
             raise RuntimeError('Tensor must be contiguous!')
 
-        if (input.size(-1) != self.N or input.size(-2) != self.M) and not self.pre_pad:
+        if (input.shape[-1] != self.N or input.shape[-2] != self.M) and not self.pre_pad:
             raise RuntimeError('Tensor must be of spatial size (%i,%i)!' % (self.M, self.N))
 
-        if (input.size(-1) != self.N_padded or input.size(-2) != self.M_padded) and self.pre_pad:
+        if (input.shape[-1] != self.N_padded or input.shape[-2] != self.M_padded) and self.pre_pad:
             raise RuntimeError('Padded tensor must be of spatial size (%i,%i)!' % (self.M_padded, self.N_padded))
 
         # each time scattering is run, one needs to make sure self.psi and self.phi point to
