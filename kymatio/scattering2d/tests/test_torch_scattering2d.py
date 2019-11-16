@@ -137,7 +137,7 @@ class TestCDGMM:
             elif backend.name=='torch':
                 with pytest.raises(TypeError) as exc:
                     backend.cdgmm(torch.empty(3, 4, 5, 2), torch.empty(4, 5, 1).cuda())
-                assert "both" in exc.value.args[0].lower()
+                assert "a must" in exc.value.args[0].lower()
 
 class TestFFT:
     @pytest.mark.parametrize("backend", backends)
