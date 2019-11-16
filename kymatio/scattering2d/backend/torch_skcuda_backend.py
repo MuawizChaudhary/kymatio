@@ -40,9 +40,9 @@ class SubsampleFourier(object):
         Parameters
         ----------
         x : tensor
-             with at least 5 dimensions, the last being the real
-             and imaginary parts.
-            Ideally, the last dimension should be a power of 2 to avoid errors.
+             Torch tensor with at least 5 dimensions, the last being the real
+             and imaginary parts. Ideally, the last dimension should be a 
+             power of 2 to avoid errors.
         k : int
             Integer such that x is subsampled by 2**k along the spatial variables.
 
@@ -132,7 +132,7 @@ class Modulus(object):
         Parameters
         ---------
         x : tensor
-           Complex torch tensor.
+            Complex torch tensor.
 
         Raises
         ------
@@ -143,7 +143,7 @@ class Modulus(object):
 
         Returns
         -------
-        output : tensor 
+        output : tensor
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
 
