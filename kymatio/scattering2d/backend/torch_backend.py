@@ -242,6 +242,17 @@ def cdgmm(A, B, inplace=False):
         inplace : boolean, optional
             If set to True, all the operations are performed inplace.
 
+        Raises
+        ------
+        RuntimeError
+            In the event that the filter B is not a 3-tensor with a last
+            dimension of size 1 or 2, or A and B are not compatible for
+            multiplication.
+        TypeError
+            In the event that A is not complex, or B does not have a final
+            dimension of 1 or 2, or A and B are not of the same dtype, or if
+            A and B are not on the same device.
+
         Returns
         -------
         C : tensor
