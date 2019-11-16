@@ -101,12 +101,12 @@ def unpad(in_):
 
         Parameters
         ----------
-        in_ : tensor_like
+        in_ : tensor
             Input tensor.
 
         Returns
         -------
-        in_[..., 1:-1, 1:-1] : tensor_like
+        in_[..., 1:-1, 1:-1] : tensor
             Output tensor.  Unpadded input.
 
     """
@@ -120,7 +120,7 @@ class SubsampleFourier(object):
 
         Parameters
         ----------
-        x : tensor_like
+        x : tensor
             Input tensor with at least 5 dimensions, the last being the real
             and imaginary parts. Ideally, the last dimension should be a power
             of 2 to avoid errors.
@@ -129,7 +129,7 @@ class SubsampleFourier(object):
 
         Returns
         -------
-        out : tensor_like
+        out : tensor
             Tensor such that its Fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
