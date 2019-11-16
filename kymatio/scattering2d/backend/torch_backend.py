@@ -97,7 +97,7 @@ class Pad(object):
 def unpad(in_):
     """Unpads input.
         
-        Slices the input tensor at indices between 1::-1.
+        Slices the input tensor at indices between 1:-1.
 
         Parameters
         ----------
@@ -158,12 +158,12 @@ class Modulus(object):
 
         Parameters
         ---------
-        x : input tensor
+        x : tensor
             Complex torch tensor.
 
         Returns
         -------
-        output : output tensor 
+        output : tensor 
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
 
@@ -341,3 +341,4 @@ backend.fft = fft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.finalize = finalize
+
