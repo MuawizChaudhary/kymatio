@@ -86,13 +86,17 @@ class Scattering2DBase(ScatteringBase):
     def __init__(self, J, shape, L=8, max_order=2, pre_pad=False,\
            backend=None):
         super(Scattering2DBase, self).__init__()
-        self.pre_pad, self.L, self.backend, self.J, self.shape, self.max_order = pre_pad, L, backend, J, shape,\
-                                                                            max_order
+        self.pre_pad = pre_pad
+        self.L = L
+        self.backend = backend
+        self.J = J 
+        self.shape = shape
+        self.max_order = max_order
 
     def build(self):
         self.M, self.N = self.shape
 
-        if 2 ** self.J > self.shape[0] or 2 ** self.J > self.shape[1]:
+        if 2 ** self.J > self.M or 2 ** self.J > self.N:
             raise RuntimeError('The smallest dimension should be larger than 2^J.')
         self.M_padded, self.N_padded = compute_padding(self.M, self.N, self.J)
         # pads equally on a given side if the amount of padding to add is an even number of pixels, otherwise it adds an extra pixel
