@@ -124,12 +124,19 @@ class Modulus(object):
 
         Parameters
         ---------
-        x : input tensor
+        x : tensor
            Complex torch tensor.
+
+        Raises
+        ------
+        RuntimeError
+            In the event that x is not contiguous.
+        TypeError
+            In the event that x is on CPU or the input is not complex.
 
         Returns
         -------
-        output : output tensor 
+        output : tensor 
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
 
@@ -185,7 +192,7 @@ def cdgmm(A, B, inplace=False):
             1).
         inplace : boolean, optional
             If set to True, all the operations are performed inplace.
-
+ 
         Returns
         -------
         C : tensor
