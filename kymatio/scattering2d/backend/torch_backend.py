@@ -279,12 +279,16 @@ def cdgmm(A, B, inplace=False):
     if A.dtype is not B.dtype:
         raise TypeError('A and B must be of the same dtype.')
 
-    if A.device.type != B.device.type:
-        raise TypeError('A and B must be both on GPU or both on CPU.')
+    if B.device.type == 'cuda':
+        if A.device.type == 'cuda':
+            if A.device.index != B.device.index:
+                raise TypeError('A and B must be on the same GPU!')
+        else:
+            raise TypeError('A must be on GPU.')
 
-    if A.device.type == 'cuda':
-        if A.device.index != B.device.index:
-            raise TypeError('A and B must be on the same GPU!')
+    if B.device.type == 'cpu':
+        if A.device.type == 'cuda':
+            raise TypeError('A must be on CPU.')
 
     if isreal(B):
         if inplace:
