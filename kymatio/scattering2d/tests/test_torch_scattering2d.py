@@ -7,7 +7,6 @@ import pytest
 from kymatio.scattering2d import Scattering2D
 from torch.autograd import gradcheck
 from kymatio.backend.fake_backend import backend as fake_backend
-
 backends = []
 
 try:
@@ -78,6 +77,14 @@ class TestSubsampleFourier:
             if backend.name == 'torch':
                 z = subsample_fourier(x, k=16)
                 assert torch.allclose(y, z)
+            
+            
+            y = x[::2, ::2]
+            if backend.name == 'torch_skcuda':
+                with pytest.raises(RuntimeError) as record:
+                    subsample_fourier(y, k=16)
+                assert ('Input' in record.value.args[0])
+
 
 # Check the CUBLAS routines
 class TestCDGMM:
