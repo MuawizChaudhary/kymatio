@@ -39,8 +39,8 @@ class SubsampleFourier(object):
 
         Parameters
         ----------
-        x : tensor_like
-            Input tensor with at least 5 dimensions, the last being the real
+        x : tensor
+             with at least 5 dimensions, the last being the real
              and imaginary parts.
             Ideally, the last dimension should be a power of 2 to avoid errors.
         k : int
@@ -48,7 +48,7 @@ class SubsampleFourier(object):
 
         Returns
         -------
-        res : tensor_like
+        res : tensor
             Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
