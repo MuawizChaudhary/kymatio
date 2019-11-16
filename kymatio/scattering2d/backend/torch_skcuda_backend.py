@@ -46,9 +46,16 @@ class SubsampleFourier(object):
         k : int
             Integer such that x is subsampled by 2**k along the spatial variables.
 
+        Raises
+        ------
+        RuntimeError
+            In the event that x is not contiguous.
+        TypeError
+            In the event that x is on CPU or the input is not complex.
+
         Returns
         -------
-        res : tensor
+        out : tensor
             Tensor such that its fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
             FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
