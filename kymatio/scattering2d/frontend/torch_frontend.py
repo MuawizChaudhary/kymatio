@@ -18,6 +18,13 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
 
         self.register_filters()
 
+    def register_filters_helper(self, k, v, n, current_filter):
+        if isinstance(k, int):
+            current_filter[k] = torch.from_numpy(v).unsqueeze(-1)
+            self.register_buffer('tensor' + str(n), current_filter[k])
+            return n + 1
+        return n
+
     def register_filters(self):
         """ This function run the filterbank function that
             will create the filters as numpy array, and then, it
@@ -26,19 +33,12 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         # Create the filters
         n = 0
         for c, phi in self.phi.items():
-            if isinstance(c, int):
-                self.phi[c] = torch.from_numpy(self.phi[c]).unsqueeze(-1) # add a trailing singleton dimension to mark
-                # it as non-complex
-                self.register_buffer('tensor' + str(n), self.phi[c])
-                n += 1
-
+            n = self.register_filters_helper(c, phi, n, self.phi)
+        
         for j in range(len(self.psi)):
             for k, v in self.psi[j].items():
-                if isinstance(k, int):
-                    self.psi[j][k] = torch.from_numpy(v).unsqueeze(-1) # add a trailing singleton dimension to mark it
-                    # as non-complex
-                    self.register_buffer('tensor' + str(n), self.psi[j][k])
-                    n += 1
+                n = self.register_filters_helper(k, v, n, self.psi[j])
+                
 
     def scattering(self, input):
         """Forward pass of the scattering.
