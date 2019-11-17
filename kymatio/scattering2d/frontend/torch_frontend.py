@@ -67,6 +67,15 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
                 arbitrary. Currently, k=2 is hardcoded. :math:`n_1` typically is the batch size, whereas
                 :math:`n_2` is the number of input channels.
 
+            Raises
+            ------
+            RuntimeError
+                In the event that the input does not have at least two
+                dimensions, or the tensor is not contiguous, or the tensor is
+                not of the correct spatial size, padded or not. 
+            TypeError
+                In the event that the input is not a Torch tensor. 
+
             Returns
             -------
             S : tensor
