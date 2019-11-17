@@ -58,21 +58,20 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
 
     def scattering(self, input):
         """Forward pass of the scattering.
+            
+            Parameters
+            ----------
+            input : tensor
+                Tensor with k+2 dimensions :math:`(n_1, ..., n_k, M, N)` where :math:`(n_1, ...,n_k)` is
+                arbitrary. Currently, k=2 is hardcoded. :math:`n_1` typically is the batch size, whereas
+                :math:`n_2` is the number of input channels.
 
-                Parameters
-                ----------
-                input : tensor
-                   Tensor with k+2 dimensions :math:`(n_1, ..., n_k, M, N)` where :math:`(n_1, ...,n_k)` is
-                   arbitrary. Currently, k=2 is hardcoded. :math:`n_1` typically is the batch size, whereas
-                    :math:`n_2` is the number of
-                   input channels.
-
-                Returns
-                -------
-                S : tensor
-                   Scattering of the input, a tensor with k+3 dimensions :math:`(n_1, ...,n_k, D, Md, Nd)`
-                   where :math:`D` corresponds to a new channel dimension and :math:`(Md, Nd)` are
-                   downsampled sizes by a factor :math:`2^J`. Currently, k=2 is hardcoded.
+            Returns
+            -------
+            S : tensor
+                Scattering of the input, a tensor with k+3 dimensions :math:`(n_1, ...,n_k, D, Md, Nd)`
+                where :math:`D` corresponds to a new channel dimension and :math:`(Md, Nd)` are
+                downsampled sizes by a factor :math:`2^J`. Currently, k=2 is hardcoded.
 
                 """
         if not torch.is_tensor(input):
