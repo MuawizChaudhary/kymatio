@@ -45,6 +45,7 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         return n
 
     def load_filters(self):
+        """ This function loads filters from the module's buffers """
         # each time scattering is run, one needs to make sure self.psi and self.phi point to
         # the correct buffers
         n = 0
