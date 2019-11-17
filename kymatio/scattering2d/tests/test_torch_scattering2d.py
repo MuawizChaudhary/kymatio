@@ -48,6 +48,13 @@ class TestModulus:
             v = v.squeeze()
             assert torch.allclose(u, v)
 
+            y = x[::2, ::2]
+            if backend.name == 'torch_skcuda':
+                with pytest.raises(RuntimeError) as record:
+                    modulus(y)
+                assert ('Input' in record.value.args[0])
+
+
 
 # Checked the subsampling
 class TestSubsampleFourier:
