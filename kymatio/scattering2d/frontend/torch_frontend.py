@@ -38,7 +38,24 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         for j in range(len(self.psi)):
             for k, v in self.psi[j].items():
                 n = self.register_filters_helper(k, v, n, self.psi[j])
-                
+
+    def load_filters_helper(self, k, v, n, current_filter, buffer_dict):
+        if isinstance(k, int):
+            current_filter[k] = buffer_dict['tensor' + str(n)]
+            return n + 1
+        return n
+
+    def load_filters(self):
+        # each time scattering is run, one needs to make sure self.psi and self.phi point to
+        # the correct buffers
+        n = 0
+        buffer_dict = dict(self.named_buffers())
+        for c, phi in self.phi.items():
+            n = self.load_filters_helper(c, phi, n, self.phi, buffer_dict)
+            
+        for j in range(len(self.psi)):
+            for k, v in self.psi[j].items():
+                n = self.load_filters_helper(k, v, n, self.psi[j], buffer_dict)
 
     def scattering(self, input):
         """Forward pass of the scattering.
@@ -74,20 +91,7 @@ class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
         if (input.shape[-1] != self.N_padded or input.shape[-2] != self.M_padded) and self.pre_pad:
             raise RuntimeError('Padded tensor must be of spatial size (%i,%i)!' % (self.M_padded, self.N_padded))
 
-        # each time scattering is run, one needs to make sure self.psi and self.phi point to
-        # the correct buffers
-        n = 0
-        buffer_dict = dict(self.named_buffers())
-        for c, phi in self.phi.items():
-            if isinstance(c, int):
-                self.phi[c] =  buffer_dict['tensor' + str(n)]
-                n += 1
-
-        for j in range(len(self.psi)):
-            for k, v in self.psi[j].items():
-                if isinstance(k, int):
-                    self.psi[j][k] = buffer_dict['tensor' + str(n)]
-                    n += 1
+        self.load_filters()
 
         return scattering2d(input, self.pad, self.unpad, self.backend, self.J, self.L, self.phi, self.psi, self.max_order)
 
