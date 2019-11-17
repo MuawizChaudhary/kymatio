@@ -92,6 +92,34 @@ class TestSubsampleFourier:
                     subsample_fourier(y, k=16)
                 assert ('Input' in record.value.args[0])
 
+    @pytest.mark.parametrize("device", devices)
+    @pytest.mark.parametrize("backend", backends)
+    def test_batch_shape_agnostic(self, device, backend):
+        x = torch.rand(100, 1, 8, 128, 128, 2).to(device)
+        subsample_fourier = backend.subsample_fourier
+        if device == 'cpu' and backend.name == 'torch_skcuda':
+            with pytest.raises(TypeError) as exc:
+                z = subsample_fourier(x, k=16)
+            assert "Use the torch backend" in exc.value.args[0]
+
+        else:
+            y = torch.zeros(100, 1, 8, 8, 8, 2).to(device)
+
+            for i in range(8):
+                for j in range(8):
+                    for m in range(16):
+                        for n in range(16):
+                            y[...,i,j,:] += x[...,i+m*8,j+n*8,:]
+
+            y = y / (16*16)
+
+            z = subsample_fourier(x, k=16)
+            print(z.size(), y.size())
+            assert torch.allclose(y, z)
+            if backend.name == 'torch':
+                z = subsample_fourier(x, k=16)
+                assert torch.allclose(y, z)
+            
 
 # Check the CUBLAS routines
 class TestCDGMM:
