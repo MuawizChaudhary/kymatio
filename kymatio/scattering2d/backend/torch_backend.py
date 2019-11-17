@@ -132,7 +132,7 @@ class SubsampleFourier(object):
         out : tensor
             Tensor such that its Fourier transform is the Fourier
             transform of a subsampled version of x, i.e. in
-            FFT^{-1}(res)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
+            FFT^{-1}(out)[u1, u2] = FFT^{-1}(x)[u1 * (2**k), u2 * (2**k)].
 
     """
     def __call__(self, x, k):
