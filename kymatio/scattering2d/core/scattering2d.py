@@ -16,15 +16,19 @@ def scattering2d(x, pad, unpad, backend, J, L, phi, psi, max_order):
         output_size += order2_size
 
     out_S_0, out_S_1, out_S_2 = [], [], []
+
     U_r = pad(x)
+
     U_0_c = fft(U_r, 'C2C')
 
     # First low pass filter
-    U_1_c = subsample_fourier(cdgmm(U_0_c, phi[0]), k=2**J)
+    U_1_c = cdgmm(U_0_c, phi[0])
+    U_1_c = subsample_fourier(U_1_c, k=2 ** J)
 
     S_0 = fft(U_1_c, 'C2R', inverse=True)
+    S_0 = unpad(S_0)
 
-    out_S_0.append(unpad(S_0))
+    out_S_0.append(S_0)
 
     for n1 in range(len(psi)):
         j1 = psi[n1]['j']
@@ -32,25 +36,37 @@ def scattering2d(x, pad, unpad, backend, J, L, phi, psi, max_order):
         if(j1 > 0):
             U_1_c = subsample_fourier(U_1_c, k=2 ** j1)
         U_1_c = fft(U_1_c, 'C2C', inverse=True)
-        U_1_c = fft(modulus(U_1_c), 'C2C')
+        U_1_c = modulus(U_1_c)
+        U_1_c = fft(U_1_c, 'C2C')
 
         # Second low pass filter
-        S_1_c = subsample_fourier(cdgmm(U_1_c, phi[j1]), k=2**(J-j1))
+        S_1_c = cdgmm(U_1_c, phi[j1])
+        S_1_c = subsample_fourier(S_1_c, k=2 ** (J-j1))
+
         S_1_r = fft(S_1_c, 'C2R', inverse=True)
-        out_S_1.append(unpad(S_1_r))
+        S_1_r = unpad(S_1_r)
+
+        out_S_1.append(S_1_r)
 
         if max_order == 2:
             for n2 in range(len(psi)):
                 j2 = psi[n2]['j']
                 if(j1 < j2):
-                    U_2_c = subsample_fourier(cdgmm(U_1_c, psi[n2][j1]), k=2 ** (j2-j1))
+                    U_2_c = cdgmm(U_1_c, psi[n2][j1])
+                    U_2_c = subsample_fourier(U_2_c, k=2 ** (j2-j1))
                     U_2_c = fft(U_2_c, 'C2C', inverse=True)
-                    U_2_c = fft(modulus(U_2_c), 'C2C')
-                    # Third low pass filter
-                    S_2_c = subsample_fourier(cdgmm(U_2_c, phi[j2]), k=2 ** (J-j2))
-                    S_2_r = fft(S_2_c, 'C2R', inverse=True)
+                    U_2_c = modulus(U_2_c)
+                    U_2_c = fft(U_2_c, 'C2C')
 
-                    out_S_2.append(unpad(S_2_r))
+                    # Third low pass filter
+                    S_2_c = cdgmm(U_2_c, phi[j2])
+                    S_2_c = subsample_fourier(S_2_c, k=2 ** (J-j2))
+                    
+                    S_2_r = fft(S_2_c, 'C2R', inverse=True)
+                    S_2_r = unpad(S_2_r)
+
+                    out_S_2.append(S_2_r)
 
     out_S = finalize(out_S_0, out_S_1, out_S_2)
     return out_S
+
