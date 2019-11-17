@@ -10,7 +10,7 @@ from ...frontend.torch_frontend import ScatteringTorch
 class Scattering2DTorch(ScatteringTorch, Scattering2DBase):
     def __init__(self, J, shape, L=8, max_order=2, pre_pad=False, backend='torch'):
         ScatteringTorch.__init__(self)
-        Scattering2DBase.__init__(self, J, shape, L, max_order, pre_pad, backend)
+        Scattering2DBase.__init__(**locals())# J, shape, L, max_order, pre_pad, backend)
 
         Scattering2DBase._instantiate_backend(self, 'kymatio.scattering2d.backend.')
         Scattering2DBase.build(self)
