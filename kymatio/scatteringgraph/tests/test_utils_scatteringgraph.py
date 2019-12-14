@@ -59,10 +59,3 @@ class TestComputeDegreeVector:
 
         assert np.allclose(P, (1/2) * (I3 + AD_i))
 
-
-
-
-
-        #P = np.array([[1/2, 1/4, 1/4], [], []]) 
-
-
