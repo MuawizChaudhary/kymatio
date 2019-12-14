@@ -3,8 +3,8 @@ from collections import namedtuple
 
 BACKEND_NAME = 'torch'
 
-def moment(x, q, mean=0, variance=1):
-    "Calculate moment"
+def normalized_moment(x, q, mean=0, variance=1):
+    "Calculate normalized moment"
     if isinstance(mean, int):
         mean = torch.zeros(1, x.shape[1]).to(x.device)
 
@@ -21,4 +21,4 @@ def moment(x, q, mean=0, variance=1):
 
 backend = namedtuple('backend', ['name', 'moment'])
 backend.name = 'torch'
-backend.moment = moment
+backend.normalized_moment = normalized_moment

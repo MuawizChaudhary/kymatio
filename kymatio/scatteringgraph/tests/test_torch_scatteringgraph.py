@@ -20,12 +20,14 @@ if 'cuda' in devices:
 
 class TestMoment:
     @pytest.mark.parametrize('backends_devices', backends_devices)
-    def test_moment(self, backends_devices):
+    def test_normalized_moment(self, backends_devices):
+        backend, device = backends_devices
+        
         # two clique adjacency matrix
         A = np.array([[0, 1], [1, 0]])
         degree_vector_A = compute_degree_vector(A)
 
-        backend, device = backends_devices
+        moment = backend.normalized_moment 
 
         A = torch.from_numpy(A)
         x = torch.from_numpy(degree_vector_A).to(device)
@@ -34,14 +36,14 @@ class TestMoment:
         mean = np.array([[1]])
         mean = torch.from_numpy(mean).float()
 
-        mean_moment = backend.moment(x, 1)
+        mean_moment = moment(x, 1)
         assert torch.allclose(mean, mean_moment)
 
         #q = 2
         var = np.array([[0]])
         var = torch.from_numpy(var).float()
 
-        var_moment = backend.moment(x, 2, mean=mean_moment)
+        var_moment = moment(x, 2, mean=mean_moment)
         assert torch.allclose(var, var_moment)
 
         #q = 3
@@ -57,14 +59,14 @@ class TestMoment:
         mean = np.array([[2]])
         mean = torch.from_numpy(mean).float()
 
-        mean_moment = backend.moment(x, 1)
+        mean_moment = moment(x, 1)
         assert torch.allclose(mean, mean_moment)
 
         #q = 2
         var = np.array([[0]])
         var = torch.from_numpy(var).float()
 
-        var_moment = backend.moment(x, 2, mean=mean_moment)
+        var_moment = moment(x, 2, mean=mean_moment)
         assert torch.allclose(var, var_moment)
 
         #q = 3
