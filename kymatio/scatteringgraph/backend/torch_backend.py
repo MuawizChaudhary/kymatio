@@ -11,11 +11,10 @@ def normalized_moment(x, q, mean=0, variance=1):
     if isinstance(variance, int):
         variance = torch.ones(1, x.shape[1]).to(x.device)
 
-    x_mu = x - mean
-    numerator = torch.pow(x_mu, q)
-    denominator = torch.pow(variance, q)    
-    ratio = torch.div(numerator, denominator)
-    q_th_moment = torch.sum(ratio, dim=0) / x.shape[0]
+    diff = x - mean
+    z_score = torch.div(diff, variance)
+    z_score_q  = torch.pow(z_score, q)
+    q_th_moment = torch.mean(z_score_q, dim=0)
 
     return q_th_moment.reshape(-1, 1)
 
