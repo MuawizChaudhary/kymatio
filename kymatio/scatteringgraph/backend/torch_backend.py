@@ -19,6 +19,14 @@ def normalized_moment(x, q, mean=0, variance=1):
 
     return q_th_moment.reshape(-1, 1)
 
-backend = namedtuple('backend', ['name', 'moment'])
+def unnormalized_moment(x, q):
+    "Calculate unnormalized moment"
+    x_q = torch.pow(x, q)
+    q_th_moment = torch.sum(ratio, dim=0)
+    return q_th_moment.reshape(-1, 1)
+
+
+backend = namedtuple('backend', ['name', 'normalized_moment', 'unnormalized_moment'])
 backend.name = 'torch'
 backend.normalized_moment = normalized_moment
+backend.unnormalized_moment = unnormalized_moment
