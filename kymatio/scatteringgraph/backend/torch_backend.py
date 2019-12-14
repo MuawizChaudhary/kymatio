@@ -19,7 +19,6 @@ def moment(x, q, mean=0, variance=1):
 
     return q_th_moment
 
-
 backend = namedtuple('backend', ['name', 'moment'])
 backend.name = 'torch'
 backend.momment = moment
