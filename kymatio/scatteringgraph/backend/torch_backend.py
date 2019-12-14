@@ -24,6 +24,10 @@ def unnormalized_moment(x, q):
     q_th_moment = torch.sum(x_q, dim=0)
     return q_th_moment.reshape(-1, 1)
 
+def absolute_value(x):
+    "Calculate absolute value"
+    return torch.abs(x)
+
 
 backend = namedtuple('backend', ['name', 'normalized_moment', 'unnormalized_moment'])
 backend.name = 'torch'
