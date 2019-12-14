@@ -71,3 +71,56 @@ class TestMoment:
 
         #q = 3
         #come up with a better example than cliques
+
+    @pytest.mark.parametrize('backends_devices', backends_devices)
+    def test_unnormalized_moment(self, backends_devices):
+        backend, device = backends_devices
+        
+        # two clique adjacency matrix
+        A = np.array([[0, 1], [1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+
+        moment = backend.unnormalized_moment 
+
+        A = torch.from_numpy(A)
+        x = torch.from_numpy(degree_vector_A).to(device).float()
+
+        #q = 1
+        mean = np.array([[2]])
+        mean = torch.from_numpy(mean).float()
+
+        mean_moment = moment(x, 1)
+        assert torch.allclose(mean, mean_moment)
+
+        #q = 2
+        var = np.array([[2]])
+        var = torch.from_numpy(var).float()
+
+        var_moment = moment(x, 2)
+        assert torch.allclose(var, var_moment)
+
+        #q = 3
+        #come up with a better example than cliques
+               
+        # three clique adjacency matrix
+        A = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+
+        x = torch.from_numpy(degree_vector_A).to(device).float()
+
+        #q = 1
+        mean = np.array([[6]])
+        mean = torch.from_numpy(mean).float()
+
+        mean_moment = moment(x, 1)
+        assert torch.allclose(mean, mean_moment)
+
+        #q = 2
+        var = np.array([[12]])
+        var = torch.from_numpy(var).float()
+
+        var_moment = moment(x, 2)
+        assert torch.allclose(var, var_moment)
+
+        #q = 3
+        #come up with a better example than cliques
