@@ -3,6 +3,9 @@ from collections import namedtuple
 
 BACKEND_NAME = 'torch'
 
+def matmul(A, B):
+    return torch.matmul(A, B)
+
 def normalized_moment(x, q, mean=0, variance=1):
     "Calculate normalized moment"
     if isinstance(mean, int):
@@ -30,10 +33,11 @@ def absolute_value(x):
 
 def concatenate(arrays):
     "Concatenate arrays together at end"
-    return torch.stack(arrays, axis=-3)
+    return torch.stack(arrays, axis=0)
 
-backend = namedtuple('backend', ['name', 'normalized_moment', 'unnormalized_moment', 'absolute_value', 'concatenate'])
+backend = namedtuple('backend', ['name', 'matmul', 'normalized_moment', 'unnormalized_moment', 'absolute_value', 'concatenate'])
 backend.name = 'torch'
+backend.matmul = matmul
 backend.normalized_moment = normalized_moment
 backend.unnormalized_moment = unnormalized_moment
 backend.absolute_value = absolute_value
