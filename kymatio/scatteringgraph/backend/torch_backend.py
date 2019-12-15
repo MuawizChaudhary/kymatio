@@ -28,8 +28,13 @@ def absolute_value(x):
     "Calculate absolute value"
     return torch.abs(x)
 
+def concatenate(arrays):
+    "concatenate arrays together at end"
+    return torch.stack(arrays, axis=-3)
 
-backend = namedtuple('backend', ['name', 'normalized_moment', 'unnormalized_moment'])
+backend = namedtuple('backend', ['name', 'normalized_moment', 'unnormalized_moment', 'absolute_value', 'concatenate'])
 backend.name = 'torch'
 backend.normalized_moment = normalized_moment
 backend.unnormalized_moment = unnormalized_moment
+backend.absolute_value = absolute_value
+backend.concatenate = concatenate
