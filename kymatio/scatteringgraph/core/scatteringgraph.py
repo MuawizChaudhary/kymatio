@@ -1,9 +1,10 @@
 # Authors:
 # Scientific Ancestry:
 
-def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
+def scatteringgraph(x, J, Q, psi, normalize, max_order, backend):
     absolute_value = backend.absolute_value
     concatenate = backend.concatenate
+    matmul = backend.matmul
     moment = backend.moment
 
     # sizes of nth order coefficents of scattering transform
@@ -26,13 +27,14 @@ def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
         # add to array
         out_S_0.append(S_0_q)
 
-    if max_order == 0:
+    if max_order < 1:
         return concatenate(out_S_0)
+
     # compute first order coefficents
     for j_1 in range(0, J):
         # multiplication with graph wavelet filter
-        U_1_c = psi[j_1] * x        
-
+        U_1_c = matmul(psi[j_1], x)        
+        
         # take absolute value for unnormalized momement calculation
         if max_order >= 2 or not normalize:
             U_1_a = absolute_value(U_1_c)
@@ -52,7 +54,7 @@ def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
         # compute second order coefficents 
         for j_2 in range(j_1 + 1, J):
             # multiplication with different graph wavelet filter
-            U_2_c = psi[j_2] * U_1_a
+            U_2_c = matmul(psi[j_2], U_1_a)
             
             if not normalize:
                 U_2_a = absolute_value(U_2_c)
@@ -65,15 +67,14 @@ def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
                     S_2_q = moment(U_2_a, q)
                
                 out_S_2.append(S_2_q)
-    
+
+    # collect all the scattering coeffcients into one tensor
     out_S = []
     out_S.extend(out_S_0)
     out_S.extend(out_S_1)
     out_S.extend(out_S_2)
-
     out_S = concatenate(out_S)
     return out_S
 
 
 __all__ = ['scatteringgraph']
-            
