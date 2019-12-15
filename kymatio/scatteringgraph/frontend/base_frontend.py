@@ -14,9 +14,11 @@ class ScatteringBaseGraph(ScatteringBase):
         self.backend = backend
 
     def build(self):
-        # to be used later
-        return
-            
+        "Choose between normalization or no normalization"
+        if self.normalize:
+            self.backend.moment = self.backend.normalized_moment
+        else:
+            self.backend.moment = self.backend.unnormalized_moment
         
     def create_filters(self):
         "Create the lazy walk matrix"
@@ -26,13 +28,13 @@ class ScatteringBaseGraph(ScatteringBase):
         D = np.diag(degree_vector_A)
         D_i = np.linalg.inv(D)
 
-        AD_i = np.dot(A, D_i)
+        AD_i = np.dot(self.A, D_i)
         
         P = (1/2) * (I + AD_i)
 
-        self.phi = []
+        self.psi = []
         for j in range(1, self.J + 1):
-            P_j_2 = np.pow(P, j - 1)
-            self.phi.append(np.dot(P_j_2, (I - P_j_2)))
+            P_j_2 = np.power(P, j - 1)
+            self.psi.append(np.dot(P_j_2, (I - P_j_2)))
 
 __all__ = ['ScatteringBaseGraph']

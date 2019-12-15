@@ -5,16 +5,17 @@ from .base_frontend import ScatteringBaseGraph
 from ...frontend.torch_frontend import ScatteringTorch
 
 
-class ScatteringTorch2D(ScatteringTorch, ScatteringBaseGraph):
+class ScatteringTorchGraph(ScatteringTorch, ScatteringBaseGraph):
     def __init__(self, J, Q=2, A=None, normalize=True, max_order=2, backend='torch'):
         ScatteringTorch.__init__(self)
         ScatteringBaseGraph.__init__(self, J, Q, A, normalize, max_order, backend)
         ScatteringBaseGraph._instantiate_backend(self, 'kymatio.scatteringgraph.backend.')
         ScatteringBaseGraph.build(self)
         ScatteringBaseGraph.create_filters(self)
+        self.register_filters()
 
     def register_single_filter(self, v, n):
-        current_filter = torch.from_numpy(v)       
+        current_filter = torch.from_numpy(v)
         self.register_buffer('tensor' + str(n), current_filter)
         return current_filter
 
@@ -26,8 +27,8 @@ class ScatteringTorch2D(ScatteringTorch, ScatteringBaseGraph):
 
         n = 0
 
-        for phi in self.phi:
-            self.phi[n] = self.register_single_filter(phi, n)
+        for psi in self.psi:
+            self.psi[n] = self.register_single_filter(psi, n)
             n = n + 1
 
     def load_single_filter(self, n, buffer_dict):
@@ -41,17 +42,18 @@ class ScatteringTorch2D(ScatteringTorch, ScatteringBaseGraph):
 
         n = 0
 
-        phis = self.phi
-        for phi in phis:
-
-            phis[n] = self.load_single_filter(n, buffer_dict)
+        psis = self.psi
+        for psi in psis:
+            psis[n] = self.load_single_filter(n, buffer_dict)
             n = n + 1
         
-        return phis
+        return psis
 
     def scattering(self, input):
-        phi = self.load_filters()
-        S = scattering2d(input, self.backend, self.J, self.Q, self.normalize, phi, self.max_order)
+        """ This function computes the functional scattering """
+        psi = self.load_filters()
+        S = scatteringgraph(input, self.J, self.Q, self.normalize,
+                psi, self.max_order, self.backend)
         return S
 
 

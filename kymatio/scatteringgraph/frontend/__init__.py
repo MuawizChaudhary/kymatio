@@ -22,7 +22,7 @@ class ScatteringGraph(object):
             frontend = frontend_suffixes[frontend]
 
             class_name = self.__class__.__name__
-            class_name = (class_name[:-2] + frontend + class_name[-2:])
+            class_name = (class_name[:-5] + frontend + class_name[-5:])
 
             self.__class__ = getattr(module, class_name)
             self.__init__(*args, **kwargs)
