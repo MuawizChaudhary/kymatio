@@ -3,6 +3,7 @@
 
 def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
     absolute_value = backend.absolute_value
+    concatenate = backend.concatenate
     moment = backend.moment
 
     # sizes of nth order coefficents of scattering transform
@@ -25,15 +26,14 @@ def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
         # add to array
         out_S_0.append(S_0_q)
 
-    if max_order >= 1:
-        continue
+    if max_order == 0:
+        return concatenate(out_S_0)
     # compute first order coefficents
     for j_1 in range(0, J):
         # multiplication with graph wavelet filter
         U_1_c = psi[j_1] * x        
 
-        # take resulting absolute value, we want this for unnormalized momement
-        # calculation
+        # take absolute value for unnormalized momement calculation
         if max_order >= 2 or not normalize:
             U_1_a = absolute_value(U_1_c)
 
@@ -45,7 +45,6 @@ def scatteringgraph(x, J, Q, A, psi, normalize, max_order, backend):
                 S_1_q = moment(U_1_a, q)
             
             out_S_1.append(S_1_q)
-
 
         if max_order < 2:
             continue
