@@ -52,8 +52,7 @@ class ScatteringTorchGraph(ScatteringTorch, ScatteringBaseGraph):
     def scattering(self, input):
         """ This function computes the functional scattering """
         psi = self.load_filters()
-        S = scatteringgraph(input, self.J, self.Q, self.normalize,
-                psi, self.max_order, self.backend)
+        S = scatteringgraph(input, self.J, self.Q, psi, self.normalize, self.max_order, self.backend)
         return S
 
 
