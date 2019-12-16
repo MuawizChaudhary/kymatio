@@ -1,0 +1,11 @@
+*.swp
+*.swo
+*__pycache__*
+*.egg-info
+doc/build/*
+.pytest_cache
+.cache/
+doc/source/gallery_1d
+doc/source/gallery_2d
+doc/source/gallery_3d
+.coverage

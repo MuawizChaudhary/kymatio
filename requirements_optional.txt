@@ -1,0 +1,8 @@
+pytest
+sphinx
+sphinxcontrib-bibtex
+sphinx-gallery
+pillow
+matplotlib
+scikit-learn
+texext
