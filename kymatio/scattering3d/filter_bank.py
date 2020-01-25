@@ -190,3 +190,91 @@ def solid_harmonic_3d(M, N, O, sigma, l, fourier=True):
     solid_harm *= norm_factor
 
     return solid_harm
+
+
+def gabor_nd(grid_or_shape, orientation, scale, xi0=3 * np.pi / 4, sigma0=.5,
+            slant=.5, remove_dc=True, ifftshift=True):
+    """Computes one n-dimensional Gabor wavelets given orientation and scale.
+
+    Parameters
+    ==========
+    grid_or_shape, ndarray-like
+        either a (short) list of integers providing grid dimensions
+        or a grid of shape (ndim, axis1, axis2[, axis3, ..., axis_ndim]).
+        If grid shape is specified, then grid step is integer
+
+    orientation: float or array-like
+        Specifies the orientation of the main oscillation of the wavelet.
+        If desired wavelets are two-dimensional, then a float value is taken to
+        specify the 2D angle. A float value can only be used in 2D.
+        If orientation is a n-dimensional vector it is taken to mean the wave
+        vector direction of the wavelet.
+
+    scale: float, usually integer
+        Specifies the octave scale at which the Gabor is to be generated. This
+        value is used to modify xi0 and sigma0 to xi0 / 2 ** scale, and
+        sigma0 * 2 ** scale.
+    
+    xi0: float,
+        Specifies the center spatial frequency of the fastest-oscillating
+        wavelet. (Modified by scale, see gabor_derivative docstring)
+
+    sigma0: float,
+        Specifies the width of the Gaussian envelope at the finest scale
+        (Modified by scale parameter)
+
+    slant: float, around 1.
+        Determines the ratio between Gaussian width in wave direction versus
+        all the other directions. Typically set to <= 1. to yield wide edges
+        more selective to orientations.
+
+    remove_dc: boolean, default True
+        By default, Gabor filters are not zero-sum in the real part, since the
+        integral of a Gaussian times a cosine is not 0. If set to True, a
+        Gaussian envelope is subtracted from the real part of the Gabor filter
+        to obtain exact zero-sum property. The result is also called Morlet
+        wavelet.
+
+    ifftshift: boolean, default True
+        When set to True, then the 0-frequency is placed in the top front left
+        corner of the grid. When set to False, the 0-frequency is placed in the
+        middle of the grid, which is more convenient for visualization.
+
+
+    Returns
+    =======
+    wavelet, array, dtype complex128
+        The shape is the same as that of the grid."""
+
+    
+    grid = check_grid(grid_or_shape)
+    ndim = grid.shape[0]
+    if isinstance(orientation, numbers.Number):
+        if ndim != 2:
+            raise ValueError("If specifying orientation as a number, then Gabor "
+                                "must be 2D, given {}.".format(ndim))
+        orientation = np.array((np.cos(orientation), np.sin(orientation)))
+    orientation = orientation.ravel() / np.linalg.norm(orientation)
+
+    _, _, VT = np.linalg.svd(orientation[np.newaxis])
+    VT[0] = orientation
+    transformed_grid = grid.T.dot(VT.T).T
+    sigma, xi = sigma0 * 2. ** scale, xi0 / 2. ** scale
+    oscillation = np.exp(1j * xi * transformed_grid[0])
+    squash_vector = np.array((1. / slant,) + (1,) * (ndim - 1))
+    squashed_grid = (transformed_grid.T * squash_vector).T
+    gaussian = (np.exp(-.5 * ((squashed_grid / sigma) ** 2).sum(0)) /
+            np.sqrt((2 * np.pi) ** ndim * np.prod(sigma / squash_vector)))
+    gabor = gaussian * oscillation
+    if remove_dc:
+        dc = np.real(gabor.sum())
+        morlet = gabor - gaussian / gaussian.sum() * dc
+        wavelet = morlet
+    else:
+        wavelet = gabor
+    if ifftshift:
+        wavelet = np.fft.ifftshift(wavelet)
+    return wavelet
+
+
+
