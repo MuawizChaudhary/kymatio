@@ -164,11 +164,10 @@ def compute_integrals(input_array, integral_powers):
             Tensor of size (B, P) containing the integrals of the input_array
             to the powers p (l_p norms).
     """
-    integrals = torch.zeros((input_array.shape[0], len(integral_powers)),
-            device=input_array.device)
+    integrals = torch.zeros(input_array.shape[0], len(integral_powers), 1)
     for i_q, q in enumerate(integral_powers):
-        integrals[:, i_q] = (input_array ** q).view(
-            input_array.shape[0], -1).sum(1)
+        integrals[:, i_q, 0] = (input_array ** q).view(
+            input_array.shape[0], -1).sum(1).cpu()
     return integrals
 
 
