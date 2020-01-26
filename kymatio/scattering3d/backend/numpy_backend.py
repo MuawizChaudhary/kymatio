@@ -73,7 +73,8 @@ def compute_integrals(input_array, integral_powers):
             Tensor of size (B, P) containing the integrals of the input_array
             to the powers p (l_p norms).
     """
-    integrals = np.zeros((input_array.shape[0], len(integral_powers)),dtype=np.complex64)
+    integrals = np.zeros((input_array.shape[0], len(integral_powers)),
+            dtype=np.complex64)
     for i_q, q in enumerate(integral_powers):
         integrals[:, i_q] = (input_array ** q).reshape((input_array.shape[0], -1)).sum(axis=1)
     return integrals
