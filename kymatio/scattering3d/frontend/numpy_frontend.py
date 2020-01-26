@@ -98,7 +98,7 @@ class HarmonicScatteringNumPy3D(ScatteringNumPy, ScatteringBase3D):
         batch_shape = input_array.shape[:-3]
         signal_shape = input_array.shape[-3:]
 
-        input_array = input_array.reshape((-1,)+signal_shape)
+        input_array = input_array.reshape((-1,) + signal_shape)
 
         S = self.scattering(input_array)
         scattering_shape = S.shape[1:]
