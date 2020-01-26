@@ -178,7 +178,6 @@ backend = namedtuple('backend',
                       'fft',
                       'modulus',
                       'modulus_rotation',
-                      'subsample',
                       'compute_integrals',
                       'concatenate'])
 
@@ -188,7 +187,4 @@ backend.fft = fft
 backend.concatenate = concatenate
 backend.modulus = complex_modulus
 backend.modulus_rotation = modulus_rotation
-backend.subsample = subsample
 backend.compute_integrals = compute_integrals
-backend._compute_standard_scattering_coefs = _compute_standard_scattering_coefs
-backend._compute_local_scattering_coefs = _compute_local_scattering_coefs
