@@ -41,7 +41,7 @@ class HarmonicScatteringNumPy3D(ScatteringNumPy, ScatteringBase3D):
         List of exponents to the power of which moduli are raised before
         integration. Used with method == 'standard', method == 'integral'
     """
-    def __init__(self, J, shape, L=3, sigma_0=1, max_order=2, rotation_covariant=True, method='standard', points=None,
+    def __init__(self, J, shape, L=3, sigma_0=1, max_order=2, rotation_covariant=True, method='integral', points=None,
                  integral_powers=(0.5, 1., 2.), backend='numpy'):
         ScatteringNumPy.__init__(self)
         ScatteringBase3D.__init__(self, J, shape, L, sigma_0, max_order,
