@@ -45,7 +45,6 @@ def test_against_standard_computations(backend):
     scattering.method = 'integral'
     scattering.integral_powers = integral_powers
     orders_1_and_2 = scattering(x)
-    #Jprint(orders_1_and_2)
 
     # WARNING: These are hard-coded values for the setting J = 2.
     n_order_1 = 3
