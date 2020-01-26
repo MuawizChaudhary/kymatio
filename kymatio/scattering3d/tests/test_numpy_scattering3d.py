@@ -17,7 +17,6 @@ def relative_difference(a, b):
 
 @pytest.mark.parametrize("backend", backends)
 def test_against_standard_computations(backend):
-
     file_path = os.path.abspath(os.path.dirname(__file__))
     with open(os.path.join(file_path, 'test_data_3d.npz'), 'rb') as f:
         buffer = io.BytesIO(f.read())
@@ -86,4 +85,3 @@ def test_against_standard_computations(backend):
 
     assert order_0_diff_cpu < 1e-6, "CPU : order 0 do not match, diff={}".format(order_0_diff_cpu)
     assert orders_1_and_2_diff_cpu < 1e-6, "CPU : orders 1 and 2 do not match, diff={}".format(orders_1_and_2_diff_cpu)
-
