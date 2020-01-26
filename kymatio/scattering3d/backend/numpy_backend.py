@@ -247,10 +247,7 @@ def cdgmm3d(A, B, inplace=False):
    
 def concatenate(arrays, L):
     S = np.stack(arrays, axis=1)
-    print(S)
-
     S = S.reshape((S.shape[0], S.shape[1] // (L + 1), (L + 1)) + S.shape[2:])
-
     return S
 
 
