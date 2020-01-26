@@ -56,23 +56,12 @@ class HarmonicScatteringNumPy3D(ScatteringNumPy, ScatteringBase3D):
         ScatteringBase3D.create_filters(self)
 
     def scattering(self, input_array):
-                
-        # NOTE: 'local' isn't really used anywhere and could be removed.
-        methods = ['standard', 'local', 'integral']
+        methods = ['integral']
         if not self.method in methods:
             raise ValueError('method must be in {}'.format(methods))
         if self.method == 'integral': \
                 self.averaging = lambda x, j: self.backend.compute_integrals(self.backend.fft(x, inverse=True),
                                                                              self.integral_powers)
-        elif self.method == 'local':
-            self.averaging = lambda x, j: \
-                self.backend._compute_local_scattering_coefs(x,
-                                                             self.tensor_gaussian_filter, j, self.points)
-        elif self.method == 'standard':
-            self.averaging = lambda x, j: \
-                self.backend._compute_standard_scattering_coefs(x,
-                                                                self.tensor_gaussian_filter, self.J,
-                                                                self.backend.subsample)
 
         return scattering3d(input_array, filters=self.filters, rotation_covariant=self.rotation_covariant, L=self.L,
                             J=self.J, max_order=self.max_order, backend=self.backend, averaging=self.averaging)

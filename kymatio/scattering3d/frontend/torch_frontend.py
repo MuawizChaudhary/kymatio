@@ -82,8 +82,8 @@ class HarmonicScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
         if not self.method in methods:
             raise ValueError('method must be in {}'.format(methods))
         if self.method == 'integral': \
-                self.averaging = lambda x, j: self.backend.compute_integrals(self.backend.fft(x, inverse=True)[..., 0],
-                                                                             self.integral_powers)
+                self.averaging = lambda x, j: self.backend.compute_integrals(self.backend.fft(x,inverse=True)[..., 0], 
+                        self.integral_powers)
         elif self.method == 'local':
             self.averaging = lambda x, j: \
                 self.backend._compute_local_scattering_coefs(x,
