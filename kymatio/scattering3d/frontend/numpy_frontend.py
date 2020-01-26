@@ -82,10 +82,12 @@ class HarmonicScatteringNumPy3D(ScatteringNumPy, ScatteringBase3D):
             first and second order scattering coefficients,
             concatenated along the feature axis
         """
+        if not type(input_array) is np.ndarray:
+            raise TypeError('The input should be a NumPy array.')
+        
         if input_array.dim() < 3:
             raise RuntimeError('Input tensor must have at least three '
                                'dimensions.')
-
 
         if (input_array.shape[-1] != self.O or input_array.shape[-2] != self.N
             or input_array.shape[-3] != self.M):
