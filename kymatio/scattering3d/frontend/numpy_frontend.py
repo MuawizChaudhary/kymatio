@@ -6,7 +6,7 @@ from ..core.scattering3d import scattering3d
 from .base_frontend import ScatteringBase3D
 
 
-class HarmonicScatteringNumPy3D(ScatteringNumpy, ScatteringBase3D):
+class HarmonicScatteringNumPy3D(ScatteringNumPy, ScatteringBase3D):
     """3D Solid Harmonic scattering .
     This class implements solid harmonic scattering on an input 3D image.
     For details see https://arxiv.org/abs/1805.00571.
@@ -42,8 +42,8 @@ class HarmonicScatteringNumPy3D(ScatteringNumpy, ScatteringBase3D):
         integration. Used with method == 'standard', method == 'integral'
     """
     def __init__(self, J, shape, L=3, sigma_0=1, max_order=2, rotation_covariant=True, method='standard', points=None,
-                 integral_powers=(0.5, 1., 2.), backend='torch'):
-        ScatteringTorch.__init__(self)
+                 integral_powers=(0.5, 1., 2.), backend='numpy'):
+        ScatteringNumPy.__init__(self)
         ScatteringBase3D.__init__(self, J, shape, L, sigma_0, max_order,
                                   rotation_covariant, method, points,
                                   integral_powers, backend)
@@ -56,16 +56,13 @@ class HarmonicScatteringNumPy3D(ScatteringNumpy, ScatteringBase3D):
         ScatteringBase3D.create_filters(self)
 
     def scattering(self, input_array):
-        buffer_dict = dict(self.named_buffers())
-        for k in range(len(self.filters)):
-            self.filters[k] = buffer_dict['tensor' + str(k)]
-
+                
         # NOTE: 'local' isn't really used anywhere and could be removed.
         methods = ['standard', 'local', 'integral']
         if not self.method in methods:
             raise ValueError('method must be in {}'.format(methods))
         if self.method == 'integral': \
-                self.averaging = lambda x, j: self.backend.compute_integrals(self.backend.fft(x, inverse=True)[..., 0],
+                self.averaging = lambda x, j: self.backend.compute_integrals(self.backend.fft(x, inverse=True),
                                                                              self.integral_powers)
         elif self.method == 'local':
             self.averaging = lambda x, j: \

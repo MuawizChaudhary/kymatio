@@ -1,25 +1,13 @@
 import numpy as np
 import warnings
 
-BACKEND_NAME = 'torch'
+BACKEND_NAME = 'numpy'
 from collections import namedtuple
-from scipy.fftpack import fft3, ifft3
+from scipy.fftpack import fftn, ifftn
 
 
-def _iscomplex(input):
-    """Checks if input is complex.
-
-        Parameters
-        ----------
-        input : tensor
-            Input to be checked if complex.
-        Returns
-        -------
-        output : boolean
-            Returns True if complex (i.e. final dimension is 2), False
-            otherwise.
-    """
-    return input.shape[-1] == 2
+def _iscomplex(x):
+    return x.dtype == np.complex64 or x.dtype == np.complex128
 
 
 def complex_modulus(input_array):
@@ -59,10 +47,10 @@ def modulus_rotation(x, module=None):
             which is covariant to 3D translations and rotations.
     """
     if module is None:
-        module = 0
+        module = np.zeros_like(x)
     else:
         module = module ** 2
-    module += (x ** 2)
+    module += np.abs(x) ** 2
     return np.sqrt(module)
 
 
@@ -164,10 +152,9 @@ def compute_integrals(input_array, integral_powers):
             Tensor of size (B, P) containing the integrals of the input_array
             to the powers p (l_p norms).
     """
-    integrals = torch.zeros(input_array.shape[0], len(integral_powers), 1)
+    integrals = np.zeros((input_array.shape[0], len(integral_powers)),dtype=np.complex64)
     for i_q, q in enumerate(integral_powers):
-        integrals[:, i_q, 0] = (input_array ** q).view(
-            input_array.shape[0], -1).sum(1).cpu()
+        integrals[:, i_q] = (input_array ** q).reshape((input_array.shape[0], -1)).sum(axis=1)
     return integrals
 
 
@@ -197,12 +184,12 @@ def fft(x, direction='C2C', inverse=False):
             raise RuntimeError('C2R mode can only be done with an inverse FFT.')
 
     if direction == 'C2R':
-        output = np.real(ifft2(x))
+        output = np.real(ifftn(x, axes=(-3, -2, -1)))
     elif direction == 'C2C':
         if inverse:
-            output = ifft3(x)
+            output = ifftn(x, axes=(-3, -2, -1))
         else:
-            output = fft3(x)
+            output = fftn(x, axes=(-3, -2, -1))
 
     return output
 
@@ -238,42 +225,29 @@ def cdgmm3d(A, B, inplace=False):
             Torch tensor of the same size as A containing the result of the
             elementwise complex multiplication of A with B.
     """
-    if not A.is_contiguous():
-        warnings.warn("cdgmm3d: tensor A is converted to a contiguous array.")
-        A = A.contiguous()
-    if not B.is_contiguous():
-        warnings.warn("cdgmm3d: tensor B is converted to a contiguous array.")
-        B = B.contiguous()
 
-    if A.shape[-4:] != B.shape:
+    if A.shape[-3:] != B.shape[-3:]:
         raise RuntimeError('The tensors are not compatible for multiplication.')
 
     if not _iscomplex(A) or not _iscomplex(B):
         raise TypeError('The input, filter and output should be complex.')
 
-    if B.ndimension() != 4:
+    if B.ndim != 3:
         raise RuntimeError('The second tensor must be simply a complex array.')
 
     if type(A) is not type(B):
         raise RuntimeError('A and B should be same type.')
 
-    if A.device.type != B.device.type:
-        raise TypeError('A and B must be both on GPU or both on CPU.')
+     
+    if inplace:
+        return np.multiply(A, B, out=A)
+    else:
+        return A * B
 
-    if A.device.type == 'cuda':
-        if A.device.index != B.device.index:
-            raise TypeError('A and B must be on the same GPU.')
-
-    C = A.new(A.shape)
-
-    C[..., 0] = A[..., 0] * B[..., 0] - A[..., 1] * B[..., 1]
-    C[..., 1] = A[..., 0] * B[..., 1] + A[..., 1] * B[..., 0]
-
-    return C if not inplace else A.copy_(C)
-
-
+   
 def concatenate(arrays, L):
     S = np.stack(arrays, axis=1)
+    print(S)
 
     S = S.reshape((S.shape[0], S.shape[1] // (L + 1), (L + 1)) + S.shape[2:])
 
@@ -290,7 +264,7 @@ backend = namedtuple('backend',
                       'compute_integrals',
                       'concatenate'])
 
-backend.name = 'torch'
+backend.name = 'numpy'
 backend.cdgmm3d = cdgmm3d
 backend.fft = fft
 backend.concatenate = concatenate
