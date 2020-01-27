@@ -18,16 +18,20 @@ if torch.cuda.is_available():
 backends = []
 backends_devices = []
 
+skcuda_available = False
 try:
     if torch.cuda.is_available():
         from skcuda import cublas
         import cupy
-        from kymatio.scattering2d.backend.torch_skcuda_backend import backend
-        backends.append(backend)
-        if 'cuda' in devices:
-            backends_devices.append((backend, 'cuda'))
+        skcuda_available = True
 except:
     Warning('torch_skcuda backend not available.')
+
+if skcuda_available:
+    from kymatio.scattering2d.backend.torch_skcuda_backend import backend
+    backends.append(backend)
+    if 'cuda' in devices:
+        backends_devices.append((backend, 'cuda'))
 
 
 from kymatio.scattering2d.backend.torch_backend import backend
@@ -105,7 +109,7 @@ class TestModulus:
         y = x[::2, ::2]
         with pytest.raises(RuntimeError) as record:
             modulus(y)
-        assert 'should be contiguous' in record.value.args[0]
+        assert 'contiguous' in record.value.args[0]
 
     @pytest.mark.parametrize('backend', backends)
     def test_cuda_only(self, backend):
@@ -234,15 +238,11 @@ class TestCDGMM:
 
         with pytest.raises(TypeError) as exc:
             backend.cdgmm(torch.empty(3, 4, 5, 1), torch.empty(4, 5, 1))
-        assert 'input must be complex' in exc.value.args[0]
+        assert 'input should be complex' in exc.value.args[0]
 
         with pytest.raises(TypeError) as exc:
             backend.cdgmm(torch.empty(3, 4, 5, 2), torch.empty(4, 5, 3))
-        assert 'filter must be complex or real' in exc.value.args[0]
-
-        with pytest.raises(RuntimeError) as exc:
-            backend.cdgmm(torch.empty(3, 4, 5, 2), torch.empty(3, 4, 5, 2))
-        assert 'filter must be a 3-tensor' in exc.value.args[0]
+        assert 'should be complex' in exc.value.args[0]
 
         with pytest.raises(TypeError) as exc:
             backend.cdgmm(torch.empty(3, 4, 5, 2),
