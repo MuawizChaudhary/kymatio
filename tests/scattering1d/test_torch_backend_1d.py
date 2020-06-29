@@ -25,7 +25,6 @@ if torch.cuda.is_available():
 else:
     devices = ['cpu']
 
-
 @pytest.mark.parametrize("device", devices)
 @pytest.mark.parametrize("backend", backends)
 def test_pad_1d(device, backend, random_state=42):
@@ -78,13 +77,11 @@ def test_pad_1d(device, backend, random_state=42):
             assert torch.allclose(x.grad, x_grad)
 
     # Check that the padding shows an error if we try to pad
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError):
         backend.pad(x, x.shape[-1], 0)
-    assert "padding size" in ve.value.args[0]
-    
-    with pytest.raises(ValueError) as ve:
+
+    with pytest.raises(ValueError):
         backend.pad(x, 0, x.shape[-1])
-    assert "padding size" in ve.value.args[0]
 
 
 @pytest.mark.parametrize("device", devices)
@@ -171,7 +168,6 @@ def test_subsample_fourier(backend, device, random_state=42):
             backend.subsample_fourier(x_bad, 1)
         assert "should be complex" in te.value.args[0]
 
-
 def test_unpad():
     # test unpading of a random tensor
     x = torch.randn(8, 4, 1)
@@ -191,7 +187,6 @@ def test_unpad():
         x_unpadded = backend.unpad(x_pad, pad_left, x_pad.shape[-1] - pad_right - 1)
         assert torch.allclose(x, x_unpadded)
 
-
 def test_fft_type():
     x = torch.randn(8, 4, 2) 
 
@@ -209,8 +204,21 @@ def test_fft_type():
         y = backend.irfft(x)
     assert 'should be complex' in record.value.args[0]
 
-
 def test_fft():
+    x = torch.randn(2, 1)
+
+    y = torch.tensor([[x[0] + x[1], 0], [x[0] - x[1], 0]])
+
+    z = backend.rfft(x)
+    assert torch.allclose(y, z)
+
+    z_1 = backend.ifft(z)
+    assert torch.allclose(x[..., 0], z_1[..., 0])
+
+    z_2 = backend.irfft(z)
+    assert not z_2.shape[-1] == 2
+    assert torch.allclose(x, z_2)
+
     def coefficent(n):
             return np.exp(-2 * np.pi * 1j * n)
 

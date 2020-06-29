@@ -3,23 +3,22 @@ import numpy as np
 
 from kymatio.scattering1d.backend.numpy_backend import backend
 
-
-def test_subsample_fourier():
+def test_subsample_fourier(random_state=42):
+    rng = np.random.RandomState(random_state)
     J = 10
     # 1d signal 
-    x = np.random.randn(2, 2 ** J) + 1j * np.random.randn(2, 2 ** J)
+    x = rng.randn(2, 2**J) + 1j * rng.randn(2, 2**J)
     x_f = np.fft.fft(x, axis=-1)
 
     for j in range(J + 1):
-        x_f_sub = backend.subsample_fourier(x_f, 2 ** j)
+        x_f_sub = backend.subsample_fourier(x_f, 2**j)
         x_sub = np.fft.ifft(x_f_sub, axis=-1)
-        assert np.allclose(x[:, ::2 ** j], x_sub)
+        assert np.allclose(x[:, ::2**j], x_sub)
 
     with pytest.raises(TypeError) as te:
         x_bad = x.real
         backend.subsample_fourier(x_bad, 1)
     assert "should be complex" in te.value.args[0]
-
 
 def test_pad():
     N = 128
@@ -46,14 +45,11 @@ def test_pad():
             for t in range(1, pad_right + 1):
                 assert np.allclose(x_pad[..., x_pad.shape[-1] - 1 - pad_right - t], x[..., x.shape[-1] - 1 - t])
 
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError):
         backend.pad(x, x.shape[-1], 0)
-    assert "padding size" in ve.value.args[0]
-    
-    with pytest.raises(ValueError) as ve:
-        backend.pad(x, 0, x.shape[-1])
-    assert "padding size" in ve.value.args[0]
 
+    with pytest.raises(ValueError):
+        backend.pad(x, 0, x.shape[-1])
 
 def test_unpad():
     # test unpading of a random tensor
@@ -74,7 +70,6 @@ def test_unpad():
         x_unpadded = backend.unpad(x_pad, pad_left, x_pad.shape[-1] - pad_right)
         assert np.allclose(x, x_unpadded)
 
-
 def test_fft_type():
     x = np.random.rand(8, 4) + 1j * np.random.rand(8, 4)
 
@@ -92,8 +87,22 @@ def test_fft_type():
         y = backend.irfft(x)
     assert 'should be complex' in record.value.args[0]
 
-
 def test_fft():
+    x = np.random.randn(2)
+
+    y = np.array([[x[0] + x[1],
+                   x[0] - x[1]]])
+
+    z = backend.rfft(x)
+    assert np.allclose(y, z)
+
+    z_1 = backend.ifft(z)
+    assert np.allclose(x, z_1)
+
+    z_2 = backend.irfft(z)
+    assert not np.iscomplexobj(z_2)
+    assert np.allclose(x, z_2)
+
     def coefficent(n):
             return np.exp(-2 * np.pi * 1j * n)
 
