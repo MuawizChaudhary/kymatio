@@ -10,7 +10,7 @@ from ...backend.torch_backend import cdgmm, contiguous_check, Modulus, concatena
 
 
 class Pad(object):
-    def __init__(self, pad_size, input_size, pre_pad=False):
+    def __init__(self, pad_size, input_size):
         """Padding which allows to simultaneously pad in a reflection fashion
             and map to complex.
 
@@ -20,11 +20,7 @@ class Pad(object):
                 Size of padding to apply [top, bottom, left, right].
             input_size : list of 2 integers
                 size of the original signal [height, width].
-            pre_pad : boolean, optional
-                If set to true, then there is no padding, one simply adds the imaginary part.
-
         """
-        self.pre_pad = pre_pad
         self.pad_size = pad_size
         self.input_size = input_size
 
@@ -70,18 +66,22 @@ class Pad(object):
         batch_shape = x.shape[:-2]
         signal_shape = x.shape[-2:]
         x = x.reshape((-1, 1) + signal_shape)
-        if not self.pre_pad:
-            x = self.padding_module(x)
+        x = self.padding_module(x)
 
-            # Note: PyTorch is not effective to pad signals of size N-1 with N
-            # elements, thus we had to add this fix.
-            if self.pad_size[0] == self.input_size[0]:
-                x = torch.cat([x[:, :, 1, :].unsqueeze(2), x, x[:, :, x.shape[2] - 2, :].unsqueeze(2)], 2)
-            if self.pad_size[2] == self.input_size[1]:
-                x = torch.cat([x[:, :, :, 1].unsqueeze(3), x, x[:, :, :, x.shape[3] - 2].unsqueeze(3)], 3)
+        # Note: PyTorch is not effective to pad signals of size N-1 with N
+        # elements, thus we had to add this fix.
+        if self.pad_size[0] == self.input_size[0]:
+            x = torch.cat([x[:, :, 1, :].unsqueeze(2), x, x[:, :, x.shape[2] - 2, :].unsqueeze(2)], 2)
+        if self.pad_size[2] == self.input_size[1]:
+            x = torch.cat([x[:, :, :, 1].unsqueeze(3), x, x[:, :, :, x.shape[3] - 2].unsqueeze(3)], 3)
 
         output = x.reshape(batch_shape + x.shape[-2:] + (1,))
         return output
+
+
+def to_real(x):
+    return x.reshape(x.shape + (1,))
+
 
 def unpad(in_):
     """Unpads input.
@@ -183,3 +183,4 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = concatenate_2d
+backend.to_real = to_real

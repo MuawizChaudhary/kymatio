@@ -9,7 +9,7 @@ BACKEND_NAME = 'tensorflow'
 from ...backend.tensorflow_backend import Modulus, cdgmm, concatenate, complex_check, real_check
 
 class Pad(object):
-    def __init__(self, pad_size, input_size, pre_pad=False):
+    def __init__(self, pad_size, input_size):
         """
             Padding which allows to simultaneously pad in a reflection fashion
             and map to complex.
@@ -19,19 +19,13 @@ class Pad(object):
                 size of padding to apply.
             input_size : list of 2 integers
                 size of the original signal
-            pre_pad : boolean
-                if set to true, then there is no padding, one simply adds the imaginarty part.
         """
-        self.pre_pad = pre_pad
         self.pad_size = pad_size
 
     def __call__(self, x):
-        if self.pre_pad:
-            return x
-        else:
-            paddings = [[0, 0]] * len(x.shape[:-2])
-            paddings += [[self.pad_size[0], self.pad_size[1]], [self.pad_size[2], self.pad_size[3]]]
-            return tf.pad(x, paddings, mode="REFLECT")
+        paddings = [[0, 0]] * len(x.shape[:-2])
+        paddings += [[self.pad_size[0], self.pad_size[1]], [self.pad_size[2], self.pad_size[3]]]
+        return tf.pad(x, paddings, mode="REFLECT")
 
 def unpad(in_):
     """
@@ -45,6 +39,11 @@ def unpad(in_):
         in_[..., 1:-1, 1:-1]
     """
     return in_[..., 1:-1, 1:-1]
+
+
+def to_real(x):
+    return x
+
 
 class SubsampleFourier(object):
     """ Subsampling of a 2D image performed in the Fourier domain.
@@ -101,3 +100,4 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = lambda x: concatenate(x, -3)
+backend.to_real = to_real

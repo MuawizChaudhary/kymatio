@@ -24,7 +24,7 @@ class ScatteringBase2D(ScatteringBase):
         self.M_padded, self.N_padded = compute_padding(self.M, self.N, self.J)
         # pads equally on a given side if the amount of padding to add is an even number of pixels, otherwise it adds an extra pixel
         self.pad = self.backend.Pad([(self.M_padded - self.M) // 2, (self.M_padded - self.M+1) // 2, (self.N_padded - self.N) // 2,
-                                (self.N_padded - self.N + 1) // 2], [self.M, self.N], pre_pad=self.pre_pad)
+                                (self.N_padded - self.N + 1) // 2], [self.M, self.N])
         self.unpad = self.backend.unpad
 
     def create_filters(self):

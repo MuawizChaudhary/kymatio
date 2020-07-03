@@ -177,6 +177,7 @@ class Modulus(object):
 
 from .torch_backend import unpad
 from .torch_backend import Pad
+from .torch_backend import to_real
 from .torch_backend import rfft, irfft, ifft
 from .torch_backend import concatenate_2d
 
@@ -191,3 +192,4 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = concatenate_2d
+backend.to_real = to_real
