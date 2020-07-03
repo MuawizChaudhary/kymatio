@@ -10,6 +10,7 @@ def scattering2d(x, pad, unpad, pre_pad, backend, J, L, phi, psi, max_order,
     irfft = backend.irfft    
     cdgmm = backend.cdgmm
     concatenate = backend.concatenate
+    to_complex = backend.to_complex
 
 
     # Define lists for output.
@@ -18,7 +19,7 @@ def scattering2d(x, pad, unpad, pre_pad, backend, J, L, phi, psi, max_order,
     if not pre_pad:
         U_r = pad(x)
     else:
-        U_r = to_real(x)
+        U_r = to_complex(x)
 
     U_0_c = rfft(U_r)
 

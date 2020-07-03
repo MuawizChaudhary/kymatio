@@ -41,7 +41,7 @@ def unpad(in_):
     return in_[..., 1:-1, 1:-1]
 
 
-def to_real(x):
+def to_complex(x):
     return x
 
 
@@ -100,4 +100,4 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = lambda x: concatenate(x, -3)
-backend.to_real = to_real
+backend.to_complex = to_complex

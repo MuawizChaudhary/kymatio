@@ -79,7 +79,7 @@ class Pad(object):
         return output
 
 
-def to_real(x):
+def to_complex(x):
     return x.reshape(x.shape + (1,))
 
 
@@ -183,4 +183,4 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = concatenate_2d
-backend.to_real = to_real
+backend.to_complex = to_complex
