@@ -5,6 +5,7 @@ import torch
 from ...frontend.torch_frontend import ScatteringTorch
 from ..core.scattering3d import scattering3d
 from ..core.scattering3d_standard import scattering3d_standard
+from ..core.wavelet_standard import wavelet_standard
 from .base_frontend import ScatteringHarmonicBase3D, ScatteringBase3D
 from ..utils import compute_padding
 
@@ -175,6 +176,33 @@ class ScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
 
         return S
 
+class WaveletTorch3D(ScatteringTorch3D):
+    def __init__(self, J, shape, orientations="cartesian", pre_pad=False,
+            backend='torch', rho='identity', return_list=False, subsample=False):
+        ScatteringTorch3D.__init__(self, J, shape, orientations, 1, pre_pad, backend)
+        self.rho = rho
+        self.return_list = return_list
+        self.subsample = subsample
 
+    # forward function
+    def scattering(self, input):
+        phi, psi = self.load_filters()
+
+        signal_shape = input.shape[-3:]
+
+        input = input.reshape((-1,) + signal_shape)
+
+        if self.rho == 'identity':
+            rho = torch.nn.Identity()
+        elif self.rho == 'relu':
+            rho = torch.nn.ReLU()
+        elif self.rho == 'modulus':
+            rho = self.backend.modulus
+
+        S = wavelet_standard(input, self.pad, self.unpad, self.backend,
+                self.J, len(self.orientations), phi, psi, self.max_order, rho,
+               self.return_list, self.subsample)
+
+        return S
 
 __all__ = ['HarmonicScatteringTorch3D', 'ScatteringBase3D']
