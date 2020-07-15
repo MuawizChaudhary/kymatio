@@ -18,14 +18,15 @@ def wavelet_standard(x, pad, unpad, backend, J, L, phi, psi, max_order, rho,
 
     for n1 in range(len(psi)):
         j1 = psi[n1]['j']
-        U_1_c = cdgmm3d(U_0_c, psi[n1][0])
-        if j1 > 0 and subsample:
-            U_1_c = subsample_fourier(U_1_c, k=2 ** j1)
-        U_1_c = ifft(U_1_c)
+        for i in range(0, 4):
+            U_1_c = cdgmm3d(U_0_c, psi[n1][i])
+            if j1 > 0 and subsample:
+                U_1_c = subsample_fourier(U_1_c, k=2 ** j1)
+            U_1_c = ifft(U_1_c)
 
-        U_1_r = rho(U_1_c)
-        print(U_1_r.shape)
-        out_U_1.append(U_1_r)
+            U_1_r = rho(U_1_c)
+
+            out_U_1.append(U_1_r)
 
     out_U = []
     out_U.extend(out_U_1)

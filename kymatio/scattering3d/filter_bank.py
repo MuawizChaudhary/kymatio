@@ -210,14 +210,19 @@ def filter_bank(M, N, P, J, orientations='cartesian'):
             psi['orientation'] = orientation
             psi_signal = gabor_nd((M, N, P), orientation, j, sigma0=0.8,
                     slant=3/len(orientations))
-                
-            psi_signal_fourier = np.fft.fftn(psi_signal)
-            # drop the imaginary part, it is zero anyway
-            psi_signal_fourier = np.real(psi_signal_fourier)
+
+            psi_signal_array = [psi_signal, psi_signal * 1J, psi_signal
+                    * (-1J), psi_signal * -1]
+
+            for i, psi_signal in enumerate(psi_signal_array):
+                psi_signal_array[i] = np.fft.fftn(psi_signal).real
+
             for res in range(min(j + 1, max(J - 1, 1))):
-                psi_signal_fourier_res = periodize_filter_fft(
-                    psi_signal_fourier, res)
-                psi[res] = psi_signal_fourier_res
+                for i, psi_signal_f in enumerate(psi_signal_array):
+                    psi_signal_fourier_res = periodize_filter_fft(
+                    psi_signal_f, res)
+                    psi[4 * res + i] = psi_signal_fourier_res
+
             filters['psi'].append(psi)
 
     filters['phi'] = {}

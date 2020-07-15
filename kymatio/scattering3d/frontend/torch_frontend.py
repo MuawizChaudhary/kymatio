@@ -120,7 +120,6 @@ class ScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
 
             self.phi[c] = self.register_single_filter(phi, n)
             n = n + 1
-
         for j in range(len(self.psi)):
             for k, v in self.psi[j].items():
                 if not isinstance(k, int):
@@ -176,6 +175,7 @@ class ScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
 
         return S
 
+# TODO base wavelet class
 class WaveletTorch3D(ScatteringTorch3D):
     def __init__(self, J, shape, orientations="cartesian", pre_pad=False,
             backend='torch', rho='identity', return_list=False, subsample=False):
