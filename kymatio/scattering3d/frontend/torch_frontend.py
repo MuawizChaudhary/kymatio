@@ -102,7 +102,10 @@ class ScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
         self.build()
     
     def register_single_filter(self, v, n):
-        current_filter = torch.from_numpy(v).unsqueeze(-1)
+        if v.shape[-1] == 2:
+            current_filter = torch.from_numpy(v)
+        else:
+            current_filter = torch.from_numpy(v).unsqueeze(-1)
         self.register_buffer('tensor' + str(n), current_filter)
         return current_filter
 

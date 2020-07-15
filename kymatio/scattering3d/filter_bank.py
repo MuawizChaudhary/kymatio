@@ -215,13 +215,13 @@ def filter_bank(M, N, P, J, orientations='cartesian'):
                     * (-1J), psi_signal * -1]
 
             for i, psi_signal in enumerate(psi_signal_array):
-                psi_signal_array[i] = np.fft.fftn(psi_signal).real
+                psi_signal_array[i] = np.fft.fftn(psi_signal)
 
             for res in range(min(j + 1, max(J - 1, 1))):
                 for i, psi_signal_f in enumerate(psi_signal_array):
                     psi_signal_fourier_res = periodize_filter_fft(
                     psi_signal_f, res)
-                    psi[4 * res + i] = psi_signal_fourier_res
+                    psi[4 * res + i] = psi_signal_fourier_res.view('(2,)float')
 
             filters['psi'].append(psi)
 
