@@ -12,13 +12,14 @@ try:
         skcuda_available = True
 except:
     Warning('torch_skcuda backend not available.')
+skcuda_available = False
 
 if skcuda_available:
     from kymatio.scattering1d.backend.torch_skcuda_backend import backend
     backends.append(backend)
 
-from kymatio.scattering1d.backend.torch_backend import backend
-backends.append(backend)
+from kymatio.scattering1d.backend.torch_backend import Torch1DBackend
+backends.append(Torch1DBackend())
 
 if torch.cuda.is_available():
     devices = ['cuda', 'cpu']
@@ -176,6 +177,8 @@ def test_unpad():
     # test unpading of a random tensor
     x = torch.randn(8, 4, 1)
 
+    Torch1DBackend()
+
     y = backend.unpad(x, 1, 3)
 
     assert y.shape == (8, 2)
@@ -194,6 +197,8 @@ def test_unpad():
 
 def test_fft_type():
     x = torch.randn(8, 4, 2) 
+
+    Torch1DBackend()
 
     with pytest.raises(TypeError) as record:
         y = backend.rfft(x)
@@ -224,6 +229,8 @@ def test_fft():
 
     x_r = torch.from_numpy(x_r)[..., None]
     y_r = torch.from_numpy(np.column_stack((y_r.real, y_r.imag)))
+    
+    Torch1DBackend()
 
     z = backend.rfft(x_r)
     assert torch.allclose(y_r, z)
