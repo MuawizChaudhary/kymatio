@@ -178,6 +178,8 @@ class ScatteringTorch3D(ScatteringTorch, ScatteringBase3D):
 
         return S
 
+
+
 # TODO base wavelet class
 class WaveletTorch3D(ScatteringTorch3D):
     def __init__(self, J, shape, orientations="cartesian", pre_pad=False,
@@ -196,11 +198,12 @@ class WaveletTorch3D(ScatteringTorch3D):
         input = input.reshape((-1,) + signal_shape)
 
         if self.rho == 'identity':
-            rho = torch.nn.Identity()
+            rho = torch.nn.Sequential(self.backend.PhaseShift, torch.nn.Identity())
         elif self.rho == 'relu':
-            rho = torch.nn.ReLU()
+            rho = torch.nn.Sequential(self.backend.PhaseShift, torch.nn.ReLU())
         elif self.rho == 'modulus':
-            rho = self.backend.modulus
+            rho = torch.nn.Sequential(self.backend.PhaseShift, self.backend.modulus)
+
 
         S = wavelet_standard(input, self.pad, self.unpad, self.backend,
                 self.J, len(self.orientations), phi, psi, self.max_order, rho,

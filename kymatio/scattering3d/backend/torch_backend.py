@@ -204,6 +204,13 @@ def ifft(x):
 
     return torch.ifft(x, 3, normalized=False)
 
+class PhaseShift(torch.nn.Module): 
+    def __init__(self):
+        super(PhaseShift, self).__init__()
+
+    def forward(self, x):
+        y = torch.stack([x[..., 1], x[..., 0]], axis=-1)
+        return torch.stack([x, -x, y, -y], 1)
 
 
 backend = namedtuple('backend',
@@ -228,3 +235,4 @@ backend.compute_integrals = compute_integrals
 backend.Pad = Pad
 backend.unpad = unpad
 backend.subsample_fourier = SubsampleFourier()
+backend.PhaseShift = PhaseShift()
