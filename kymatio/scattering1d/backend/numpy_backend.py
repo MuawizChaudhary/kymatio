@@ -35,7 +35,6 @@ class NumpyBackend1D(NumpyBackend):
 
         return res
     
-    
     def pad(self, x, pad_left, pad_right):
         """Pad real 1D tensors
         1D implementation of the padding function for real PyTorch tensors.
@@ -64,7 +63,6 @@ class NumpyBackend1D(NumpyBackend):
         output = self.np.pad(x, paddings, mode='reflect')
 
         return output
-    
 
     def unpad(self, x, i0, i1):
         """Unpad real 1D tensor
@@ -83,29 +81,24 @@ class NumpyBackend1D(NumpyBackend):
             The tensor x[..., i0:i1].
         """
         return x[..., i0:i1]
-
     
     def concatenate(self, arrays):
         return self.np.stack(arrays, axis=-2)
-
 
     def rfft(self, x):
         real_check(x)
 
         return self.np.fft.fft(x)
     
-    
     def irfft(self, x):
         complex_check(x)
 
         return self.np.fft.ifft(x).real
     
-    
     def ifft(self, x):
         complex_check(x)
 
         return self.np.fft.ifft(x)
-
 
 class FFTBackend1D(NumpyBackend1D):
     def __init__(self, np, fft):
@@ -118,12 +111,10 @@ class FFTBackend1D(NumpyBackend1D):
 
         return self.fft.fft(x)
     
-    
     def irfft(self, x):
         complex_check(x)
 
         return self.fft.ifft(x).real
-    
 
     def ifft(self, x):
         complex_check(x)

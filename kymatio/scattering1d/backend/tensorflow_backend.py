@@ -33,7 +33,6 @@ class TensorFlowBackend1D(TensorFlowBackend):
     
         return tf.reduce_mean(y, axis=(-2,))
     
-    
     def pad(self, x, pad_left, pad_right):
         """Pad real 1D tensors
         1D implementation of the padding function for real PyTorch tensors.
@@ -61,7 +60,6 @@ class TensorFlowBackend1D(TensorFlowBackend):
 
         return tf.pad(x, paddings, mode="REFLECT")
     
-    
     def unpad(self, x, i0, i1):
         """Unpad real 1D tensor
         Slices the input tensor at indices between i0 and i1 along the last axis.
@@ -80,25 +78,21 @@ class TensorFlowBackend1D(TensorFlowBackend):
         """
         return x[..., i0:i1]
     
-    
     def rfft(self, x):
         real_check(x)
 
         return tf.signal.fft(tf.cast(x, tf.complex64), name='rfft1d')
-    
     
     def irfft(self, x):
         complex_check(x)
 
         return tf.math.real(tf.signal.ifft(x, name='irfft1d'))
     
-    
     def ifft(self, x):
         complex_check(x)
 
         return tf.signal.ifft(x, name='ifft1d')
 
-    
     def concatenate(self, x):
         return self.concat(x, -2)
 

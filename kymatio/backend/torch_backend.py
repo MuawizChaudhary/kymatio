@@ -127,42 +127,34 @@ class Modulus():
 
         return norm
 
-
 def input_checks(x):
     if x is None:
         raise TypeError('The input should be not empty.')
 
     contiguous_check(x)
 
-
 def complex_check(x):
     if not _is_complex(x):
         raise TypeError('The input should be complex (i.e. last dimension is 2).')
-
 
 def real_check(x):
     if not _is_real(x):
         raise TypeError('The input should be real.')
 
-
 def _is_complex(x):
     return x.shape[-1] == 2
 
-
 def _is_real(x):
     return x.shape[-1] == 1
-
 
 def complex_contiguous_check(x):
     complex_check(x)
     contiguous_check(x)
 
-
 def contiguous_check(x):
     if not x.is_contiguous():
         raise RuntimeError('Tensors must be contiguous.')
  
-
 class TorchBackend():
     def __init__(self):
         self.name = 'torch'
@@ -243,8 +235,6 @@ class TorchBackend():
             C[..., 1].view(-1, B.nelement() // 2)[:] = A_r * B_i + A_i * B_r
     
             return C if not inplace else A.copy_(C)
-    
 
     def concat(self, arrays, dim):
         return torch.stack(arrays, dim=dim)
-

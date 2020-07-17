@@ -104,20 +104,17 @@ class TorchBackend1D(TorchBackend):
     
         return torch.fft(x_r, 1, normalized=False)
     
-    
     def irfft(self, x):
         contiguous_check(x)
         complex_check(x)
     
         return torch.ifft(x, 1, normalized=False)[..., :1]
     
-    
     def ifft(self, x):
         contiguous_check(x)
         complex_check(x)
     
         return torch.ifft(x, 1, normalized=False)
-    
     
     def concatenate(self, x):
         return self.concat(x, -2)

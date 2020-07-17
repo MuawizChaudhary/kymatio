@@ -5,24 +5,19 @@ def input_checks(x):
     if x is None:
         raise TypeError('The input should be not empty.')
 
-
 def complex_check(x):
     if not _is_complex(x):
         raise TypeError('The input should be complex.')
-
 
 def real_check(x):
     if not _is_real(x):
         raise TypeError('The input should be real.')
 
-
 def _is_complex(x):
     return (x.dtype == numpy.complex64) or (x.dtype == numpy.complex128)
 
-
 def _is_real(x):
     return (x.dtype == numpy.float32) or (x.dtype == numpy.float64)
-
     
 class NumpyBackend():
     def __init__(self, np):
@@ -48,7 +43,6 @@ class NumpyBackend():
         """
         return self.np.abs(x)
    
-    
     def cdgmm(self, A, B, inplace=False):
         """
             Complex pointwise multiplication between (batched) tensor A and tensor B.
@@ -69,7 +63,6 @@ class NumpyBackend():
                 C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :]
     
         """
-    
         if not _is_complex(A):
             raise TypeError('The first input must be complex.')
     

@@ -8,7 +8,6 @@ BACKEND_NAME = 'torch_skcuda'
 def _is_complex(x):
     return x.shape[-1] == 2
 
-
 def _is_real(x):
     return x.shape[-1] == 1
 

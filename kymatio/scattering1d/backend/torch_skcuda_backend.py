@@ -22,7 +22,6 @@ def get_dtype(t):
     elif isinstance(t, torch.cuda.DoubleTensor):
         return 'double'
 
-
 class Modulus(object):
     """Stable complex modulus
 
@@ -214,7 +213,6 @@ def subsample_fourier(x, k):
         tensor of size x.shape[-2] // k along that dimension.
     """
     return subsamplefourier(x,k)
-
 
 #from .torch_backend import  cdgmm, unpad, pad, concatenate, rfft, irfft, ifft, concatenate_1d
 
