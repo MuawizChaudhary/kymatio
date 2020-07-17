@@ -84,6 +84,7 @@ class Modulus(object):
              block=(self.CUDA_NUM_THREADS, 1, 1),
              args=[x.data_ptr(), out.data_ptr(), out.numel()],
              stream=Stream(ptr=torch.cuda.current_stream().cuda_stream))
+
         return out
 
 modulus = Modulus()
@@ -184,6 +185,7 @@ class SubsampleFourier(object):
                 1)
         periodize(grid=grid, block=self.block, args=[x.data_ptr(), out.data_ptr()],
                   stream=Stream(ptr=torch.cuda.current_stream().cuda_stream))
+
         return out
 
 subsamplefourier = SubsampleFourier()

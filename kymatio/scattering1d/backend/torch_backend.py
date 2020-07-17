@@ -36,7 +36,9 @@ class TorchBackend1D(TorchBackend):
         complex_check(x)
         
         N = x.shape[-2]
+
         res = x.view(x.shape[:-2] + (k, N // k, 2)).mean(dim=-3)
+
         return res
     
     def pad(self, x, pad_left, pad_right):
@@ -62,8 +64,10 @@ class TorchBackend1D(TorchBackend):
         """
         if (pad_left >= x.shape[-1]) or (pad_right >= x.shape[-1]):
             raise ValueError('Indefinite padding size (larger than tensor).')
+
         res = F.pad(x, (pad_left, pad_right), mode='reflect')
         res = res[..., None]
+
         return res
     
     def unpad(self, x, i0, i1):
@@ -86,6 +90,7 @@ class TorchBackend1D(TorchBackend):
             The tensor x[..., i0:i1].
         """
         x = x.reshape(x.shape[:-1])
+
         return x[..., i0:i1]
     
     # we cast to complex here then fft rather than use torch.rfft as torch.rfft is

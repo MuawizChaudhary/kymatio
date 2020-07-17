@@ -32,6 +32,7 @@ class NumpyBackend1D(NumpyBackend):
         y = x.reshape(-1, k, x.shape[-1] // k)
     
         res = y.mean(axis=(-2,))
+
         return res
     
     
@@ -61,6 +62,7 @@ class NumpyBackend1D(NumpyBackend):
         paddings += (pad_left, pad_right), 
     
         output = self.np.pad(x, paddings, mode='reflect')
+
         return output
     
 
@@ -89,16 +91,19 @@ class NumpyBackend1D(NumpyBackend):
 
     def rfft(self, x):
         real_check(x)
+
         return self.np.fft.fft(x)
     
     
     def irfft(self, x):
         complex_check(x)
+
         return self.np.fft.ifft(x).real
     
     
     def ifft(self, x):
         complex_check(x)
+
         return self.np.fft.ifft(x)
 
 
@@ -110,16 +115,19 @@ class FFTBackend1D(NumpyBackend1D):
     
     def rfft(self, x):
         real_check(x)
+
         return self.fft.fft(x)
     
     
     def irfft(self, x):
         complex_check(x)
+
         return self.fft.ifft(x).real
     
 
     def ifft(self, x):
         complex_check(x)
+
         return self.fft.ifft(x)
 
 import numpy

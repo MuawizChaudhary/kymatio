@@ -7,7 +7,6 @@ class TensorFlowBackend1D(TensorFlowBackend):
     def __init__(self):
         super(TensorFlowBackend1D, self).__init__()
 
-
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain
         Subsampling in the temporal domain amounts to periodization in the Fourier
@@ -59,6 +58,7 @@ class TensorFlowBackend1D(TensorFlowBackend):
     
         paddings = [[0, 0]] * len(x.shape[:-1])
         paddings += [[pad_left, pad_right]]
+
         return tf.pad(x, paddings, mode="REFLECT")
     
     
@@ -83,16 +83,19 @@ class TensorFlowBackend1D(TensorFlowBackend):
     
     def rfft(self, x):
         real_check(x)
+
         return tf.signal.fft(tf.cast(x, tf.complex64), name='rfft1d')
     
     
     def irfft(self, x):
         complex_check(x)
+
         return tf.math.real(tf.signal.ifft(x, name='irfft1d'))
     
     
     def ifft(self, x):
         complex_check(x)
+
         return tf.signal.ifft(x, name='ifft1d')
 
     

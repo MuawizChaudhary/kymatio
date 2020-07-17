@@ -20,6 +20,7 @@ class Modulus():
     """
     def __call__(self, x):
         norm = tf.abs(x)
+
         return norm
 
 

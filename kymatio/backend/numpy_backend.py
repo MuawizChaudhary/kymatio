@@ -28,7 +28,6 @@ class NumpyBackend():
     def __init__(self, np):
         self.np = np
         self.name = 'numpy'
-  
 
     def modulus(self, x):
         """

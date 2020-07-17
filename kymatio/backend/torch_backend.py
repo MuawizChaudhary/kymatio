@@ -85,6 +85,7 @@ class ModulusStable(Function):
             The gradient with respect to the input.
         """
         x, output = ctx.saved_tensors
+
         if ctx.dim is not None and ctx.keepdim is False and x.dim() != 1:
             grad_output = grad_output.unsqueeze(ctx.dim)
             output = output.unsqueeze(ctx.dim)
@@ -121,7 +122,9 @@ class Modulus():
     """
     def __call__(self, x):
         complex_contiguous_check(x)
+
         norm = modulus(x)[..., None]
+
         return norm
 
 
