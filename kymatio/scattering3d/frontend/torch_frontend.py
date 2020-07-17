@@ -198,11 +198,11 @@ class WaveletTorch3D(ScatteringTorch3D):
         input = input.reshape((-1,) + signal_shape)
 
         if self.rho == 'identity':
-            rho = torch.nn.Sequential(self.backend.PhaseShift, torch.nn.Identity())
+            rho = self.backend.PhaseShift(torch.nn.Identity())
         elif self.rho == 'relu':
-            rho = torch.nn.Sequential(self.backend.PhaseShift, torch.nn.ReLU())
-        elif self.rho == 'modulus':
-            rho = torch.nn.Sequential(self.backend.PhaseShift, self.backend.modulus)
+            rho = self.backend.PhaseShift(torch.nn.ReLU())
+        elif self.rho == 'abs':
+            rho = self.backend.PhaseShift(torch.abs)
 
 
         S = wavelet_standard(input, self.pad, self.unpad, self.backend,
