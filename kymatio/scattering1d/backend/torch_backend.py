@@ -9,8 +9,6 @@ from ...backend.torch_backend import TorchBackend, complex_check, contiguous_che
 class TorchBackend1D(TorchBackend):
     def __init__(self):
         super(TorchBackend1D, self).__init__()
-        pass
-
 
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain
