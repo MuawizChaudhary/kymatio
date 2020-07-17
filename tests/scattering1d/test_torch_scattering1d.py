@@ -13,7 +13,7 @@ try:
     if torch.cuda.is_available():
         from skcuda import cublas
         import cupy
-        skcuda_available = True
+#        skcuda_available = True
 except:
     Warning('torch_skcuda backend not available.')
 

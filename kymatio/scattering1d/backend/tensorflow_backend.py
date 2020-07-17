@@ -1,13 +1,11 @@
 BACKEND_NAME = 'tensorflow'
+import tensorflow as tf
+from ...backend.tensorflow_backend import TensorFlowBackend, complex_check, real_check
 
 
-from ...backend.tensorflow_backend import TensorFlowBaseBackend
-
-
-class TensorFlow1DBackend(TensorFlowBaseBackend):
-    def __init__(self, tf):
-        super(TensorFlow1DBackend, self).__init__(tf)
-        self.tf = tf
+class TensorFlowBackend1D(TensorFlowBackend):
+    def __init__(self):
+        super(TensorFlowBackend1D, self).__init__()
 
 
     def subsample_fourier(self, x, k):
@@ -30,11 +28,11 @@ class TensorFlow1DBackend(TensorFlowBaseBackend):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
-        self.complex_check(x)
+        complex_check(x)
     
-        y = self.tf.reshape(x, (-1, k, x.shape[-1] // k))
+        y = tf.reshape(x, (-1, k, x.shape[-1] // k))
     
-        return self.tf.reduce_mean(y, axis=(-2,))
+        return tf.reduce_mean(y, axis=(-2,))
     
     
     def pad(self, x, pad_left, pad_right):
@@ -61,7 +59,7 @@ class TensorFlow1DBackend(TensorFlowBaseBackend):
     
         paddings = [[0, 0]] * len(x.shape[:-1])
         paddings += [[pad_left, pad_right]]
-        return self.tf.pad(x, paddings, mode="REFLECT")
+        return tf.pad(x, paddings, mode="REFLECT")
     
     
     def unpad(self, x, i0, i1):
@@ -84,15 +82,22 @@ class TensorFlow1DBackend(TensorFlowBaseBackend):
     
     
     def rfft(self, x):
-        self.real_check(x)
-        return self.tf.signal.fft(self.tf.cast(x, self.tf.complex64), name='rfft1d')
+        real_check(x)
+        return tf.signal.fft(tf.cast(x, tf.complex64), name='rfft1d')
     
     
     def irfft(self, x):
-        self.complex_check(x)
-        return self.tf.math.real(self.tf.signal.ifft(x, name='irfft1d'))
+        complex_check(x)
+        return tf.math.real(tf.signal.ifft(x, name='irfft1d'))
     
     
     def ifft(self, x):
-        self.complex_check(x)
-        return self.tf.signal.ifft(x, name='ifft1d')
+        complex_check(x)
+        return tf.signal.ifft(x, name='ifft1d')
+
+    
+    def concatenate(self, x):
+        return self.concat(x, -2)
+
+
+backend = TensorFlowBackend1D()

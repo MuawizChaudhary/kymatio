@@ -1,24 +1,35 @@
+import numpy
 
 
-class NumpyBaseBackend():
+def input_checks(x):
+    if x is None:
+        raise TypeError('The input should be not empty.')
+
+
+def complex_check(x):
+    if not _is_complex(x):
+        raise TypeError('The input should be complex.')
+
+
+def real_check(x):
+    if not _is_real(x):
+        raise TypeError('The input should be real.')
+
+
+def _is_complex(x):
+    return (x.dtype == numpy.complex64) or (x.dtype == numpy.complex128)
+
+
+def _is_real(x):
+    return (x.dtype == numpy.float32) or (x.dtype == numpy.float64)
+
+    
+class NumpyBackend():
     def __init__(self, np):
         self.np = np
+        self.name = 'numpy'
+  
 
-    def input_checks(self, x):
-        if x is None:
-            raise TypeError('The input should be not empty.')
-    
-
-    def complex_check(self, x):
-        if not self._is_complex(x):
-            raise TypeError('The input should be complex.')
-    
-
-    def real_check(self, x):
-        if not self._is_real(x):
-            raise TypeError('The input should be real.')
-    
-    
     def modulus(self, x):
         """
             This function implements a modulus transform for complex numbers.
@@ -37,15 +48,7 @@ class NumpyBaseBackend():
     
         """
         return self.np.abs(x)
-    
-    
-    def _is_complex(self, x):
-        return (x.dtype == self.np.complex64) or (x.dtype == self.np.complex128)
-    
-    
-    def _is_real(self, x):
-        return (x.dtype == self.np.float32) or (x.dtype == self.np.float64)
-    
+   
     
     def cdgmm(self, A, B, inplace=False):
         """
@@ -68,14 +71,14 @@ class NumpyBaseBackend():
     
         """
     
-        if not self._is_complex(A):
+        if not _is_complex(A):
             raise TypeError('The first input must be complex.')
     
         if A.shape[-len(B.shape):] != B.shape[:]:
             raise RuntimeError('The inputs are not compatible for '
                                'multiplication.')
     
-        if not self._is_complex(B) and not self._is_real(B):
+        if not _is_complex(B) and not _is_real(B):
             raise TypeError('The second input must be complex or real.')
     
         if inplace:

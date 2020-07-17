@@ -4,13 +4,11 @@ import torch.nn.functional as F
 
 BACKEND_NAME = 'torch'
 
-from ...backend.torch_backend import TorchBaseBackend
+from ...backend.torch_backend import TorchBackend, complex_check, contiguous_check, real_check
 
-
-class Torch1DBackend(TorchBaseBackend):
+class TorchBackend1D(TorchBackend):
     def __init__(self):
-        super(Torch1DBackend, self).__init__()
-        self.name = 'torch'
+        super(TorchBackend1D, self).__init__()
         pass
 
 
@@ -37,7 +35,7 @@ class Torch1DBackend(TorchBaseBackend):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
-        self.complex_check(x)
+        complex_check(x)
         
         N = x.shape[-2]
         res = x.view(x.shape[:-2] + (k, N // k, 2)).mean(dim=-3)
@@ -95,8 +93,8 @@ class Torch1DBackend(TorchBaseBackend):
     # we cast to complex here then fft rather than use torch.rfft as torch.rfft is
     # inefficent.
     def rfft(self, x):
-        self.contiguous_check(x)
-        self.real_check(x)
+        contiguous_check(x)
+        real_check(x)
         
         x_r = torch.zeros(x.shape[:-1] + (2,), dtype=x.dtype, layout=x.layout, device=x.device)
         x_r[..., 0] = x[..., 0]
@@ -105,18 +103,20 @@ class Torch1DBackend(TorchBaseBackend):
     
     
     def irfft(self, x):
-        self.contiguous_check(x)
-        self.complex_check(x)
+        contiguous_check(x)
+        complex_check(x)
     
         return torch.ifft(x, 1, normalized=False)[..., :1]
     
     
     def ifft(self, x):
-        self.contiguous_check(x)
-        self.complex_check(x)
+        contiguous_check(x)
+        complex_check(x)
     
         return torch.ifft(x, 1, normalized=False)
     
     
-    def concatenate_1d(self, x):
-        return concatenate(x, -2)
+    def concatenate(self, x):
+        return self.concat(x, -2)
+
+backend = TorchBackend1D()

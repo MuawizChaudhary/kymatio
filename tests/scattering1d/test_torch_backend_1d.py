@@ -18,8 +18,8 @@ if skcuda_available:
     from kymatio.scattering1d.backend.torch_skcuda_backend import backend
     backends.append(backend)
 
-from kymatio.scattering1d.backend.torch_backend import Torch1DBackend
-backends.append(Torch1DBackend())
+from kymatio.scattering1d.backend.torch_backend import backend
+backends.append(backend)
 
 if torch.cuda.is_available():
     devices = ['cuda', 'cpu']
@@ -173,11 +173,14 @@ def test_subsample_fourier(backend, device, random_state=42):
         assert "should be complex" in te.value.args[0]
 
 
-def test_unpad():
-    # test unpading of a random tensor
-    x = torch.randn(8, 4, 1)
+@pytest.mark.parametrize("backend", backends)
+@pytest.mark.parametrize("device", devices)
+def test_unpad(backend, device):
+    if backend.name == "torch_skcuda" and device == "cpu":
+        pytest.skip()
 
-    Torch1DBackend()
+    # test unpading of a random tensor
+    x = torch.randn(8, 4, 1).to(device)
 
     y = backend.unpad(x, 1, 3)
 
@@ -185,7 +188,7 @@ def test_unpad():
     assert torch.allclose(y, x[:, 1:3, 0])
 
     N = 128
-    x = torch.rand(2, 4, N)
+    x = torch.rand(2, 4, N).to(device)
 
     # similar to for loop in pad test
     for pad_left in range(0, N - 16, 16):
@@ -195,16 +198,19 @@ def test_unpad():
         assert torch.allclose(x, x_unpadded)
 
 
-def test_fft_type():
-    x = torch.randn(8, 4, 2) 
+@pytest.mark.parametrize("backend", backends)
+@pytest.mark.parametrize("device", devices)
+def test_fft_type(backend, device):
+    if backend.name == "torch_skcuda" and device == "cpu":
+        pytest.skip()
 
-    Torch1DBackend()
+    x = torch.randn(8, 4, 2).to(device)
 
     with pytest.raises(TypeError) as record:
         y = backend.rfft(x)
     assert 'should be real' in record.value.args[0]
 
-    x = torch.randn(8, 4, 1)
+    x = torch.randn(8, 4, 1).to(device)
 
     with pytest.raises(TypeError) as record:
         y = backend.ifft(x)
@@ -215,7 +221,12 @@ def test_fft_type():
     assert 'should be complex' in record.value.args[0]
 
 
-def test_fft():
+@pytest.mark.parametrize("backend", backends)
+@pytest.mark.parametrize("device", devices)
+def test_fft(backend, device):
+    if backend.name == "torch_skcuda" and device == "cpu":
+        pytest.skip()
+
     def coefficent(n):
             return np.exp(-2 * np.pi * 1j * n)
 
@@ -227,11 +238,9 @@ def test_fft():
         
     y_r = (x_r * coefficents).sum(-1)
 
-    x_r = torch.from_numpy(x_r)[..., None]
-    y_r = torch.from_numpy(np.column_stack((y_r.real, y_r.imag)))
+    x_r = torch.from_numpy(x_r)[..., None].to(device)
+    y_r = torch.from_numpy(np.column_stack((y_r.real, y_r.imag))).to(device)
     
-    Torch1DBackend()
-
     z = backend.rfft(x_r)
     assert torch.allclose(y_r, z)
 

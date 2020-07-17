@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import scipy.fftpack
 
-from kymatio.scattering1d.backend.numpy_backend import Numpy1DBackend, FFT1DBackend
+from kymatio.scattering1d.backend.numpy_backend import backend
 
 
 def test_subsample_fourier():
@@ -10,7 +10,6 @@ def test_subsample_fourier():
     # 1d signal 
     x = np.random.randn(2, 2 ** J) + 1j * np.random.randn(2, 2 ** J)
     x_f = np.fft.fft(x, axis=-1)
-    backend = Numpy1DBackend(np)
 
     for j in range(J + 1):
         x_f_sub = backend.subsample_fourier(x_f, 2 ** j)
@@ -26,7 +25,6 @@ def test_subsample_fourier():
 def test_pad():
     N = 128
     x = np.random.rand(2, 4, N)
-    backend = Numpy1DBackend(np)
     
     for pad_left in range(0, N - 16, 16):
         for pad_right in [pad_left, pad_left + 16]:
@@ -62,8 +60,6 @@ def test_unpad():
     # test unpading of a random tensor
     x = np.random.rand(8, 4)
     
-    backend = Numpy1DBackend(np)
-
     y = backend.unpad(x, 1, 3)
 
     assert y.shape == (8, 2)
@@ -82,8 +78,6 @@ def test_unpad():
 
 def test_fft_type():
     x = np.random.rand(8, 4) + 1j * np.random.rand(8, 4)
-
-    backend = Numpy1DBackend(np)
 
     with pytest.raises(TypeError) as record:
         y = backend.rfft(x)
@@ -110,8 +104,6 @@ def test_fft():
 
     coefficents = coefficent(K * I / x_r.shape[0])
         
-    backend = FFT1DBackend(np, scipy.fftpack)
-
     y_r = (x_r * coefficents).sum(-1)
 
     z = backend.rfft(x_r)

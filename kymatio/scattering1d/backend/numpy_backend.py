@@ -1,11 +1,11 @@
 BACKEND_NAME = 'numpy'
 
-from ...backend.numpy_backend import NumpyBaseBackend
+from ...backend.numpy_backend import NumpyBackend, complex_check, real_check
 
 
-class Numpy1DBackend(NumpyBaseBackend):
+class NumpyBackend1D(NumpyBackend):
     def __init__(self, np):
-        super(Numpy1DBackend, self).__init__(np)
+        super(NumpyBackend1D, self).__init__(np)
         self.np = np
 
 
@@ -29,7 +29,7 @@ class Numpy1DBackend(NumpyBaseBackend):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
-        self.complex_check(x)
+        complex_check(x)
     
         y = x.reshape(-1, k, x.shape[-1] // k)
     
@@ -90,36 +90,41 @@ class Numpy1DBackend(NumpyBaseBackend):
 
 
     def rfft(self, x):
-        self.real_check(x)
+        real_check(x)
         return self.np.fft.fft(x)
     
     
     def irfft(self, x):
-        self.complex_check(x)
+        complex_check(x)
         return self.np.fft.ifft(x).real
     
     
     def ifft(self, x):
-        self.complex_check(x)
+        complex_check(x)
         return self.np.fft.ifft(x)
 
 
-class FFT1DBackend(Numpy1DBackend):
+class FFTBackend1D(NumpyBackend1D):
     def __init__(self, np, fft):
-        super(Numpy1DBackend, self).__init__(np)
+        super(NumpyBackend1D, self).__init__(np)
         self.np = np
         self.fft = fft
     
     def rfft(self, x):
-        self.real_check(x)
+        real_check(x)
         return self.fft.fft(x)
     
     
     def irfft(self, x):
-        self.complex_check(x)
+        complex_check(x)
         return self.fft.ifft(x).real
     
 
     def ifft(self, x):
-        self.complex_check(x)
+        complex_check(x)
         return self.fft.ifft(x)
+
+import numpy
+import scipy.fftpack
+
+backend = FFTBackend1D(numpy, scipy.fftpack)
