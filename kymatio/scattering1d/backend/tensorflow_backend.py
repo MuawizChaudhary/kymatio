@@ -1,5 +1,5 @@
 import tensorflow as tf
-from ...backend.tensorflow_backend import TensorFlowBackend, complex_check, real_check
+from ...backend.tensorflow_backend import TensorFlowBackend
 
 
 class TensorFlowBackend1D(TensorFlowBackend):
@@ -26,7 +26,7 @@ class TensorFlowBackend1D(TensorFlowBackend):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
-        complex_check(x)
+        self.complex_check(x)
     
         y = tf.reshape(x, (-1, k, x.shape[-1] // k))
     
@@ -78,17 +78,17 @@ class TensorFlowBackend1D(TensorFlowBackend):
         return x[..., i0:i1]
     
     def rfft(self, x):
-        real_check(x)
+        self.real_check(x)
 
         return tf.signal.fft(tf.cast(x, tf.complex64), name='rfft1d')
     
     def irfft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return tf.math.real(tf.signal.ifft(x, name='irfft1d'))
     
     def ifft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return tf.signal.ifft(x, name='ifft1d')
 
