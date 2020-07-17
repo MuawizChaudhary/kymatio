@@ -118,46 +118,49 @@ class Modulus():
             A tensor with the same dimensions as x, such that output[..., 0]
             contains the complex modulus of x, while output[..., 1] = 0.
     """
+    def __init__(self, complex_contiguous_check):
+        self.complex_contiguous_check = complex_contiguous_check
+
     def __call__(self, x):
-        complex_contiguous_check(x)
+        self.complex_contiguous_check(x)
 
         norm = modulus(x)[..., None]
 
         return norm
 
-def input_checks(x):
-    if x is None:
-        raise TypeError('The input should be not empty.')
-
-    contiguous_check(x)
-
-def complex_check(x):
-    if not _is_complex(x):
-        raise TypeError('The input should be complex (i.e. last dimension is 2).')
-
-def real_check(x):
-    if not _is_real(x):
-        raise TypeError('The input should be real.')
-
-def _is_complex(x):
-    return x.shape[-1] == 2
-
-def _is_real(x):
-    return x.shape[-1] == 1
-
-def complex_contiguous_check(x):
-    complex_check(x)
-    contiguous_check(x)
-
-def contiguous_check(x):
-    if not x.is_contiguous():
-        raise RuntimeError('Tensors must be contiguous.')
- 
 class TorchBackend():
     def __init__(self):
         self.name = 'torch'
-        self.modulus = Modulus()
-
+        self.modulus = Modulus(self.complex_contiguous_check)
+    
+    def input_checks(self, x):
+        if x is None:
+            raise TypeError('The input should be not empty.')
+    
+        self.contiguous_check(x)
+    
+    def complex_check(self, x):
+        if not self._is_complex(x):
+            raise TypeError('The input should be complex (i.e. last dimension is 2).')
+    
+    def real_check(self, x):
+        if not self._is_real(x):
+            raise TypeError('The input should be real.')
+    
+    def _is_complex(self, x):
+        return x.shape[-1] == 2
+    
+    def _is_real(self, x):
+        return x.shape[-1] == 1
+    
+    def complex_contiguous_check(self, x):
+        self.complex_check(x)
+        self.contiguous_check(x)
+    
+    def contiguous_check(self, x):
+        if not x.is_contiguous():
+            raise RuntimeError('Tensors must be contiguous.')
+ 
     def cdgmm(self, A, B, inplace=False):
         """Complex pointwise multiplication.
     
@@ -191,12 +194,12 @@ class TorchBackend():
                 C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
     
         """
-        if not _is_real(B):
-            complex_contiguous_check(B)
+        if not self._is_real(B):
+            self.complex_contiguous_check(B)
         else:
-            contiguous_check(B)
+            self.contiguous_check(B)
         
-        complex_contiguous_check(A)
+        self.complex_contiguous_check(A)
     
         if A.shape[-len(B.shape):-1] != B.shape[:-1]:
             raise RuntimeError('The filters are not compatible for multiplication.')
@@ -215,7 +218,7 @@ class TorchBackend():
             if A.device.type == 'cuda':
                 raise TypeError('Input must be on CPU.')
     
-        if _is_real(B):
+        if self._is_real(B):
             if inplace:
                 return A.mul_(B)
             else:

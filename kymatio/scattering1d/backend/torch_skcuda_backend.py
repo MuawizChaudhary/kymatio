@@ -2,7 +2,6 @@ import torch
 import cupy
 from collections import namedtuple
 from string import Template
-from ...backend.torch_backend import contiguous_check, complex_check
 from ...backend.torch_skcuda_backend import TorchSKcudaBackend
 from .torch_backend import TorchBackend1D
 
@@ -48,9 +47,11 @@ class Modulus(object):
         zero).
     """
 
-    def __init__(self, backend='skcuda'):
+    def __init__(self, contiguous_check, complex_check, backend='skcuda'):
         self.CUDA_NUM_THREADS = 1024
         self.backend = backend
+        self.contiguous_check = contiguous_check
+        self.complex_check = complex_check
 
     def get_blocks(self, N):
         return (N + self.CUDA_NUM_THREADS - 1) // self.CUDA_NUM_THREADS
@@ -61,8 +62,8 @@ class Modulus(object):
         
         out = torch.empty(x.shape[:-1] + (1,), device=x.device, layout=x.layout, dtype=x.dtype)
    
-        contiguous_check(x)
-        complex_check(x)
+        self.contiguous_check(x)
+        self.complex_check(x)
 
         # abs_complex_value takes in a complex array and returns the real
         # modulus of the input array
@@ -84,28 +85,6 @@ class Modulus(object):
              stream=Stream(ptr=torch.cuda.current_stream().cuda_stream))
 
         return out
-
-modulus = Modulus()
-
-def modulus_complex(x):
-    """Compute the complex modulus
-
-    Computes the modulus of x and stores the result in a complex tensor of the
-    same size, with the real part equal to the modulus and the imaginary part
-    equal to zero.
-
-    Parameters
-    ----------
-    x : tensor
-        A complex tensor (that is, whose last dimension is equal to 2).
-
-    Returns
-    -------
-    norm : tensor
-        A tensor with the same dimensions as x, such that norm[..., 0] contains
-        the complex modulus of x, while norm[..., 1] = 0.
-    """
-    return modulus(x)
 
 class SubsampleFourier(object):
     """Subsampling in the Fourier domain
@@ -135,9 +114,11 @@ class SubsampleFourier(object):
         The input tensor periodized along the next to last axis to yield a
         tensor of size x.shape[-2] // k along that dimension.
     """
-    def __init__(self, backend='skcuda'):
+    def __init__(self, contiguous_check, complex_check, backend='skcuda'):
         self.block = (1024, 1, 1)
         self.backend = backend
+        self.contiguous_check = contiguous_check
+        self.complex_check = complex_check
 
     def get_blocks(self, N, threads):
         return (N + threads - 1) // threads
@@ -146,8 +127,8 @@ class SubsampleFourier(object):
         if not x.is_cuda and self.backend == 'skcuda':
             raise TypeError('Use the torch backend (without skcuda) for CPU tensors.')
 
-        contiguous_check(x) 
-        complex_check(x)
+        self.contiguous_check(x) 
+        self.complex_check(x)
 
         out = torch.empty(x.shape[:-2] + (x.shape[-2] // k, x.shape[-1]), dtype=x.dtype, layout=x.layout, device=x.device)
 
@@ -186,40 +167,56 @@ class SubsampleFourier(object):
 
         return out
 
-subsamplefourier = SubsampleFourier()
-
-def subsample_fourier(x, k):
-    """Subsampling in the Fourier domain
-
-    Subsampling in the temporal domain amounts to periodization in the Fourier
-    domain, so the input is periodized according to the subsampling factor.
-
-    Parameters
-    ----------
-    x : tensor
-        Input tensor with at least 3 dimensions, where the next to last
-        corresponds to the frequency index in the standard PyTorch FFT
-        ordering. The length of this dimension should be a power of 2 to
-        avoid errors. The last dimension should represent the real and
-        imaginary parts of the Fourier transform.
-    k : int
-        The subsampling factor.
-
-    Returns
-    -------
-    res : tensor
-        The input tensor periodized along the next to last axis to yield a
-        tensor of size x.shape[-2] // k along that dimension.
-    """
-    return subsamplefourier(x,k)
-
-#from .torch_backend import  cdgmm, unpad, pad, concatenate, rfft, irfft, ifft, concatenate_1d
-
 class TorchSKcudaBackend1D(TorchBackend1D, TorchSKcudaBackend):
     def __init__(self):
         TorchBackend1D.__init__(self)
         TorchSKcudaBackend.__init__(self)
-        self.modulus = modulus_complex
-        self.subsample_fourier = subsample_fourier
+        self.modulus_complex = Modulus(self.contiguous_check, self.complex_check)
+        self.subsamplefourier = SubsampleFourier(self.contiguous_check, self.complex_check)
+
+    def modulus(self, x):
+        """Compute the complex modulus
+        
+            Computes the modulus of x and stores the result in a complex tensor of the
+            same size, with the real part equal to the modulus and the imaginary part
+            equal to zero.
+        
+            Parameters
+            ----------
+            x : tensor
+                A complex tensor (that is, whose last dimension is equal to 2).
+        
+            Returns
+            -------
+            norm : tensor
+                A tensor with the same dimensions as x, such that norm[..., 0] contains
+                the complex modulus of x, while norm[..., 1] = 0.
+        """
+        return self.modulus_complex(x)
+
+    def subsample_fourier(self, x, k):
+        """Subsampling in the Fourier domain
+    
+        Subsampling in the temporal domain amounts to periodization in the Fourier
+        domain, so the input is periodized according to the subsampling factor.
+    
+        Parameters
+        ----------
+        x : tensor
+            Input tensor with at least 3 dimensions, where the next to last
+            corresponds to the frequency index in the standard PyTorch FFT
+            ordering. The length of this dimension should be a power of 2 to
+            avoid errors. The last dimension should represent the real and
+            imaginary parts of the Fourier transform.
+        k : int
+            The subsampling factor.
+    
+        Returns
+        -------
+        res : tensor
+            The input tensor periodized along the next to last axis to yield a
+            tensor of size x.shape[-2] // k along that dimension.
+        """
+        return self.subsamplefourier(x,k)
 
 backend = TorchSKcudaBackend1D()

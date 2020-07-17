@@ -2,15 +2,15 @@ import torch
 from skcuda import cublas
 
 
-def _is_complex(x):
-    return x.shape[-1] == 2
-
-def _is_real(x):
-    return x.shape[-1] == 1
-
 class TorchSKcudaBackend():
     def __init__(self):
         self.name = 'torch_skcuda'
+
+    def _is_complex(self, x):
+        return x.shape[-1] == 2
+    
+    def _is_real(self, x):
+        return x.shape[-1] == 1
 
     def cdgmm(A, B, inplace=False):
         """Complex pointwise multiplication.
@@ -47,10 +47,10 @@ class TorchSKcudaBackend():
                 C[b, c, m, n, :] = A[b, c, m, n, :] * B[m, n, :].
     
         """
-        if not _is_complex(A):
+        if not self._is_complex(A):
             raise TypeError('The input should be complex (i.e. last dimension is 2).')
     
-        if not _is_complex(B) and not _is_real(B):
+        if not self._is_complex(B) and not self._is_real(B):
             raise TypeError('The filter should be complex or real, indicated by a '
                             'last dimension of size 2 or 1, respectively.')
     
@@ -66,7 +66,7 @@ class TorchSKcudaBackend():
         if A.device.index != B.device.index:
             raise TypeError('Input and filter must be on the same GPU.')
     
-        if _is_real(B):
+        if self._is_real(B):
             if inplace:
                 return A.mul_(B)
             else:
