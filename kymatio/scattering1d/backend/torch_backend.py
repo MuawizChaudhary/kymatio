@@ -1,10 +1,7 @@
 import torch
 import torch.nn.functional as F
-
-
-BACKEND_NAME = 'torch'
-
 from ...backend.torch_backend import TorchBackend, complex_check, contiguous_check, real_check
+
 
 class TorchBackend1D(TorchBackend):
     def __init__(self):

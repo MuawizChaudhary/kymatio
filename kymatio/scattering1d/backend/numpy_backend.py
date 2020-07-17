@@ -1,5 +1,3 @@
-BACKEND_NAME = 'numpy'
-
 from ...backend.numpy_backend import NumpyBackend, complex_check, real_check
 
 

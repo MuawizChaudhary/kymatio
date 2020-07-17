@@ -1,4 +1,3 @@
-BACKEND_NAME = 'tensorflow'
 import tensorflow as tf
 from ...backend.tensorflow_backend import TensorFlowBackend, complex_check, real_check
 

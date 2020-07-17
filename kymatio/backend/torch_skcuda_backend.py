@@ -2,9 +2,6 @@ import torch
 from skcuda import cublas
 
 
-BACKEND_NAME = 'torch_skcuda'
-
-
 def _is_complex(x):
     return x.shape[-1] == 2
 

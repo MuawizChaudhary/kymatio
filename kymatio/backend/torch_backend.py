@@ -1,8 +1,6 @@
 import torch
 from torch.autograd import Function
 
-BACKEND_NAME = 'torch'
-
  
 class ModulusStable(Function):
     """Stable complex modulus

@@ -6,7 +6,6 @@ from ...backend.torch_backend import contiguous_check, complex_check
 from ...backend.torch_skcuda_backend import TorchSKcudaBackend
 from .torch_backend import TorchBackend1D
 
-BACKEND_NAME = 'torch_skcuda'
 
 @cupy.util.memoize(for_each_device=True)
 def load_kernel(kernel_name, code, **kwargs):
