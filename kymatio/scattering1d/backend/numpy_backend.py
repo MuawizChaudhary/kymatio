@@ -6,8 +6,6 @@ from ...backend.numpy_backend import NumpyBackend, complex_check, real_check
 class NumpyBackend1D(NumpyBackend):
     def __init__(self, np):
         super(NumpyBackend1D, self).__init__(np)
-        self.np = np
-
 
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain
