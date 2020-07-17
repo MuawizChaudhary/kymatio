@@ -1,4 +1,4 @@
-from ...backend.numpy_backend import NumpyBackend, complex_check, real_check
+from ...backend.numpy_backend import NumpyBackend
 
 
 class NumpyBackend1D(NumpyBackend):
@@ -25,7 +25,7 @@ class NumpyBackend1D(NumpyBackend):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
-        complex_check(x)
+        self.complex_check(x)
     
         y = x.reshape(-1, k, x.shape[-1] // k)
     
@@ -84,17 +84,17 @@ class NumpyBackend1D(NumpyBackend):
         return self.np.stack(arrays, axis=-2)
 
     def rfft(self, x):
-        real_check(x)
+        self.real_check(x)
 
         return self.np.fft.fft(x)
     
     def irfft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return self.np.fft.ifft(x).real
     
     def ifft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return self.np.fft.ifft(x)
 
@@ -105,17 +105,17 @@ class FFTBackend1D(NumpyBackend1D):
         self.fft = fft
     
     def rfft(self, x):
-        real_check(x)
+        self.real_check(x)
 
         return self.fft.fft(x)
     
     def irfft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return self.fft.ifft(x).real
 
     def ifft(self, x):
-        complex_check(x)
+        self.complex_check(x)
 
         return self.fft.ifft(x)
 
