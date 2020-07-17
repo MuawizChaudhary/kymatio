@@ -12,7 +12,6 @@ try:
         skcuda_available = True
 except:
     Warning('torch_skcuda backend not available.')
-skcuda_available = False
 
 if skcuda_available:
     from kymatio.scattering1d.backend.torch_skcuda_backend import backend

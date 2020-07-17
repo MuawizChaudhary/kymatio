@@ -3,6 +3,8 @@ import cupy
 from collections import namedtuple
 from string import Template
 from ...backend.torch_backend import contiguous_check, complex_check
+from ...backend.torch_skcuda_backend import TorchSKcudaBackend
+from .torch_backend import TorchBackend1D
 
 BACKEND_NAME = 'torch_skcuda'
 
@@ -212,17 +214,13 @@ def subsample_fourier(x, k):
     return subsamplefourier(x,k)
 
 
-from .torch_backend import  cdgmm, unpad, pad, concatenate, rfft, irfft, ifft, concatenate_1d
+#from .torch_backend import  cdgmm, unpad, pad, concatenate, rfft, irfft, ifft, concatenate_1d
 
-backend = namedtuple('backend', ['name', 'modulus_complex', 'subsample_fourier', 'pad', 'real', 'unpad', 'fft', 'concatenate'])
+class TorchSKcudaBackend1D(TorchBackend1D, TorchSKcudaBackend):
+    def __init__(self):
+        TorchBackend1D.__init__(self)
+        TorchSKcudaBackend.__init__(self)
+        self.modulus = modulus_complex
+        self.subsample_fourier = subsample_fourier
 
-backend.name = 'torch_skcuda'
-backend.modulus = modulus_complex
-backend.subsample_fourier = subsample_fourier
-backend.cdgmm = cdgmm
-backend.unpad = unpad
-backend.pad = pad
-backend.rfft = rfft
-backend.irfft = irfft
-backend.ifft = ifft
-backend.concatenate =  concatenate_1d
+backend = TorchSKcudaBackend1D()
