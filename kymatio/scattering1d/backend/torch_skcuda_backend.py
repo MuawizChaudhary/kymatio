@@ -59,7 +59,7 @@ class Modulus(object):
     def __call__(self, x):
         if not x.is_cuda and self.backend=='skcuda':
             raise TypeError('Use the torch backend (without skcuda) for CPU tensors.')
-        
+
         out = torch.empty(x.shape[:-1] + (1,), device=x.device, layout=x.layout, dtype=x.dtype)
    
         self.contiguous_check(x)
@@ -171,7 +171,7 @@ class TorchSKcudaBackend1D(TorchBackend1D, TorchSKcudaBackend):
     def __init__(self):
         TorchBackend1D.__init__(self)
         TorchSKcudaBackend.__init__(self)
-        self.modulus_complex = Modulus(self.contiguous_check, self.complex_check)
+        self.modulus = Modulus(self.contiguous_check, self.complex_check)
         self.subsamplefourier = SubsampleFourier(self.contiguous_check, self.complex_check)
 
     def modulus(self, x):
@@ -192,7 +192,7 @@ class TorchSKcudaBackend1D(TorchBackend1D, TorchSKcudaBackend):
                 A tensor with the same dimensions as x, such that norm[..., 0] contains
                 the complex modulus of x, while norm[..., 1] = 0.
         """
-        return self.modulus_complex(x)
+        return self.modulus(x)
 
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain
