@@ -1,9 +1,9 @@
 
    
 class NumpyBackend:
-    def __init__(self, np):
+    def __init__(self, np, name='numpy'):
         self.np = np
-        self.name = 'numpy'
+        self.name = name
 
     def input_checks(self, x):
         if x is None:
