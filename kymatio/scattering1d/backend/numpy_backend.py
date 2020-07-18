@@ -29,7 +29,7 @@ class NumpyBackend1D(NumpyBackend):
     
         y = x.reshape(-1, k, x.shape[-1] // k)
     
-        res = y.mean(axis=(-2,))
+        res = y.mean(axis=-2)
 
         return res
     
