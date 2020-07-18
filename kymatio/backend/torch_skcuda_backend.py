@@ -12,7 +12,7 @@ class TorchSKcudaBackend:
     def _is_real(self, x):
         return x.shape[-1] == 1
 
-    def cdgmm(A, B, inplace=False):
+    def cdgmm(self, A, B):
         """Complex pointwise multiplication.
     
             Complex pointwise multiplication between (batched) tensor A and tensor
@@ -67,15 +67,12 @@ class TorchSKcudaBackend:
             raise TypeError('Input and filter must be on the same GPU.')
     
         if self._is_real(B):
-            if inplace:
-                return A.mul_(B)
-            else:
-                return A * B
+            return A * B
         else:
             if not A.is_contiguous() or not B.is_contiguous():
                 raise RuntimeError('Tensors must be contiguous.')
     
-            C = torch.empty_like(A) if not inplace else A
+            C = torch.empty_like(A)
             m, n = B.nelement() // 2, A.nelement() // B.nelement()
             lda = m
             ldc = m

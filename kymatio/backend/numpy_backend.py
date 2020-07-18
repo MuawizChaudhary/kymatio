@@ -42,7 +42,7 @@ class NumpyBackend:
         """
         return self.np.abs(x)
    
-    def cdgmm(self, A, B, inplace=False):
+    def cdgmm(self, A, B):
         """
             Complex pointwise multiplication between (batched) tensor A and tensor B.
     
@@ -72,7 +72,4 @@ class NumpyBackend:
         if not self._is_complex(B) and not self._is_real(B):
             raise TypeError('The second input must be complex or real.')
     
-        if inplace:
-            return self.np.multiply(A, B, out=A)
-        else:
-            return A * B
+        return A * B

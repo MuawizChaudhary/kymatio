@@ -161,7 +161,7 @@ class TorchBackend:
         if not x.is_contiguous():
             raise RuntimeError('Tensors must be contiguous.')
  
-    def cdgmm(self, A, B, inplace=False):
+    def cdgmm(self, A, B):
         """Complex pointwise multiplication.
     
             Complex pointwise multiplication between (batched) tensor A and tensor B.
@@ -217,12 +217,9 @@ class TorchBackend:
         if B.device.type == 'cpu':
             if A.device.type == 'cuda':
                 raise TypeError('Input must be on CPU.')
-    
+            
         if self._is_real(B):
-            if inplace:
-                return A.mul_(B)
-            else:
-                return A * B
+            return A * B
         else:
             C = A.new(A.shape)
     
@@ -235,7 +232,7 @@ class TorchBackend:
             C[..., 0].view(-1, B.nelement() // 2)[:] = A_r * B_r - A_i * B_i
             C[..., 1].view(-1, B.nelement() // 2)[:] = A_r * B_i + A_i * B_r
     
-            return C if not inplace else A.copy_(C)
+            return C
 
     def concat(self, arrays, dim):
         return torch.stack(arrays, dim=dim)

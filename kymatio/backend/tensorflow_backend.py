@@ -45,7 +45,7 @@ class TensorFlowBackend:
     def concat(self, arrays, dim):
         return tf.stack(arrays, axis=dim)
     
-    def cdgmm(self, A, B, inplace=False):
+    def cdgmm(self, A, B):
         """
             Complex pointwise multiplication between (batched) tensor A and tensor B.
             Parameters

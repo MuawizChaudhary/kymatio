@@ -167,7 +167,7 @@ class SubsampleFourier(object):
 
         return out
 
-class TorchSKcudaBackend1D(TorchBackend1D, TorchSKcudaBackend):
+class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
     def __init__(self):
         TorchBackend1D.__init__(self)
         TorchSKcudaBackend.__init__(self)
