@@ -128,7 +128,7 @@ class Modulus():
 
         return norm
 
-class TorchBackend():
+class TorchBackend:
     def __init__(self):
         self.name = 'torch'
         self.modulus = Modulus(self.complex_contiguous_check)

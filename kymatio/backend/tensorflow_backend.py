@@ -23,7 +23,7 @@ class Modulus():
 
         return norm
 
-class TensorFlowBackend():
+class TensorFlowBackend:
     def __init__(self):
         self.name = 'tensorflow'
         self.modulus = Modulus()

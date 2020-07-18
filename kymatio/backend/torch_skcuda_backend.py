@@ -2,7 +2,7 @@ import torch
 from skcuda import cublas
 
 
-class TorchSKcudaBackend():
+class TorchSKcudaBackend:
     def __init__(self):
         self.name = 'torch_skcuda'
 
