@@ -30,7 +30,7 @@ class TensorFlowBackend1D(TensorFlowBackend):
     
         y = tf.reshape(x, (-1, k, x.shape[-1] // k))
     
-        return tf.reduce_mean(y, axis=(-2,))
+        return tf.reduce_mean(y, axis=-2)
     
     def pad(self, x, pad_left, pad_right):
         """Pad real 1D tensors
