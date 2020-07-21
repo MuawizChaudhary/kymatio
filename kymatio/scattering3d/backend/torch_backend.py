@@ -214,6 +214,17 @@ class PhaseShift(torch.nn.Module):
             self.rho(x[..., 1]), self.rho(-x[..., 1])], 1)
 
 
+def mean(x):
+    return torch.mean(x, dim=-1, keepdim=True)
+
+def covariance(x, mean):
+    X = x - mean
+    cov = X @ X.t() / (X.shape[-1] - 1)
+    return cov
+
+
+
+
 backend = namedtuple('backend',
                      ['name',
                       'cdgmm3d',
@@ -237,3 +248,5 @@ backend.Pad = Pad
 backend.unpad = unpad
 backend.subsample_fourier = SubsampleFourier()
 backend.PhaseShift = PhaseShift
+backend.mean = mean
+backend.covariance = covariance

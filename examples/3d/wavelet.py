@@ -5,11 +5,31 @@ import torch
 orientations = np.array([(1,0,0), (0, 1,0), (0, 0, 1), (1,1,0), (0, 1,1), (1,
     0, 1), (1, 1, 1)])
 
-x = torch.zeros((1, 64, 64, 64)).cuda().double()
-x[:, 16:48, 16:48, 16:48] = 1
+x = torch.randn((1, 64, 64, 64)).cuda().double() #torch.zeros((1, 64, 64, 64)).cuda().double()
+#x[:, 16:48, 16:48, 16:48] = 1
+
+y = torch.autograd.Variable(x, requires_grad=True)
 
 S = WaveletTorch3D(3, (64, 64, 64), orientations, rho='relu', return_list=False,
         subsample=False).cuda().double()
-Sx = S(x)
-print(len(Sx))
-print(Sx.shape)
+
+Sx = S(y)
+Sx = Sx.view((-1,) + tuple(Sx.shape[-3:]))
+
+Sz = torch.flatten(Sx, -3, -1)
+Sz.retain_grad()
+
+backend = S.backend
+
+mean = backend.mean(Sz)
+mean.retain_grad()
+mean.backward(torch.ones_like(mean))
+grad = Sz.grad
+
+cov = backend.covariance(Sz, mean)
+i_cov = torch.inverse(cov)
+
+print(grad.shape, i_cov.shapem y.grad.shape)
+fisher_1 = torch.matmul(i_cov, grad)
+fisher_2 = torch.matmul(grad.t(), fisher_1)
+print(fisher_2.shape)
