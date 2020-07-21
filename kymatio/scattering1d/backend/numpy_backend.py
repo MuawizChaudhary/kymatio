@@ -79,9 +79,6 @@ class NumpyBackend1D(NumpyBackend):
             The tensor x[..., i0:i1].
         """
         return x[..., i0:i1]
-    
-    def concatenate(self, arrays):
-        return self.np.stack(arrays, axis=-2)
 
     def rfft(self, x):
         self.real_check(x)

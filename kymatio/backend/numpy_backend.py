@@ -23,6 +23,9 @@ class NumpyBackend:
     def _is_real(self, x):
         return (x.dtype == self.np.float32) or (x.dtype == self.np.float64)
  
+    def concatenate(self, arrays):
+        return self.np.stack(arrays, axis=1)
+
     def modulus(self, x):
         """
             This function implements a modulus transform for complex numbers.
