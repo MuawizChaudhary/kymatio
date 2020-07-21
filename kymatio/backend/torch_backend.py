@@ -206,5 +206,5 @@ class TorchBackend:
     
             return C
 
-    def concat(self, arrays, dim):
-        return torch.stack(arrays, dim=dim)
+    def concatenate(self, arrays):
+        return torch.stack(arrays, dim=2)

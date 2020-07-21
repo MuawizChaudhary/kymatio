@@ -113,7 +113,4 @@ class TorchBackend1D(TorchBackend):
     
         return torch.ifft(x, 1, normalized=False)
     
-    def concatenate(self, x):
-        return self.concat(x, -2)
-
 backend = TorchBackend1D()
