@@ -171,7 +171,7 @@ class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
     def __init__(self):
         TorchBackend1D.__init__(self)
         TorchSKcudaBackend.__init__(self)
-        self.modulus = Modulus(self.contiguous_check, self.complex_check)
+        self.modulus_complex = Modulus(self.contiguous_check, self.complex_check)
         self.subsamplefourier = SubsampleFourier(self.contiguous_check, self.complex_check)
 
     def modulus(self, x):
@@ -192,7 +192,7 @@ class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
                 A tensor with the same dimensions as x, such that norm[..., 0] contains
                 the complex modulus of x, while norm[..., 1] = 0.
         """
-        return self.modulus(x)
+        return self.modulus_complex(x)
 
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain

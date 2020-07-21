@@ -95,44 +95,11 @@ class ModulusStable(Function):
 
         return grad_input
 
-# shortcut for ModulusStable.apply
-modulus = ModulusStable.apply
-
-class Modulus():
-    """This class implements a modulus transform for complex numbers.
-
-        Usage
-        -----
-        modulus = Modulus()
-        x_mod = modulus(x)
-
-        Parameters
-        ---------
-        x : tensor
-            Complex torch tensor.
-
-        Returns
-        -------
-        output : tensor
-
-            A tensor with the same dimensions as x, such that output[..., 0]
-            contains the complex modulus of x, while output[..., 1] = 0.
-    """
-    def __init__(self, complex_contiguous_check):
-        self.complex_contiguous_check = complex_contiguous_check
-
-    def __call__(self, x):
-        self.complex_contiguous_check(x)
-
-        norm = modulus(x)[..., None]
-
-        return norm
 
 class TorchBackend:
     def __init__(self):
         self.name = 'torch'
-        self.modulus = Modulus(self.complex_contiguous_check)
-    
+ 
     def input_checks(self, x):
         if x is None:
             raise TypeError('The input should be not empty.')
@@ -160,6 +127,11 @@ class TorchBackend:
     def contiguous_check(self, x):
         if not x.is_contiguous():
             raise RuntimeError('Tensors must be contiguous.')
+
+    def modulus(self, x):
+        self.complex_contiguous_check(x)
+        norm = ModulusStable.apply(x)[..., None]
+        return norm
  
     def cdgmm(self, A, B):
         """Complex pointwise multiplication.
