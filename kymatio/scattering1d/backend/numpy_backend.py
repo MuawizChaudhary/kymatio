@@ -2,8 +2,8 @@ from ...backend.numpy_backend import NumpyBackend
 
 
 class NumpyBackend1D(NumpyBackend):
-    def __init__(self, np):
-        super(NumpyBackend1D, self).__init__(np)
+    def __init__(self):
+        super(NumpyBackend1D, self).__init__()
 
     def subsample_fourier(self, x, k):
         """Subsampling in the Fourier domain
@@ -88,35 +88,11 @@ class NumpyBackend1D(NumpyBackend):
     def irfft(self, x):
         self.complex_check(x)
 
-        return self.np.fft.ifft(x).real
-    
-    def ifft(self, x):
-        self.complex_check(x)
-
-        return self.np.fft.ifft(x)
-
-class FFTBackend1D(NumpyBackend1D):
-    def __init__(self, np, fft):
-        super(NumpyBackend1D, self).__init__(np)
-        self.np = np
-        self.fft = fft
-    
-    def rfft(self, x):
-        self.real_check(x)
-
-        return self.fft.fft(x)
-    
-    def irfft(self, x):
-        self.complex_check(x)
-
         return self.fft.ifft(x).real
-
+    
     def ifft(self, x):
         self.complex_check(x)
 
         return self.fft.ifft(x)
 
-import numpy
-import scipy.fftpack
-
-backend = FFTBackend1D(numpy, scipy.fftpack)
+backend = NumpyBackend1D()

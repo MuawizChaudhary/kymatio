@@ -1,8 +1,11 @@
 
    
 class NumpyBackend:
-    def __init__(self, np, name='numpy'):
-        self.np = np
+    def __init__(self, name='numpy'):
+        import numpy
+        import scipy.fftpack
+        self.np = numpy
+        self.fft = scipy.fftpack
         self.name = name
 
     def input_checks(self, x):
