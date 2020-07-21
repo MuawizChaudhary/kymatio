@@ -47,11 +47,9 @@ class Modulus(object):
         zero).
     """
 
-    def __init__(self, contiguous_check, complex_check, backend='skcuda'):
+    def __init__(self, backend='skcuda'):
         self.CUDA_NUM_THREADS = 1024
         self.backend = backend
-        self.contiguous_check = contiguous_check
-        self.complex_check = complex_check
 
     def get_blocks(self, N):
         return (N + self.CUDA_NUM_THREADS - 1) // self.CUDA_NUM_THREADS
@@ -62,9 +60,6 @@ class Modulus(object):
 
         out = torch.empty(x.shape[:-1] + (1,), device=x.device, layout=x.layout, dtype=x.dtype)
    
-        self.contiguous_check(x)
-        self.complex_check(x)
-
         # abs_complex_value takes in a complex array and returns the real
         # modulus of the input array
         kernel = """
@@ -114,11 +109,9 @@ class SubsampleFourier(object):
         The input tensor periodized along the next to last axis to yield a
         tensor of size x.shape[-2] // k along that dimension.
     """
-    def __init__(self, contiguous_check, complex_check, backend='skcuda'):
+    def __init__(self, backend='skcuda'):
         self.block = (1024, 1, 1)
         self.backend = backend
-        self.contiguous_check = contiguous_check
-        self.complex_check = complex_check
 
     def get_blocks(self, N, threads):
         return (N + threads - 1) // threads
@@ -127,8 +120,6 @@ class SubsampleFourier(object):
         if not x.is_cuda and self.backend == 'skcuda':
             raise TypeError('Use the torch backend (without skcuda) for CPU tensors.')
 
-        self.contiguous_check(x) 
-        self.complex_check(x)
 
         out = torch.empty(x.shape[:-2] + (x.shape[-2] // k, x.shape[-1]), dtype=x.dtype, layout=x.layout, device=x.device)
 
@@ -171,8 +162,8 @@ class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
     def __init__(self):
         TorchBackend1D.__init__(self)
         TorchSKcudaBackend.__init__(self)
-        self.modulus_complex = Modulus(self.contiguous_check, self.complex_check)
-        self.subsamplefourier = SubsampleFourier(self.contiguous_check, self.complex_check)
+        self.modulus_complex = Modulus()
+        self.subsamplefourier = SubsampleFourier()
 
     def modulus(self, x):
         """Compute the complex modulus
@@ -192,6 +183,8 @@ class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
                 A tensor with the same dimensions as x, such that norm[..., 0] contains
                 the complex modulus of x, while norm[..., 1] = 0.
         """
+        self.contiguous_check(x) 
+        self.complex_check(x)
         return self.modulus_complex(x)
 
     def subsample_fourier(self, x, k):
@@ -217,6 +210,8 @@ class TorchSKcudaBackend1D(TorchSKcudaBackend, TorchBackend1D):
             The input tensor periodized along the next to last axis to yield a
             tensor of size x.shape[-2] // k along that dimension.
         """
+        self.contiguous_check(x) 
+        self.complex_check(x)
         return self.subsamplefourier(x,k)
 
 backend = TorchSKcudaBackend1D()
