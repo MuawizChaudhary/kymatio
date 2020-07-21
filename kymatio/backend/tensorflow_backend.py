@@ -42,8 +42,8 @@ class TensorFlowBackend:
     def _is_real(self, x):
         return (x.dtype == np.float32) or (x.dtype == np.float64)
   
-    def concat(self, arrays, dim):
-        return tf.stack(arrays, axis=dim)
+    def concatenate(self, arrays):
+        return tf.stack(arrays, axis=1)
     
     def cdgmm(self, A, B):
         """

@@ -92,8 +92,4 @@ class TensorFlowBackend1D(TensorFlowBackend):
 
         return tf.signal.ifft(x, name='ifft1d')
 
-    def concatenate(self, x):
-        return self.concat(x, -2)
-
-
 backend = TensorFlowBackend1D()
