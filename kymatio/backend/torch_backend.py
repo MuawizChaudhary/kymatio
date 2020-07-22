@@ -113,13 +113,7 @@ class TorchBackend:
     def real_check(self, x):
         if not self._is_real(x):
             raise TypeError('The input should be real.')
-    
-    def _is_complex(self, x):
-        return x.shape[-1] == 2
-    
-    def _is_real(self, x):
-        return x.shape[-1] == 1
-    
+
     def complex_contiguous_check(self, x):
         self.complex_check(x)
         self.contiguous_check(x)
@@ -128,10 +122,19 @@ class TorchBackend:
         if not x.is_contiguous():
             raise RuntimeError('Tensors must be contiguous.')
 
+    def _is_complex(self, x):
+        return x.shape[-1] == 2
+    
+    def _is_real(self, x):
+        return x.shape[-1] == 1
+    
     def modulus(self, x):
         self.complex_contiguous_check(x)
         norm = ModulusStable.apply(x)[..., None]
         return norm
+
+    def concatenate(self, arrays):
+        return torch.stack(arrays, dim=2)
  
     def cdgmm(self, A, B):
         """Complex pointwise multiplication.
@@ -205,6 +208,3 @@ class TorchBackend:
             C[..., 1].view(-1, B.nelement() // 2)[:] = A_r * B_i + A_i * B_r
     
             return C
-
-    def concatenate(self, arrays):
-        return torch.stack(arrays, dim=2)
