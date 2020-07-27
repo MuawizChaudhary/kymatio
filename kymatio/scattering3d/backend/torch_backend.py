@@ -215,7 +215,7 @@ class PhaseShift(torch.nn.Module):
 
 
 def mean(x):
-    return torch.mean(x, dim=-1, keepdim=True)
+    return torch.mean(x, dim=(-1,-2,-3), keepdim=False)
 
 def covariance(x, mean):
     X = x - mean

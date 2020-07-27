@@ -14,22 +14,12 @@ S = WaveletTorch3D(3, (64, 64, 64), orientations, rho='relu', return_list=False,
         subsample=False).cuda().double()
 
 Sx = S(y)
-Sx = Sx.view((-1,) + tuple(Sx.shape[-3:]))
-
-Sz = torch.flatten(Sx, -3, -1)
-Sz.retain_grad()
-
 backend = S.backend
 
-mean = backend.mean(Sz)
-mean.retain_grad()
-mean.backward(torch.ones_like(mean))
-grad = Sz.grad
+mean = backend.mean(Sx).reshape(Sx.shape[0], -1)
 
-cov = backend.covariance(Sz, mean)
+cov = backend.covariance(mean, torch.mean(mean, dim=-1, keepdim=True))
 i_cov = torch.inverse(cov)
 
-print(grad.shape, i_cov.shapem y.grad.shape)
-fisher_1 = torch.matmul(i_cov, grad)
-fisher_2 = torch.matmul(grad.t(), fisher_1)
-print(fisher_2.shape)
+#fisher_1 = torch.matmul(i_cov, grad)
+#fisher_2 = torch.matmul(grad.t(), fisher_1)
