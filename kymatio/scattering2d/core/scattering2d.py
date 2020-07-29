@@ -16,10 +16,7 @@ def scattering2d(x, pad, unpad, pre_pad, backend, J, L, phi, psi, max_order,
     # Define lists for output.
     out_S_0, out_S_1, out_S_2 = [], [], []
     
-    if not pre_pad:
-        U_r = pad(x)
-    else:
-        U_r = to_complex(x)
+    U_r = pad(x)
 
     U_0_c = rfft(U_r)
 
