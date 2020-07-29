@@ -27,7 +27,7 @@ class Pad(object):
         self.pad_size = pad_size
 
     def __call__(self, x):
-        paddings = (0, 0),
+        paddings = ((0, 0),) * (x.ndim - 2)
         paddings += ((self.pad_size[0], self.pad_size[1]), (self.pad_size[2], self.pad_size[3]))
 
         output = np.pad(x, paddings, mode='reflect')
