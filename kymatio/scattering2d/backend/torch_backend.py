@@ -79,10 +79,6 @@ class Pad(object):
         return output
 
 
-def to_complex(x):
-    return x.reshape(x.shape + (1,))
-
-
 def unpad(in_):
     """Unpads input.
 
@@ -183,4 +179,3 @@ backend.ifft = ifft
 backend.Pad = Pad
 backend.unpad = unpad
 backend.concatenate = concatenate_2d
-backend.to_complex = to_complex

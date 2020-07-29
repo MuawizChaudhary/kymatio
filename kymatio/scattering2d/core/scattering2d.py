@@ -10,7 +10,6 @@ def scattering2d(x, pad, unpad, pre_pad, backend, J, L, phi, psi, max_order,
     irfft = backend.irfft    
     cdgmm = backend.cdgmm
     concatenate = backend.concatenate
-    to_complex = backend.to_complex
 
 
     # Define lists for output.
