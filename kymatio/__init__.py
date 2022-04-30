@@ -9,14 +9,9 @@ warnings.filterwarnings('always', category=PendingDeprecationWarning,
                         module=r'^{0}.*'.format(re.escape(__name__)))
 ### End Snippet
 
+
 __all__ = [
-            'Scattering1D',
-            'Scattering2D',
-            'HarmonicScattering3D'
+        # ScatteringGraph
             ]
-
-from .scattering1d import ScatteringEntry1D as Scattering1D
-from .scattering2d import ScatteringEntry2D as Scattering2D
-from .scattering3d import HarmonicScatteringEntry3D as HarmonicScattering3D
-
+# import ScatteringEntryGraph as ScatteringGraph
 from .version import version as __version__

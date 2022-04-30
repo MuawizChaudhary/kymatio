@@ -9,7 +9,7 @@ import sys
 from setuptools import setup, find_packages
 
 # Constants
-DISTNAME = 'kymatio'
+DISTNAME = 'geometric kymatio'
 DESCRIPTION = 'Wavelet scattering transforms in Python with GPU acceleration'
 URL = 'https://www.kymat.io'
 LICENSE = 'BSD-3-Clause'
