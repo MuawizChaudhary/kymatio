@@ -15,38 +15,35 @@ def graph_wavelet(P):
     psi = []
     for d1 in [1,2,4,8,16]:
         W_d1 = LA.matrix_power(P,d1) - LA.matrix_power(P,2*d1)
-        psi.append(W_d1)
+        psi.append(W_d1.astype(np.float32))
     return psi
 
 def normalized_zero_order_feature(ro):
     F0 = []
     mu = np.mean(ro,0)
     F0.append(mu)
-    print(F0[-1])
     var = np.var(ro,0)
     F0.append(var)
-    print(F0[-1])
     skew = scipy.stats.skew(ro,bias=0,axis=0)
     F0.append(skew)
-    print(F0[-1])
     kurtosis = scipy.stats.kurtosis(ro,axis=0)
     F0.append(kurtosis)
-    print(F0[-1])
     F0 = np.array(F0).reshape(-1,1)
-
     return F0
 
 def normalized_first_order_feature(u):
     F1  = []
-    mu = np.mean(u,1)
-    F1.append(mu)
-    var = np.var(u,1)
-    F1.append(var)
-    skew = scipy.stats.skew(u,bias=0,axis=1)
-    F1.append(skew)
-    kurtosis = scipy.stats.kurtosis(u,axis=1)
-    F1.append(kurtosis)
-    F1 = np.array(F1).reshape(-1,1)
+    W_u = u
+    for u in W_u:
+        mu = np.mean(u,0)
+        F1.append(mu)
+        var = np.var(u,0)
+        F1.append(var)
+        skew = scipy.stats.skew(u,bias=False,axis=0)
+        F1.append(skew)
+        kurtosis = scipy.stats.kurtosis(u,axis=0)
+        F1.append(kurtosis)
+    F1 = np.array(F1).reshape(-1, 1)
     return F1
 
 def normalized_selected_second_order_feature(W,u):
@@ -55,14 +52,16 @@ def normalized_selected_second_order_feature(W,u):
         u1 = np.concatenate((u1,np.einsum('ij,ajt ->ait',W[i],u[0:i])),0)
     u1 = np.abs(u1)
     F2 = []
-    mu = np.mean(u1,1)
-    F2.append(mu)
-    var = np.var(u1,1)
-    F2.append(var)
-    skew = scipy.stats.skew(u1,bias=0,axis=1)
-    F2.append(skew)
-    kurtosis = scipy.stats.kurtosis(u1,axis=1)
-    F2.append(kurtosis)
+    W_u = u1
+    for u1 in W_u:
+        mu = np.mean(u1,0)
+        F2.append(mu)
+        var = np.var(u1,0)
+        F2.append(var)
+        skew = scipy.stats.skew(u1,bias=True,axis=0)
+        F2.append(skew)
+        kurtosis = scipy.stats.kurtosis(u1,axis=0)
+        F2.append(kurtosis)
     F2 = np.array(F2).reshape(-1,1)
     return F2
 

@@ -4,10 +4,9 @@ import torch
 from kymatio.scatteringgraph.utils import compute_degree_vector
 from kymatio import ScatteringGraph
 from . import  utils
-devices = ['cpu']
+devices = ['cpu'] 
 if torch.cuda.is_available():
     devices.append('cuda')
-
 
 backends = []
 backends_devices = []
@@ -36,7 +35,7 @@ def gen_W(P):
     I = np.eye(P.shape[0])
     for j in [1, 2, 4, 8, 16]:
         P_j_2 = np.linalg.matrix_power(P, j )
-        psi.append(np.dot(P_j_2, (I - P_j_2)))
+        psi.append(np.matmul(P_j_2, (I - P_j_2)))
     return psi
 
 
@@ -185,6 +184,117 @@ class TestOrderMoments:
         assert np.allclose(S_x0, Sx_0)
  
 
+
+class TestNormalizedOrderMoments:
+    @pytest.mark.parametrize('backends_devices', backends_devices)
+    def test_normalized_zero_order_moments(self, backends_devices):
+        backend, device = backends_devices
+        
+        # two clique adjacency matrix
+        A = np.array([[0, 1], [1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=0,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+    
+
+        A = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=0,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+ 
+    @pytest.mark.parametrize('backends_devices', backends_devices)
+    def test_normalized_first_order_moments(self, backends_devices):
+        backend, device = backends_devices
+        
+        # two clique adjacency matrix
+        A = np.array([[0, 1], [1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=1,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        u = np.abs(np.matmul(W, degree_vector_A))
+        u[np.abs(u) < 1e-12] = 0.0
+        Sx_1 = utils.normalized_first_order_feature(u)
+        Sx_0 = np.concatenate((Sx_0,Sx_1),axis=0)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+    
+
+        A = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=1,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        u = np.abs(np.matmul(W, degree_vector_A))
+        u[np.abs(u) < 1e-12] = 0.0
+        Sx_1 = utils.normalized_first_order_feature(u)
+        Sx_0 = np.concatenate((Sx_0,Sx_1),axis=0)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+ 
+ 
+    @pytest.mark.parametrize('backends_devices', backends_devices)
+    def test_normalized_second_order_moments(self, backends_devices):
+        backend, device = backends_devices
+        
+        # two clique adjacency matrix
+        A = np.array([[0, 1], [1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=2,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        u = np.abs(np.matmul(W, degree_vector_A))
+        u[np.abs(u) < 1e-12] = 0.0
+        Sx_1 = utils.normalized_first_order_feature(u)
+        Sx_2 = utils.normalized_selected_second_order_feature(W, u)
+        Sx_0 = np.concatenate((Sx_0,Sx_1, Sx_2),axis=0)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+    
+
+        A = np.array([[0, 1, 1], [1, 0, 1], [1, 1, 0]])
+        degree_vector_A = compute_degree_vector(A)
+        S = ScatteringGraph(J=5, Q=4, A=A, normalize=True, max_order=2,
+                backend=backend).to(device)
+        x = compute_degree_vector(A)
+        x = torch.from_numpy(x).to(device).double()
+        S_x0 = S(x).cpu().detach().squeeze(-1).numpy()
+        W = utils.graph_wavelet(utils.lazy_random_walk(A))
+        Sx_0 = utils.normalized_zero_order_feature(degree_vector_A)
+        u = np.abs(np.matmul(W, degree_vector_A))
+        u[np.abs(u) < 1e-12] = 0.0
+        Sx_1 = utils.normalized_first_order_feature(u)
+        Sx_2 = utils.normalized_selected_second_order_feature(W, u)
+        Sx_0 = np.concatenate((Sx_0,Sx_1, Sx_2),axis=0)
+        assert S_x0.shape == Sx_0.shape
+        assert np.allclose(S_x0, Sx_0)
+ 
 
 class TestMoment:
     @pytest.mark.parametrize('backends_devices', backends_devices)

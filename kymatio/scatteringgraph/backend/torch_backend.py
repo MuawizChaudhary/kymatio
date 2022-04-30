@@ -10,15 +10,18 @@ def matmul(A, B):
 def normalized_moment(x, q, mean=0, std=1):
     "Calculate normalized moment"
     if isinstance(mean, int):
-        mean = torch.zeros(1, x.shape[1]).to(x.device)
-
-    if isinstance(std, int):
-        std = torch.ones(1, x.shape[1]).to(x.device)
-
+        mean = torch.mean(x, 0).reshape(-1, 1)
+        return mean
     diff = x - mean
+    if isinstance(std, int):
+        std = torch.std(diff, 0, False).reshape(-1, 1)
+        return std
     z_score = torch.div(diff, std)
+    z_score[z_score != z_score]  = 0
     z_score_q  = torch.pow(z_score, q)
     q_th_moment = torch.mean(z_score_q, dim=0)
+    if q == 4:
+        q_th_moment = q_th_moment - 3
     return q_th_moment.reshape(-1, 1)
 
 def sqrt(x):
