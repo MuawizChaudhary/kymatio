@@ -1,6 +1,6 @@
-#from .scattering1d.frontend.torch_frontend import ScatteringTorch1D as Scattering1D
+from .scatteringgraph.frontend.torch_frontend import ScatteringTorchGraph as ScatteringGraph
 
-#Scattering1D.__module__ = 'kymatio.torch'
-#Scattering1D.__name__ = 'Scattering1D'
+ScatteringGraph.__module__ = 'kymatio.torch'
+ScatteringGraph.__name__ = 'ScatteringGraph'
 
-__all__ = []
+__all__ = ['ScatteringGraph']
