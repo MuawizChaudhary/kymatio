@@ -3,7 +3,6 @@ import numpy as np
 import torch
 from kymatio.scatteringgraph.utils import compute_degree_vector
 from kymatio import ScatteringGraph
-#from kymatio.scatteringgraph import ScatteringGraph
 
 devices = ['cpu']
 if torch.cuda.is_available():
@@ -135,8 +134,7 @@ class TestScatteringGraph:
         # two clique adjacency matrix
         A = np.array([[0, 1], [1, 0]])
 
-        S = ScatteringGraph(J=2, Q=2, A=A, normalize=False, max_order=2,
-                backend=backend)
+        S = ScatteringGraph(J=2, Q=2, A=A, normalize=False, max_order=2)
         S = S.to(device)
 
         x = compute_degree_vector(A)
