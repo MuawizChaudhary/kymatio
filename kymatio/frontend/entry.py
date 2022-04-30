@@ -7,18 +7,12 @@ class ScatteringEntry(object):
     def __init__(self, *args, **kwargs):
         self.name = kwargs['name']
         self.class_name = kwargs['class_name']
-        kwargs.pop('name')
+        kwargs.pop('name') 
         kwargs.pop('class_name')
 
-        frontend_suffixes = {'torch' : 'Torch',
-                             'numpy' : 'NumPy',
-                             'tensorflow' : 'TensorFlow',
-                             'keras': 'Keras',
-                             'sklearn': 'Transformer'}
+        frontend_suffixes = {'torch' : 'Torch'}
 
         if 'frontend' not in kwargs:
-            warnings.warn("Torch frontend is currently the default, but NumPy will become the default in the next"
-                          " version.", DeprecationWarning)
             frontend = 'torch'
         else:
             frontend = kwargs['frontend'].lower()
@@ -41,9 +35,9 @@ class ScatteringEntry(object):
 
             class_name = self.__class__.__name__
 
-            base_name = class_name[:-len('Entry*D')]
-            dim_suffix = class_name[-len('*D'):]
-
+            #TODO look this over. How to generalize?
+            base_name = class_name[:-len('EntryGraph')]
+            dim_suffix = class_name[-len('Graph'):]
             class_name = base_name + frontend + dim_suffix
 
             self.__class__ = getattr(module, class_name)

@@ -11,7 +11,8 @@ warnings.filterwarnings('always', category=PendingDeprecationWarning,
 
 
 __all__ = [
-        # ScatteringGraph
+            'ScatteringGraph'
             ]
-# import ScatteringEntryGraph as ScatteringGraph
+
+from .scatteringgraph import ScatteringEntryGraph as ScatteringGraph
 from .version import version as __version__
