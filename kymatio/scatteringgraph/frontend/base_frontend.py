@@ -33,8 +33,8 @@ class ScatteringBaseGraph(ScatteringBase):
         P = (1/2) * (I + AD_i)
 
         self.psi = []
-        for j in range(1, self.J + 1):
-            P_j_2 = np.power(P, j - 1)
+        for j in range(1, self.J+1):
+            P_j_2 = np.linalg.matrix_power(P, j )
             self.psi.append(np.dot(P_j_2, (I - P_j_2)))
 
 __all__ = ['ScatteringBaseGraph']

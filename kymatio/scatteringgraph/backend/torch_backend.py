@@ -19,7 +19,6 @@ def normalized_moment(x, q, mean=0, std=1):
     z_score = torch.div(diff, std)
     z_score_q  = torch.pow(z_score, q)
     q_th_moment = torch.mean(z_score_q, dim=0)
-
     return q_th_moment.reshape(-1, 1)
 
 def sqrt(x):
