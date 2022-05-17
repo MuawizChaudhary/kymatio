@@ -384,7 +384,7 @@ class ScatteringBase1D(ScatteringBase):
             n=cls._doc_array_n)
 
 
-class TimeFrequencyScatteringBase(ScatteringBase1D):
+class TimeFrequencyScatteringBase():
     def get_J_fr(self):
         return int(math.log2(self.Q * self.J))
 
