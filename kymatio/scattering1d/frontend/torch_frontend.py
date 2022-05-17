@@ -143,4 +143,80 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 ScatteringTorch1D._document()
 
 
+
+
+class TimeFrequencyScatteringTorch(TimeFrequencyScatteringBase, ScatteringTorch1D):
+    def __init__(self, J, shape, Q, average=True, oversampling=0,
+            out_type="array", backend="torch"):
+        vectorize = True # for compatibility, will be removed in 0.3
+
+        # Second-order scattering object for the time variable
+        max_order_tm = 2
+        ScatteringTorch1D.__init__(
+            self, J, shape, Q, max_order_tm, average,
+            oversampling, vectorize, out_type, backend)
+
+        # First-order scattering object for the frequency variable
+        max_order_fr = 1
+        shape_fr = (Q * J)
+        J_fr = self.get_J_fr()
+        Q_fr = 1
+        self.sc_freq = ScatteringTorch1D(
+            J_fr, shape_fr, Q, max_order_fr, average,
+            oversampling, vectorize, out_type, backend)
+
+
+    def scattering(self, x):
+        if len(x.shape) < 1:
+            raise ValueError(
+                'Input tensor x should have at least one axis, got {}'.format(
+                    len(x.shape)))
+
+        if not self.average and self.out_type == 'array':
+            raise ValueError("Options average=False and out_type='array'"
+                             "are mutually incompatible. "
+                             "Please set out_type='list'.")
+
+        if not self.out_type in ('array', 'list'):
+            raise RuntimeError("The out_type must be one of 'array' or 'list'.")
+
+        batch_shape = x.shape[:-1]
+        signal_shape = x.shape[-1:]
+        x = x.reshape((-1, 1) + signal_shape)
+
+        # Load filters
+        self.load_filters()
+        self.sc_freq.load_filters()
+
+        # Precompute output size
+        size_scattering = 1 + self.J * (2*self.get_J_fr() + 1)
+
+        S = timefrequency_scattering(
+            x,
+            self.backend.pad, self.backend.unpad,
+            self.backend,
+            self.J,
+            self.psi1_f, self.psi2_f, self.phi_f,
+            self.sc_freq,
+            average=self.average,
+            pad_left=self.pad_left, pad_right=self.pad_right,
+            ind_start=self.ind_start, ind_end=self.ind_end,
+            oversampling=self.oversampling,
+            size_scattering=size_scattering,
+            out_type=self.out_type)
+
+        # TODO switch-case out_type array vs list
+        return S
+
+TimeFrequencyScatteringTorch._document()
+
+
+
+
+
+
+
+
+
+
 __all__ = ['ScatteringTorch1D']

@@ -384,4 +384,12 @@ class ScatteringBase1D(ScatteringBase):
             n=cls._doc_array_n)
 
 
+class TimeFrequencyScatteringBase(ScatteringBase1D):
+    def get_J_fr(self):
+        return int(math.log2(self.Q * self.J))
+
+    def get_shape_fr(self):
+        return 2**math.ceil(1 + np.log2(self.Q * self.J))
+
+
 __all__ = ['ScatteringBase1D']
