@@ -4,15 +4,15 @@ import warnings
 from ...frontend.torch_frontend import ScatteringTorch
 from ..core.scattering1d import scattering1d
 from ..utils import precompute_size_scattering
-from .base_frontend import ScatteringBase1D
+from .base_frontend import ScatteringBase1D, TimeFrequencyScatteringBase
 
 
 class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
     def __init__(self, J, shape, Q=1, T=None, max_order=2, average=True,
-            oversampling=0, vectorize=True, out_type='array', backend='torch'):
+            oversampling=0, vectorize=True, out_type='array', backend='torch', spinnable=False):
         ScatteringTorch.__init__(self)
         ScatteringBase1D.__init__(self, J, shape, Q, T, max_order, average,
-                oversampling, vectorize, out_type, backend)
+                oversampling, vectorize, out_type, backend, spinnable)
         ScatteringBase1D._instantiate_backend(self, 'kymatio.scattering1d.backend.')
         ScatteringBase1D.build(self)
         ScatteringBase1D.create_filters(self)
@@ -143,17 +143,21 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 ScatteringTorch1D._document()
 
 
+def timefrequency_scattering(x, pad, unpad, backend, J, psi1, psi2, phi, psi_fr, average, pad_left=0,
+        pad_right=0, ind_start=None, ind_end=None, oversampling=0,
+        size_scattering=(0, 0, 0), out_type='array'):
+    pass
 
 
-class TimeFrequencyScatteringTorch(TimeFrequencyScatteringBase, ScatteringTorch1D):
-    def __init__(self, J, shape, Q, average=True, oversampling=0,
-            out_type="array", backend="torch"):
+class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBase):
+    def __init__(self, J, shape, Q=1, T=None, average=True,
+            oversampling=0, vectorize=True, out_type='array', backend='torch'):
         vectorize = True # for compatibility, will be removed in 0.3
 
         # Second-order scattering object for the time variable
         max_order_tm = 2
         ScatteringTorch1D.__init__(
-            self, J, shape, Q, max_order_tm, average,
+            self, J, shape, Q, T, max_order_tm, average,
             oversampling, vectorize, out_type, backend)
 
         # First-order scattering object for the frequency variable
@@ -161,10 +165,10 @@ class TimeFrequencyScatteringTorch(TimeFrequencyScatteringBase, ScatteringTorch1
         shape_fr = (Q * J)
         J_fr = self.get_J_fr()
         Q_fr = 1
-        self.sc_freq = ScatteringTorch1D(
-            J_fr, shape_fr, Q, max_order_fr, average,
-            oversampling, vectorize, out_type, backend)
 
+        self.sc_freq = ScatteringTorch1D(
+            J_fr, shape_fr, Q_fr, max_order_fr, average,
+            oversampling, vectorize, out_type, backend, spinnable=True)
 
     def scattering(self, x):
         if len(x.shape) < 1:
@@ -209,7 +213,6 @@ class TimeFrequencyScatteringTorch(TimeFrequencyScatteringBase, ScatteringTorch1
         return S
 
 TimeFrequencyScatteringTorch._document()
-
 
 
 
