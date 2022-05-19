@@ -13,7 +13,7 @@ class ScatteringBase1D(ScatteringBase):
     def __init__(self, J, shape, 
                  Q=1, T=None, max_order=2, average=True, oversampling=0, 
                  vectorize=True, out_type='array', backend=None, 
-                 complex_input=False, F=None):
+                 complex_input=False):
         super(ScatteringBase1D, self).__init__()
         self.J = J
         self.shape = shape
@@ -26,7 +26,6 @@ class ScatteringBase1D(ScatteringBase):
         self.out_type = out_type
         self.backend = backend
         self.complex_input = complex_input
-        self.F = F
 
     def build(self):
         """Set up padding and filters

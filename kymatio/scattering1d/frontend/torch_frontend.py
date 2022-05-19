@@ -10,10 +10,10 @@ from .base_frontend import ScatteringBase1D, TimeFrequencyScatteringBase
 class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
     def __init__(self, J, shape, Q=1, T=None, max_order=2, average=True,
             oversampling=0, vectorize=True, out_type='array', backend='torch', 
-            complex_input=False, F=None):
+            complex_input=False):
         ScatteringTorch.__init__(self)
         ScatteringBase1D.__init__(self, J, shape, Q, T, max_order, average,
-                oversampling, vectorize, out_type, backend, complex_input, F)
+                oversampling, vectorize, out_type, backend, complex_input)
         ScatteringBase1D._instantiate_backend(self, 'kymatio.scattering1d.backend.')
         ScatteringBase1D.build(self)
         ScatteringBase1D.create_filters(self)
@@ -169,9 +169,9 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
         Q_fr = 1
 
         self.sc_freq = ScatteringTorch1D(
-            J_fr, shape_fr, Q=Q_fr, max_order=max_order_fr, average=average,
+            J_fr, shape_fr, Q=Q_fr, T=F, max_order=max_order_fr, average=average,
             oversampling=oversampling, vectorize=vectorize, out_type=out_type, 
-            backend=backend, complex_input=True, F=F)
+            backend=backend, complex_input=True)
 
     def scattering(self, x):
         if len(x.shape) < 1:
