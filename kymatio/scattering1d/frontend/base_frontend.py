@@ -1,6 +1,7 @@
 from ...frontend.base_frontend import ScatteringBase
 import math
 import numbers
+import warnings
 
 import numpy as np
 
@@ -26,6 +27,12 @@ class ScatteringBase1D(ScatteringBase):
         self.out_type = out_type
         self.backend = backend
         self.complex_input = complex_input
+
+        warnings.warn("The average argument is deprecated and will be "
+                        "removed in version 0.3." 
+                        "T=None will do averaging over a default temporal"
+                        "support of 2^J. T=0 corresponds to average=False",
+                        DeprecationWarning)
 
     def build(self):
         """Set up padding and filters
