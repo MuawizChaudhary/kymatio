@@ -145,34 +145,35 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 ScatteringTorch1D._document()
 
 
-def timefrequency_scattering(x, pad, unpad, backend, J, psi1, psi2, phi, psi_fr, average, pad_left=0,
+def timefrequency_scattering(x, pad, unpad, backend, J, psi1, psi2, phi, psi_fr, 
+                             pad_left=0,
         pad_right=0, ind_start=None, ind_end=None, oversampling=0,
         size_scattering=(0, 0, 0), out_type='array'):
     pass
 
 
 class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBase):
-    def __init__(self, J, shape, Q=1, T=None, F=None, average=True,
-            oversampling=0, vectorize=True, out_type='array', backend='torch'):
+    def __init__(self, J, shape, 
+                 Q=1, T=None, F=None, oversampling=0, J_fr=None, Q_fr=1,
+                 out_type='array', backend='torch'):
         vectorize = True # for compatibility, will be removed in 0.3
 
         # Second-order scattering object for the time variable
         max_order_tm = 2
-        ScatteringTorch1D.__init__(
-            self, J, shape, Q=Q, T=T, max_order=max_order_tm, average=average,
-            oversampling=oversampling, vectorize=vectorize, out_type=out_type, 
-            backend=backend)
+        ScatteringTorch1D.__init__(self, J, shape, 
+                                   Q=Q, T=T, max_order=max_order_tm,
+                                   oversampling=oversampling, out_type=out_type, 
+                                   backend=backend)
 
         # First-order scattering object for the frequency variable
-        max_order_fr = 1
         shape_fr = (Q * J)
-        J_fr = self.get_J_fr()
-        Q_fr = 1
+        self.J_fr = self.get_J_fr if not J_fr else J_fr
+        self.Q_fr = Q_fr
 
         self.sc_freq = ScatteringTorch1D(
-            J_fr, shape_fr, Q=Q_fr, T=F, max_order=max_order_fr, average=average,
-            oversampling=oversampling, vectorize=vectorize, out_type=out_type, 
-            backend=backend, complex_input=True)
+            self.J_fr, shape_fr, 
+            Q=self.Q_fr, T=F, max_order=1, oversampling=oversampling, 
+            out_type=out_type, backend=backend, complex_input=True)
 
     def scattering(self, x):
         if len(x.shape) < 1:
