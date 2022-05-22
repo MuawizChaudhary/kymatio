@@ -145,9 +145,9 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 ScatteringTorch1D._document()
 
 
-def timefrequency_scattering(x, pad, unpad, backend, J, psi1, psi2, phi, psi_fr, 
-                             pad_left=0,pad_right=0, ind_start=None, ind_end=None, 
-                             oversampling=0, size_scattering=(0, 0, 0), 
+def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi, 
+                             psi_fr, pad_left=0,pad_right=0, ind_start=None, 
+                             ind_end=None, oversampling=0, size_scattering=(0, 0, 0), 
                              out_type='array'):
     pass
 
@@ -166,7 +166,7 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
                                    backend=backend)
 
         # First-order scattering object for the frequency variable
-        shape_fr = (Q * J)
+        self.shape_fr = (Q * J) # compute actual input shape
         self.J_fr = self.get_J_fr() if not J_fr else J_fr
         self.Q_fr = Q_fr
 
@@ -201,7 +201,7 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
         size_scattering = 1 + self.J * (2*self.get_J_fr() + 1)
 
         S = timefrequency_scattering(x, self.backend.pad, self.backend.unpad,
-                                     self.backend, self.J, self.psi1_f, 
+                                     self.backend, self.J, self.J_fr, self.psi1_f, 
                                      self.psi2_f, self.phi_f, self.sc_freq, 
                                      pad_left=self.pad_left, pad_right=self.pad_right,
                                      ind_start=self.ind_start, ind_end=self.ind_end,
@@ -209,7 +209,6 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
                                      size_scattering=size_scattering,
                                      out_type=self.out_type)
 
-        # TODO switch-case out_type array vs list
         return S
 
 TimeFrequencyScatteringTorch._document()
