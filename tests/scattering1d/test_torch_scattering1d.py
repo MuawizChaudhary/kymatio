@@ -1,6 +1,7 @@
 import pytest
 import torch
 from kymatio import Scattering1D
+from kymatio.scattering1d.frontend.torch_frontend import TimeFrequencyScatteringTorch
 import math
 import os
 import io
@@ -28,6 +29,23 @@ if torch.cuda.is_available():
     devices = ['cuda', 'cpu']
 else:
     devices = ['cpu']
+
+
+
+@pytest.mark.parametrize("device", devices)
+@pytest.mark.parametrize("backend", backends)
+def test_instantiation(device, backend, random_state=42):
+    rng = np.random.RandomState(random_state)
+    J = 6
+    Q = 8
+    N = 2**9
+    jtfs = TimeFrequencyScatteringTorch(J, N, Q, backend=backend).to(device)
+
+    # zero signal
+    x0 = torch.zeros(2, N).to(device)
+    S_x = jtfs(x0)
+
+
 
 @pytest.mark.parametrize("device", devices)
 @pytest.mark.parametrize("backend", backends)
@@ -427,5 +445,5 @@ def test_T(device, backend):
 
     Sg0 = scattering0(x)
     Sg1 = scattering1(x)
-    assert np.allclose(Sg0, Sx0)
+    assert np.allclose(Sg0.cpu(), Sx0.cpu())
     assert Sg1.shape == (Sg0.shape[0], Sg0.shape[1], Sg0.shape[2]*2**(sigma_low_scale_factor))

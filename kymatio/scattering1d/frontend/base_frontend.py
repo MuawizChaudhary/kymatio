@@ -1,6 +1,7 @@
 from ...frontend.base_frontend import ScatteringBase
 import math
 import numbers
+import warnings
 
 import numpy as np
 
@@ -10,8 +11,10 @@ compute_meta_scattering, precompute_size_scattering)
 
 
 class ScatteringBase1D(ScatteringBase):
-    def __init__(self, J, shape, Q=1, T=None, max_order=2, average=True,
-            oversampling=0, vectorize=True, out_type='array', backend=None):
+    def __init__(self, J, shape, 
+                 Q=1, T=None, max_order=2, average=True, oversampling=0, 
+                 vectorize=True, out_type='array', backend=None, 
+                 complex_input=False):
         super(ScatteringBase1D, self).__init__()
         self.J = J
         self.shape = shape
@@ -23,6 +26,13 @@ class ScatteringBase1D(ScatteringBase):
         self.vectorize = vectorize
         self.out_type = out_type
         self.backend = backend
+        self.complex_input = complex_input
+
+        warnings.warn("The average argument is deprecated and will be "
+                        "removed in version 0.3." 
+                        "T=None will do averaging over a default temporal"
+                        "support of 2^J. T=0 corresponds to average=False",
+                        DeprecationWarning)
 
     def build(self):
         """Set up padding and filters
@@ -84,7 +94,7 @@ class ScatteringBase1D(ScatteringBase):
             self.J_pad, self.J, self.Q, self.T, normalize=self.normalize,
             criterion_amplitude=self.criterion_amplitude,
             r_psi=self.r_psi, sigma0=self.sigma0, alpha=self.alpha,
-            P_max=self.P_max, eps=self.eps)
+            P_max=self.P_max, eps=self.eps, spinned=self.complex_input)
 
     def meta(self):
         """Get meta information on the transform
@@ -384,7 +394,7 @@ class ScatteringBase1D(ScatteringBase):
             n=cls._doc_array_n)
 
 
-class TimeFrequencyScatteringBase(ScatteringBase1D):
+class TimeFrequencyScatteringBase():
     def get_J_fr(self):
         return int(math.log2(self.Q * self.J))
 
