@@ -3,6 +3,7 @@ import warnings
 
 from ...frontend.torch_frontend import ScatteringTorch
 from ..core.scattering1d import scattering1d
+from ..core.timefrequency_scattering import timefrequency_scattering
 from ..utils import precompute_size_scattering
 from .base_frontend import ScatteringBase1D, TimeFrequencyScatteringBase
 
@@ -144,12 +145,6 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 
 ScatteringTorch1D._document()
 
-
-def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi, 
-                             psi_fr, pad_left=0,pad_right=0, ind_start=None, 
-                             ind_end=None, oversampling=0, size_scattering=(0, 0, 0), 
-                             out_type='array'):
-    pass
 
 
 class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBase):
