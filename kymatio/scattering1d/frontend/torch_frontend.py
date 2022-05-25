@@ -166,7 +166,7 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
                                    backend=backend)
 
         # First-order scattering object for the frequency variable
-        self.shape_fr = (Q * J) # compute actual input shape
+        self.shape_fr = len(self.psi2_f) + len(self.psi1_f) # compute actual input shape
         self.J_fr = self.get_J_fr() if not J_fr else J_fr
         self.Q_fr = Q_fr
 
