@@ -197,12 +197,16 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
 
         S = timefrequency_scattering(x, self.backend.pad, self.backend.unpad,
                                      self.backend, self.J, self.J_fr, self.psi1_f, 
-                                     self.psi2_f, self.phi_f, self.sc_freq, 
+                                     self.psi2_f, self.phi_f,
+                                     self.sc_freq.psi1_f, self.sc_freq.phi_f, 
                                      pad_left=self.pad_left, pad_right=self.pad_right,
                                      ind_start=self.ind_start, ind_end=self.ind_end,
                                      oversampling=self.oversampling,
                                      size_scattering=size_scattering,
                                      out_type=self.out_type)
+        scattering_shape = S.shape[-3:]
+        new_shape = batch_shape + scattering_shape
+        S = S.reshape(new_shape)
 
         return S
 
