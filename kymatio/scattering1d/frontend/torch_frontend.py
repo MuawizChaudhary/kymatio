@@ -171,7 +171,7 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
         self.Q_fr = Q_fr
 
         self.sc_freq = ScatteringTorch1D(
-            self.J_fr, shape_fr, 
+            self.J_fr, self.shape_fr, 
             Q=self.Q_fr, T=F, max_order=1, oversampling=oversampling, 
             out_type=out_type, backend=backend, complex_input=True)
 
