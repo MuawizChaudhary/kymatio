@@ -445,5 +445,5 @@ def test_T(device, backend):
 
     Sg0 = scattering0(x)
     Sg1 = scattering1(x)
-    assert np.allclose(Sg0, Sx0)
+    assert np.allclose(Sg0.cpu(), Sx0.cpu())
     assert Sg1.shape == (Sg0.shape[0], Sg0.shape[1], Sg0.shape[2]*2**(sigma_low_scale_factor))
