@@ -3,6 +3,7 @@ import warnings
 
 from ...frontend.torch_frontend import ScatteringTorch
 from ..core.scattering1d import scattering1d
+from ..core.timefrequency_scattering import timefrequency_scattering
 from ..utils import precompute_size_scattering
 from .base_frontend import ScatteringBase1D, TimeFrequencyScatteringBase
 
@@ -145,12 +146,6 @@ class ScatteringTorch1D(ScatteringTorch, ScatteringBase1D):
 ScatteringTorch1D._document()
 
 
-def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi, 
-                             psi_fr, pad_left=0,pad_right=0, ind_start=None, 
-                             ind_end=None, oversampling=0, size_scattering=(0, 0, 0), 
-                             out_type='array'):
-    pass
-
 
 class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBase):
     def __init__(self, J, shape, 
@@ -202,12 +197,16 @@ class TimeFrequencyScatteringTorch(ScatteringTorch1D, TimeFrequencyScatteringBas
 
         S = timefrequency_scattering(x, self.backend.pad, self.backend.unpad,
                                      self.backend, self.J, self.J_fr, self.psi1_f, 
-                                     self.psi2_f, self.phi_f, self.sc_freq, 
+                                     self.psi2_f, self.phi_f,
+                                     self.sc_freq.psi1_f, self.sc_freq.phi_f, 
                                      pad_left=self.pad_left, pad_right=self.pad_right,
                                      ind_start=self.ind_start, ind_end=self.ind_end,
                                      oversampling=self.oversampling,
                                      size_scattering=size_scattering,
                                      out_type=self.out_type)
+        scattering_shape = S.shape[-3:]
+        new_shape = batch_shape + scattering_shape
+        S = S.reshape(new_shape)
 
         return S
 

@@ -128,9 +128,19 @@ class TorchBackend1D(TorchBackend):
         return _ifft(x)
 
     @classmethod
-    def transpose(cls, x):
-        cls.complex_check(x)
+    def to_real(cls, x):
+        return x.unsqueeze(-1)
 
-        return torch.transpose(x, dim0=-2, dim1=-3)
+    @classmethod
+    def real_out(cls, x):
+        return x.squeeze(-1)
+
+    @classmethod
+    def mean(cls, x):
+        return torch.mean(x, dim=-2, keepdim=True)
+
+    @classmethod
+    def transpose(cls, x):
+        return torch.transpose(x, dim0=-2, dim1=-3).contiguous()
 
 backend = TorchBackend1D
