@@ -136,6 +136,10 @@ class TorchBackend1D(TorchBackend):
         return x.squeeze(-1)
 
     @classmethod
+    def mean(cls, x):
+        return torch.mean(x, dim=-2, keepdim=True)
+
+    @classmethod
     def transpose(cls, x):
         return torch.transpose(x, dim0=-2, dim1=-3).contiguous()
 

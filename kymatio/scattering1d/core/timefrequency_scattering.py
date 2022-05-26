@@ -1,12 +1,13 @@
 import math 
 def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi, 
-                             psi_fr, phi_fr, pad_left=0,pad_right=0, ind_start=None, 
+                             psi_fr, phi_fr, T="global", pad_left=0,pad_right=0, ind_start=None, 
                              ind_end=None, oversampling=0, size_scattering=(0, 0, 0), 
                              out_type='array'):
 
     subsample_fourier = backend.subsample_fourier
     transpose = backend.transpose
     modulus = backend.modulus
+    mean = backend.mean
     rfft = backend.rfft
     ifft = backend.ifft
     irfft = backend.irfft
@@ -36,13 +37,16 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
 
         k1_J = max(J - k1 - oversampling, 0)
 
-        #TODO add if statement for T=None, int, 'global'
-        S_1_c = cdgmm(U_1_hat, phi[k1])
-        S_1_hat = subsample_fourier(S_1_c, 2**k1_J)
-        S_1_r = irfft(S_1_hat)
+        if T == "global":
+            S_1_T = mean(U_1_m)
+            S_1_T = real_out(S_1_T)
+        else:
+            S_1_c = cdgmm(U_1_hat, phi[k1])
+            S_1_hat = subsample_fourier(S_1_c, 2**k1_J)
+            S_1_r = irfft(S_1_hat)
 
-        S_1_T = unpad(S_1_r, ind_start[k1_J + k1], ind_end[k1_J + k1])
-        # good spot to print shapes
+            S_1_T = unpad(S_1_r, ind_start[k1_J + k1], ind_end[k1_J + k1])
+            # good spot to print shapes
         S_1_T_list.append(S_1_T)
 
     total_height = 2 ** math.ceil(1+math.log2(len(psi1)))
@@ -107,17 +111,21 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
             S_2_fr = irfft(S_2_fr_hat)
             S_2_fr = transpose(S_2_fr)
 
-            k2_J = max(J - j2 - oversampling, 0)
-            U_2_hat = rfft(S_2_fr)
-            S_2_c = cdgmm(U_2_hat, phi[j2])
-            S_2_hat = subsample_fourier(S_2_c, 2 ** k2_J)
-            S_2_r = irfft(S_2_hat)
-            S_2 = unpad(S_2_r, ind_start[k2_J+k2+k1], ind_end[k2_J+k2+k1])
+            if T == "global":
+                S_2 = mean(S_2_fr)
+                S_2 = real_out(S_2)
+            else:
+                k2_J = max(J - j2 - oversampling, 0)
+                U_2_hat = rfft(S_2_fr)
+                S_2_c = cdgmm(U_2_hat, phi[j2])
+                S_2_hat = subsample_fourier(S_2_c, 2 ** k2_J)
+                S_2_r = irfft(S_2_hat)
+                S_2 = unpad(S_2_r, ind_start[k2_J+k2+k1], ind_end[k2_J+k2+k1])
             # good spot to print shapes
             S_2_list.append(S_2)
 
     out_S = []
-    out_S.extend([S_1_FR])
+    #out_S.extend([S_1_FR])
     out_S.extend(S_2_list)
     out_S = concatenate(out_S)
     # good spot to print shapes
