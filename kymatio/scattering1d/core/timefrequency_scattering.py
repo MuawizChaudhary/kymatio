@@ -48,22 +48,40 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
             S_1_T = unpad(S_1_r, ind_start[k1_J + k1], ind_end[k1_J + k1])
             # good spot to print shapes
         S_1_T_list.append(S_1_T)
+        print(len(S_1_T_list), j1, k1)
 
+    #why pad to power of 2? ask vincent
+    #why pad in the first place?
     total_height = 2 ** math.ceil(1+math.log2(len(psi1)))
     padding_row = 0 * S_1_T
+    length = len(S_1_T_list)
     for n1 in range(total_height - len(S_1_T_list)):
         S_1_T_list.append(padding_row)
     S_1_TM = to_real(concatenate(S_1_T_list))
+    print()
+    print(S_1_T.shape, total_height, length, total_height-length, S_1_TM.shape)
 
+    # what does this mean intutitively? How do we use this k_fr_J thing
     k_fr_J = max(J_fr - oversampling, 0)
     S_1_TM_T = transpose(S_1_TM)
     S_1_TM_T_hat = rfft(S_1_TM_T)
     S_1_TM_T_c = cdgmm(S_1_TM_T_hat, phi_fr[0])
+    #S_1_T_TM * phi_fr[0]
+    #why subsample fourier
+    # what does subsampling by k_fr_J mean?
     S_1_TM_T_hat = subsample_fourier(S_1_TM_T_c, 2**k_fr_J)
+    print(phi_fr.keys(), k_fr_J, J_fr, oversampling, 2**k_fr_J,
+            S_1_TM_T_hat.shape)
     S_1_TM_T = irfft(S_1_TM_T_hat)
     S_1_FR = transpose(S_1_TM_T)
     S_1_FR = real_out(S_1_FR)
-    # good spot to print shapes
+    # good spot to print shapes 
+    #print(S_1_TM.shape, S_1_FR.shape)
+    #for i in range(len(phi_fr)):
+    #    print(phi_fr[i].shape)
+    #
+    #
+    #|U1 * phi_t * psi_f| *phi_t * phi_fr?  
 
     S_2_list = []
     for n2 in range(len(psi2)):
@@ -76,6 +94,7 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
             j1 = psi1[n1]['j']
             if j1 >= j2:
                 continue
+            #what do these mean? some indices to do 
             k1 = max(j1 - oversampling, 0)
             k2 = max(j2 - j1 - oversampling, 0)
 
@@ -96,6 +115,10 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
         U_2_hat_T = ifft(U_2_T)
         # good spot to print shapes
         
+        #|U1 * psi_2 * phi_fr| * phi_t * phi_fr
+
+
+        #|U1 * psi_2 * psi_fr| * phi_t * phi_fr 
         for n_fr in range(len(psi_fr)):
             j_fr = psi_fr[n_fr]['j']
             k_fr = max(j_fr - oversampling, 0)
@@ -103,10 +126,12 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
             U_fr_hat = subsample_fourier(U_fr_c, 2**k_fr)
 
             U_2_m = modulus(U_fr_hat)
+            # do phi_t here then phi_fr
             
             k_J_fr = max(J_fr  - k_fr - oversampling, 0)
             U_2_hat = rfft(U_2_m)
             S_2_fr_c = cdgmm(U_2_hat, phi_fr[k_fr])
+            #print(k_fr, phi_fr[k_fr].shape)
             S_2_fr_hat = subsample_fourier(S_2_fr_c, 2**k_J_fr)
             S_2_fr = irfft(S_2_fr_hat)
             S_2_fr = transpose(S_2_fr)
@@ -116,6 +141,7 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
                 S_2 = real_out(S_2)
             else:
                 k2_J = max(J - j2 - oversampling, 0)
+                #sus
                 U_2_hat = rfft(S_2_fr)
                 S_2_c = cdgmm(U_2_hat, phi[j2])
                 S_2_hat = subsample_fourier(S_2_c, 2 ** k2_J)
@@ -125,7 +151,7 @@ def timefrequency_scattering(x, pad, unpad, backend, J, J_fr, psi1, psi2, phi,
             S_2_list.append(S_2)
 
     out_S = []
-    #out_S.extend([S_1_FR])
+    out_S.extend([S_1_FR])
     out_S.extend(S_2_list)
     out_S = concatenate(out_S)
     # good spot to print shapes

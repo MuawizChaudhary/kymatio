@@ -9,24 +9,24 @@ import numpy as np
 
 backends = []
 skcuda_available = False
-try:
-    if torch.cuda.is_available():
-        from skcuda import cublas
-        import cupy
-        skcuda_available = True
-except:
-    Warning('torch_skcuda backend not available.')
+#try:
+#    if torch.cuda.is_available():
+#        from skcuda import cublas
+#        import cupy
+#        skcuda_available = True
+#except:
+#    Warning('torch_skcuda backend not available.')
 
-if skcuda_available:
-    from kymatio.scattering1d.backend.torch_skcuda_backend import backend
-    backends.append(backend)
+#if skcuda_available:
+#    from kymatio.scattering1d.backend.torch_skcuda_backend import backend
+#    backends.append(backend)
 
 from kymatio.scattering1d.backend.torch_backend import backend
 backends.append(backend)
 
 
 if torch.cuda.is_available():
-    devices = ['cuda', 'cpu']
+    devices = ['cuda']
 else:
     devices = ['cpu']
 
@@ -40,11 +40,16 @@ def test_instantiation(device, backend, random_state=42):
     Q = 8
     N = 2**9
     jtfs = TimeFrequencyScatteringTorch(J, N, Q, backend=backend).to(device)
+    S1D = Scattering1D(J, N, Q, backend=backend).to(device)
 
     # zero signal
     x0 = torch.zeros(2, N).to(device)
     S_x = jtfs(x0)
+    print(x0.shape)
+    print(S_x.shape, N, len(jtfs.sc_freq.psi1_f))
+    print(S1D(x0).shape, N, len(jtfs.sc_freq.psi1_f))
 
+    assert False
 
 
 @pytest.mark.parametrize("device", devices)

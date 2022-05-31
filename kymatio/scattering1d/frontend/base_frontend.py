@@ -77,6 +77,8 @@ class ScatteringBase1D(ScatteringBase):
             alpha=self.alpha, P_max=self.P_max, eps=self.eps,
             criterion_amplitude=self.criterion_amplitude,
             normalize=self.normalize)
+        # need to do different type of padding for frequency, pad every
+        # sequenc to the length the longest sequence would be after padding
         # to avoid padding more than N - 1 on the left and on the right,
         # since otherwise torch sends nans
         J_max_support = int(np.floor(np.log2(3 * self.N - 2)))

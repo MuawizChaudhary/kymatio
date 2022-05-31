@@ -189,6 +189,7 @@ class TorchBackend:
             raise RuntimeError('The filters are not compatible for multiplication.')
 
         if A.dtype is not B.dtype:
+            print(A.dtype, B.dtype)
             raise TypeError('Input and filter must be of the same dtype.')
 
         if B.device.type == 'cuda':
