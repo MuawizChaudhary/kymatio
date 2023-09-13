@@ -9,13 +9,21 @@ Based on pytorch example for CIFAR10
 import torch.optim
 from torchvision import datasets, transforms
 import torch.nn.functional as F
-from kymatio import Scattering2D
+from kymatio.torch import Scattering2D
 import torch
 import argparse
-import kymatio.datasets as scattering_datasets
 import torch.nn as nn
 from numpy.random import RandomState
 import numpy as np
+import random
+
+def set_seed(seed=0):
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    random.seed(seed)
+    np.random.seed(seed)
+
 
 
 class Identity(nn.Module):
@@ -168,11 +176,13 @@ def main():
                         help='samples per class')
     parser.add_argument('--learning_schedule_multi', type=int, default=10,
                         help='samples per class')
-    parser.add_argument('--seed', type=int, default=0,
+    parser.add_argument('--dataset_seed', type=int, default=0,
                         help='seed for dataset subselection')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='seed for random')
     parser.add_argument('--width', type=int, default=2,help='width factor for resnet')
     args = parser.parse_args()
-
+    set_seed(args.seed)
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
@@ -185,6 +195,7 @@ def main():
         model = Scattering2dResNet(8, args.width,standard=True).to(device)
         scattering = Identity()
 
+    set_seed(args.seed)
 
     # DataLoaders
     num_workers = 4
@@ -198,14 +209,14 @@ def main():
 
 
     #####cifar data
-    cifar_data = datasets.CIFAR10(root=scattering_datasets.get_dataset_dir('CIFAR'), train=True, transform=transforms.Compose([
+    cifar_data = datasets.CIFAR10(root='.', train=True, transform=transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, 4),
             transforms.ToTensor(),
             normalize,
         ]), download=True)
     # Extract a subset of X samples per class
-    prng = RandomState(args.seed)
+    prng = RandomState(args.dataset_seed)
     random_permute = prng.permutation(np.arange(0, 5000))[0:args.num_samples]
     indx = np.concatenate([np.where(np.array(cifar_data.targets) == classe)[0][random_permute] for classe in range(0, 10)])
 
@@ -215,7 +226,7 @@ def main():
                                                pin_memory=pin_memory)
 
     test_loader = torch.utils.data.DataLoader(
-        datasets.CIFAR10(root=scattering_datasets.get_dataset_dir('CIFAR'), train=False, transform=transforms.Compose([
+        datasets.CIFAR10(root='.', train=False, transform=transforms.Compose([
             transforms.ToTensor(),
             normalize,
         ])),
@@ -230,6 +241,7 @@ def main():
     M = args.learning_schedule_multi
     drops = [60*M,120*M,160*M]
     scheduler = torch.optim.MultiStepLR(optimizer, drops, gamma=0.2)
+    set_seed(args.seed)
     for epoch in range(0, 200*M):
         train(model, device, train_loader, optimizer, epoch+1, scattering)
         scheduler.step()

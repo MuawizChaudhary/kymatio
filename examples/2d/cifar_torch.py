@@ -11,8 +11,17 @@ import torch.nn.functional as F
 import torch.optim
 from torchvision import datasets, transforms
 from kymatio.torch import Scattering2D
-import kymatio.datasets as scattering_datasets
 import argparse
+import numpy as np
+import random
+
+def set_seed(seed=0):
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    random.seed(seed)
+    np.random.seed(seed)
+
 
 
 class Scattering2dCNN(nn.Module):
@@ -118,7 +127,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MNIST scattering  + hybrid examples')
     parser.add_argument('--mode', type=int, default=1,help='scattering 1st or 2nd order')
     parser.add_argument('--classifier', type=str, default='cnn',help='classifier model')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='seed for random')
+ 
     args = parser.parse_args()
+    set_seed(args.seed)
     assert(args.classifier in ['linear','mlp','cnn'])
 
     use_cuda = torch.cuda.is_available()
@@ -137,6 +150,7 @@ if __name__ == '__main__':
 
     model = Scattering2dCNN(K,args.classifier).to(device)
 
+    set_seed(args.seed)
     # DataLoaders
     num_workers = 4
     if use_cuda:
@@ -148,7 +162,7 @@ if __name__ == '__main__':
                                      std=[0.229, 0.224, 0.225])
 
     train_loader = torch.utils.data.DataLoader(
-        datasets.CIFAR10(root=scattering_datasets.get_dataset_dir('CIFAR'), train=True, transform=transforms.Compose([
+        datasets.CIFAR10(root='.', train=True, transform=transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, 4),
             transforms.ToTensor(),
@@ -157,7 +171,7 @@ if __name__ == '__main__':
         batch_size=128, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 
     test_loader = torch.utils.data.DataLoader(
-        datasets.CIFAR10(root=scattering_datasets.get_dataset_dir('CIFAR'), train=False, transform=transforms.Compose([
+        datasets.CIFAR10(root='.', train=False, transform=transforms.Compose([
             transforms.ToTensor(),
             normalize,
         ])),
@@ -166,7 +180,8 @@ if __name__ == '__main__':
     # Optimizer
     lr = 0.1
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9,
-                                        weight_decay=0.0005)
+                                       weight_decay=0.0005)
+    set_seed(args.seed)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
     for epoch in range(0, 90):
